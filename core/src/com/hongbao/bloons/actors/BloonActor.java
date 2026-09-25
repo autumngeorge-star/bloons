@@ -24,6 +24,8 @@ public class BloonActor extends RenderableActor {
 	private Long bloonId;
 	private Bloon bloon;
 	private float collisionRadius;
+	private int gridCol = -1;
+	private int gridRow = -1;
 	
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
@@ -69,6 +71,33 @@ public class BloonActor extends RenderableActor {
 		this.collisionRadius = collisionRadius;
 	}
 	
+	public int getGridCol() {
+		return gridCol;
+	}
+
+	public void setGridCol(int gridCol) {
+		this.gridCol = gridCol;
+	}
+
+	public int getGridRow() {
+		return gridRow;
+	}
+
+	public void setGridRow(int gridRow) {
+		this.gridRow = gridRow;
+	}
+
+	@Override
+	protected void positionChanged() {
+		super.positionChanged();
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+			if (app.getMap() != null && app.getMap().getBloonManager() != null) {
+				app.getMap().getBloonManager().updateBloonGridPosition(this);
+			}
+		}
+	}
+
 	public Long getBloonId() {
 		return bloonId;
 	}
