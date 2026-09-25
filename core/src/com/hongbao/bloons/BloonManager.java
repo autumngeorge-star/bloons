@@ -2,6 +2,7 @@ package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
@@ -24,6 +25,7 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private BloonTextureCache bloonTextureCache;
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
@@ -31,6 +33,11 @@ public class BloonManager {
 		onstageBloons = new HashSet<>();
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
+		bloonTextureCache = BloonTextureCache.getInstance();
+	}
+
+	public BloonTextureCache getBloonTextureCache() {
+		return bloonTextureCache;
 	}
 
 	public void nextLevel() {
@@ -61,7 +68,8 @@ public class BloonManager {
 		Set<Bloon> bloonsToBeCreated = bloonQueue.getBloons();
 		
 		for (Bloon bloon : bloonsToBeCreated) {
-			BloonActor actor = new BloonActor(bloon, -25, 425, null); // todo make these numbers an attribute in map or something
+			TextureRegion textureRegion = bloonTextureCache.getTextureRegion(bloon.getImageFileName());
+			BloonActor actor = new BloonActor(bloon, textureRegion, -25, 425, null); // todo make these numbers an attribute in map or something
 			stage.addActor(actor);
 			onstageBloons.add(actor);
 		}
@@ -106,11 +114,12 @@ public class BloonManager {
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
 				BloonActor generatedBloonActor;
+				TextureRegion textureRegion = bloonTextureCache.getTextureRegion(bloon.getImageFileName());
 				if (previousBloonActor == null) {
-					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
+					 generatedBloonActor = new BloonActor(bloon, textureRegion, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
 				} else {
 					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
-					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
+					generatedBloonActor = new BloonActor(bloon, textureRegion, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
 				}
 				stage.addActor(generatedBloonActor);
 				onstageBloons.add(generatedBloonActor);
@@ -208,6 +217,23 @@ public class BloonManager {
 		}
 		
 		return bloonActor;
+	}
+
+	public void reset() {
+		for (BloonActor bloonActor : onstageBloons) {
+			bloonActor.remove();
+		}
+		onstageBloons.clear();
+		if (bloonTextureCache != null) {
+			bloonTextureCache.dispose();
+		}
+	}
+
+	public void dispose() {
+		reset();
+		if (popSound != null) {
+			popSound.dispose();
+		}
 	}
 	
 }
