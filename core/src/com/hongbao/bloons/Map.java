@@ -35,6 +35,7 @@ public class Map {
 	public static final int TILE_HEIGHT = 50;
 
 	private String backgroundImage;
+	private MapType mapType;
 	private BloonManager bloonManager;
 	private Pair<Float, Float>[][] directions;
 	private Set<GirlActor> onStageGirls;
@@ -178,6 +179,18 @@ public class Map {
         });
         sellBackground.addAction(Actions.repeat(RepeatAction.FOREVER, sellLabelAction));
 		sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
+	}
+
+	public MapType getMapType() {
+		return mapType;
+	}
+
+	public void setMapType(MapType mapType) {
+		this.mapType = mapType;
+	}
+
+	public String getMapId() {
+		return mapType != null ? mapType.getId() : "basic";
 	}
 
 	public void setDirections(Pair<Float, Float>[][] directions) {
