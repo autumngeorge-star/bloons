@@ -4,3 +4,16 @@ sourceCompatibility = 8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.resources.srcDirs = [ "assets/" ]
+sourceSets.test.java.srcDirs = [ "test/" ]
+sourceSets.test.resources.srcDirs = [ "assets/" ]
+
+task testUIManager(type: JavaExec) {
+    mainClass = "com.hongbao.bloons.UIManagerTest"
+    classpath = sourceSets.test.runtimeClasspath
+    workingDir = file("assets")
+}
+
+test.dependsOn testUIManager
+
+
