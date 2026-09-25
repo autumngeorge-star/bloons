@@ -153,6 +153,7 @@ public class Bloon {
 
 	public void setCamo(boolean camo) {
 		this.camo = camo;
+		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
 	}
 
 	public boolean isRegen() {
@@ -161,6 +162,7 @@ public class Bloon {
 
 	public void setRegen(boolean regen) {
 		this.regen = regen;
+		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
 	}
 	
 	public boolean willPopBloon(int damage) {

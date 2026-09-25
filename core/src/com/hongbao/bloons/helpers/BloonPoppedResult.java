@@ -49,9 +49,9 @@ public class BloonPoppedResult {
 	public BloonPoppedResult(Bloon bloon, int damage) {
 		bloonsGenerated = new HashSet<>();
 		
-		if (bloon.getHealth() > damage) {
+		int newBloonHealth = bloon.getHealth() - damage;
+		if (newBloonHealth >= 1) {
 			Bloon.Color originalColor = bloon.getColor();
-			int newBloonHealth = bloon.getHealth() - damage;
 			Bloon.Color poppedColor = Bloon.getColorFromHealth(newBloonHealth);
 			
 			int bloonsToBeCreated = COLOR_TO_RATIO.get(poppedColor) / COLOR_TO_RATIO.get(originalColor);
@@ -59,6 +59,8 @@ public class BloonPoppedResult {
 			for (int x = 0; x < bloonsToBeCreated; x++) {
 				Bloon bloonOfType = BloonFactory.createBloonOfType(poppedColor.getValue(), newBloonHealth);
 				bloonOfType.setDistanceTravelled(bloon.getDistanceTravelled());
+				bloonOfType.setCamo(bloon.isCamo());
+				bloonOfType.setRegen(bloon.isRegen());
 				bloonsGenerated.add(bloonOfType);
 			}
 		}
