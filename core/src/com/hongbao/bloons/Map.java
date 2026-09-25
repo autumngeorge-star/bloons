@@ -20,6 +20,8 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.actors.SpellCardActor;
+import com.hongbao.bloons.components.AbilityCooldownManager;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -94,15 +96,31 @@ public class Map {
 		rightDataBackground.setColor(Color.BLACK);
 		final RunnableAction rightDataLabelAction = new RunnableAction();
 		rightDataLabelAction.setRunnable(() -> {
-			Girl girl = getSelectedGirl().getGirl();
+			GirlActor selected = getSelectedGirl();
+			if (selected == null) {
+				return;
+			}
+			Girl girl = selected.getGirl();
 			Girl upgradedStats = girl.getUpgradedStats();
+			AbilityCooldownManager cooldownManager = selected.getAbilityCooldownManager();
+
+			String abilityText = "Ability: N/A";
+			if (cooldownManager != null && cooldownManager.hasAbility()) {
+				float progress = cooldownManager.getCooldownProgress();
+				if (cooldownManager.isReady()) {
+					abilityText = "Ability: Ready";
+				} else {
+					abilityText = String.format("Ability: %.1fs", cooldownManager.getRemainingSeconds());
+				}
+			}
+
 			if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
 				rightDataActor.getActor().setText(
 				  "Range: " + (int)girl.getRange() + " (" + (int)upgradedStats.getRange() + ")\n" +
 				  "Upgrade: " + girl.getUpgradeCostString() + " (" + upgradedStats.getUpgradeCostString() + ")\n" +
 				  "Sell: $" + girl.getSellPrice() + "\n" +
 				  " \n" +
-				  " "
+				  abilityText
 				);
 			} else {
 				rightDataActor.getActor().setText(
@@ -110,7 +128,7 @@ public class Map {
 				  "Upgrade: " + girl.getUpgradeCostString() + "\n" +
 				  "Sell: $" + girl.getSellPrice() + "\n" +
 				  " \n" +
-				  " "
+				  abilityText
 				);
 			}
 		});
@@ -274,7 +292,13 @@ public class Map {
 	
 	public void placeSpellCard() {
 		if (selectedGirl != null) {
-			stage.addActor(selectedGirl.createSpellCardActor());
+			AbilityCooldownManager cooldownManager = selectedGirl.getAbilityCooldownManager();
+			if (cooldownManager != null && cooldownManager.isReady()) {
+				SpellCardActor spellCardActor = selectedGirl.createSpellCardActor();
+				if (spellCardActor != null) {
+					stage.addActor(spellCardActor);
+				}
+			}
 		}
 	}
 	
@@ -294,7 +318,22 @@ public class Map {
 	public void showGirlDetailsModule() {
 		hideGirlDetailsModule();
 
-		Girl girl = getSelectedGirl().getGirl();
+		GirlActor selected = getSelectedGirl();
+		if (selected == null) {
+			return;
+		}
+		Girl girl = selected.getGirl();
+		AbilityCooldownManager cooldownManager = selected.getAbilityCooldownManager();
+
+		String abilityText = "Ability: N/A";
+		if (cooldownManager != null && cooldownManager.hasAbility()) {
+			float progress = cooldownManager.getCooldownProgress();
+			if (cooldownManager.isReady()) {
+				abilityText = "Ability: Ready";
+			} else {
+				abilityText = String.format("Ability: %.1fs", cooldownManager.getRemainingSeconds());
+			}
+		}
 
 		leftDataActor.getActor().setText(
 		 		girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
@@ -308,7 +347,7 @@ public class Map {
 				"Upgrade: " + girl.getUpgradeCostString() + "\n" +
 				"Sell: $" + girl.getSellPrice() + "\n" +
 				" \n" +
-				" "
+				abilityText
 		);
 		stage.addActor(infoBackground);
 		stage.addActor(leftDataActor);

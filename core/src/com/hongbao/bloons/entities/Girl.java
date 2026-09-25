@@ -23,9 +23,14 @@ public class Girl {
 	private List<Integer> upgradeCost;
 	private int level;
 	private int totalInvestment;
+	private float abilityCooldown;
 	
 	
 	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+		this(name, attackDelay, bulletSpeed, damage, pierce, range, visualRange, homing, imageFileName, bulletFileName, cost, upgradeCost, 0f);
+	}
+
+	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost, float abilityCooldown) {
 		this.name = name;
 		this.attackDelay = attackDelay;
 		this.cooldown = attackDelay.get(0);
@@ -39,6 +44,7 @@ public class Girl {
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
 		this.upgradeCost = upgradeCost;
+		this.abilityCooldown = abilityCooldown;
 		level = 0;
 		totalInvestment = cost;
 	}
@@ -139,6 +145,10 @@ public class Girl {
 		return currentCash >= getUpgradeCost();
 	}
 	
+	public float getAbilityCooldown() {
+		return abilityCooldown;
+	}
+
 	public Girl getUpgradedStats() {
 		if (getUpgradeCost() != NO_UPGRADES_AVAILABLE) {
 			Girl upgradedGirl = new Girl(
@@ -153,7 +163,8 @@ public class Girl {
 			 imageFileName,
 			 bulletFileName,
 			 cost,
-			 upgradeCost
+			 upgradeCost,
+			 abilityCooldown
 			);
 			upgradedGirl.level = level + 1;
 			return upgradedGirl;
