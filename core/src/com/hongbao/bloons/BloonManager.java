@@ -24,6 +24,8 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private ProgressionManager progressionManager;
+	private int lastRecordedCompletedLevel;
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
@@ -31,6 +33,33 @@ public class BloonManager {
 		onstageBloons = new HashSet<>();
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
+		progressionManager = new ProgressionManager();
+		lastRecordedCompletedLevel = 0;
+	}
+
+	public ProgressionManager getProgressionManager() {
+		return progressionManager;
+	}
+
+	public void setProgressionManager(ProgressionManager progressionManager) {
+		this.progressionManager = progressionManager;
+	}
+
+	public boolean isWaveActive() {
+		return !onstageBloons.isEmpty() || (!bloonQueue.isEmpty() && getLevel() > 0);
+	}
+
+	public void checkLevelCompletion() {
+		if (map != null && map.getMapType() != null && onstageBloons.isEmpty() && bloonQueue.isEmpty()) {
+			int level = getLevel();
+			if (level > 0 && level > lastRecordedCompletedLevel) {
+				lastRecordedCompletedLevel = level;
+				boolean isWon = !bloonQueue.hasNextLevel();
+				if (progressionManager != null) {
+					progressionManager.recordLevelCompletion(map.getMapType(), level, isWon);
+				}
+			}
+		}
 	}
 
 	public void nextLevel() {
@@ -46,6 +75,7 @@ public class BloonManager {
 	}
 
 	public boolean canGoToNextLevel() {
+		checkLevelCompletion();
 		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 
@@ -54,6 +84,7 @@ public class BloonManager {
 	}
 
 	public boolean hasWonGame() {
+		checkLevelCompletion();
 		return !bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 	
@@ -118,6 +149,7 @@ public class BloonManager {
 			}
 			
 			popSound.play(0.5f);
+			checkLevelCompletion();
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
@@ -187,6 +219,7 @@ public class BloonManager {
 
 	public void removeBloonFromStage(BloonActor actor) {
 		onstageBloons.remove(actor);
+		checkLevelCompletion();
 	}
 	
 	public BloonActor getNewHomingTarget(BulletActor bulletActor) {

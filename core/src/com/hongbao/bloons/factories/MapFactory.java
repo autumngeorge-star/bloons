@@ -9,8 +9,35 @@ public class MapFactory {
 	
 	public static final float ROOT_2_OVER_2 = 0.7071f;
 	
+	public static Map createMap(com.hongbao.bloons.MapType mapType, Stage stage) {
+		if (mapType == null) {
+			mapType = com.hongbao.bloons.MapType.BASIC_MAP;
+		}
+		switch (mapType) {
+			case MAP_WITH_TURN:
+				return createMapWithTurn(stage);
+			case HEATER_MAP:
+				return createHeaterMap(stage);
+			case BASIC_MAP:
+			default:
+				return createBasicMap(stage);
+		}
+	}
+
+	public static boolean isMapUnlocked(com.hongbao.bloons.MapType mapType, com.hongbao.bloons.ProgressionManager progressionManager) {
+		if (progressionManager == null || mapType == null) {
+			return false;
+		}
+		return progressionManager.isMapUnlocked(mapType);
+	}
+
+	public static com.hongbao.bloons.MapType getPrerequisiteMap(com.hongbao.bloons.MapType mapType) {
+		return mapType != null ? mapType.getPrerequisiteMap() : null;
+	}
+
 	public static Map createBasicMap(Stage stage) {
 		Map map = new Map("basic_map.png", stage);
+		map.setMapType(com.hongbao.bloons.MapType.BASIC_MAP);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		for (int x = 0; x < 32; x++) {
@@ -23,6 +50,7 @@ public class MapFactory {
 	
 	public static Map createMapWithTurn(Stage stage) {
 		Map map = new Map("map_with_turn.png", stage);
+		map.setMapType(com.hongbao.bloons.MapType.MAP_WITH_TURN);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		directions[0][8] = new Pair<>(1f, 0f);
 		directions[1][8] = new Pair<>(1f, 0f);
@@ -43,6 +71,7 @@ public class MapFactory {
 	
 	public static Map createHeaterMap(Stage stage) {
 		Map map = new Map("heater.png", stage);
+		map.setMapType(com.hongbao.bloons.MapType.HEATER_MAP);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		directions[0][8] = new Pair<>(1f, 0f);
