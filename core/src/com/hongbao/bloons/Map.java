@@ -221,6 +221,20 @@ public class Map {
 		}
 	}
 
+	public Set<GirlActor> getOnStageGirls() {
+		return onStageGirls;
+	}
+
+	public void clearGirls() {
+		if (onStageGirls != null) {
+			for (GirlActor girlActor : new HashSet<>(onStageGirls)) {
+				girlActor.remove();
+			}
+			onStageGirls.clear();
+		}
+		setSelectedGirl(null);
+	}
+
 	public BloonManager getBloonManager() {
 		return bloonManager;
 	}

@@ -27,7 +27,10 @@ import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
+import com.hongbao.bloons.event.GameOverEvent;
+import com.hongbao.bloons.event.PauseEvent;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.state.GameStateManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +52,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private GameStateManager gameStateManager;
+	private boolean gameOverDispatched = false;
 	
 	
 	@Override
@@ -70,6 +75,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		Gdx.input.setInputProcessor(stage);
 		
 		createMap();
+		gameStateManager = new GameStateManager(this);
 		createMenu();
 		createInstructions();
 		musicPlayer.playTitleMusic();
@@ -206,7 +212,15 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			((Label)healthLabelAction.getActor()).setText(String.valueOf(player.getHealth()));
 			
 			if (player.getHealth() == 0) {
+				if (!gameOverDispatched) {
+					gameOverDispatched = true;
+					if (gameStateManager != null) {
+						gameStateManager.dispatchEvent(new GameOverEvent());
+					}
+				}
 				pause();
+			} else {
+				gameOverDispatched = false;
 			}
 		});
 		healthLabel.addAction(Actions.repeat(RepeatAction.FOREVER, healthLabelAction));
@@ -403,6 +417,61 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		yuyukoCost.setFontScale(1.5f,1.5f);
 		yuyukoCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
 		stage.addActor(new RenderableLabel(yuyukoCost, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label save1Label = new Label("SAVE S1", skin);
+		save1Label.setPosition(1510, 110);
+		save1Label.setFontScale(1.1f, 1.1f);
+		save1Label.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				gameStateManager.saveStateAsync(GameStateManager.SLOT_1);
+			}
+		});
+		stage.addActor(new RenderableLabel(save1Label, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label save2Label = new Label("SAVE S2", skin);
+		save2Label.setPosition(1650, 110);
+		save2Label.setFontScale(1.1f, 1.1f);
+		save2Label.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				gameStateManager.saveStateAsync(GameStateManager.SLOT_2);
+			}
+		});
+		stage.addActor(new RenderableLabel(save2Label, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label load1Label = new Label("LOAD S1", skin);
+		load1Label.setPosition(1510, 80);
+		load1Label.setFontScale(1.1f, 1.1f);
+		load1Label.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				gameStateManager.loadState(GameStateManager.SLOT_1);
+			}
+		});
+		stage.addActor(new RenderableLabel(load1Label, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label load2Label = new Label("LOAD S2", skin);
+		load2Label.setPosition(1650, 80);
+		load2Label.setFontScale(1.1f, 1.1f);
+		load2Label.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				gameStateManager.loadState(GameStateManager.SLOT_2);
+			}
+		});
+		stage.addActor(new RenderableLabel(load2Label, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label loadAutoLabel = new Label("LOAD AUTO", skin);
+		loadAutoLabel.setPosition(1510, 50);
+		loadAutoLabel.setFontScale(1.1f, 1.1f);
+		loadAutoLabel.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				gameStateManager.loadState(GameStateManager.AUTO_SAVE_SLOT);
+			}
+		});
+		stage.addActor(new RenderableLabel(loadAutoLabel, ZIndex.MENU_ITEM_Z_INDEX));
 	}
 	
 	private RunnableAction createNewCostLabelAction() {
@@ -526,6 +595,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
 				autoContinue = !autoContinue;
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+				gameStateManager.saveStateAsync(GameStateManager.SLOT_1);
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+				gameStateManager.loadState(GameStateManager.SLOT_1);
 			}
 			
 			if (girl != null) {
@@ -559,10 +632,17 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		}
 	}
 
+	public GameStateManager getGameStateManager() {
+		return gameStateManager;
+	}
+
 	@Override
 	public void pause() {
 		paused = true;
 		musicPlayer.pause();
+		if (gameStateManager != null) {
+			gameStateManager.dispatchEvent(new PauseEvent());
+		}
 	}
 
 	@Override
@@ -573,6 +653,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		if (gameStateManager != null) {
+			gameStateManager.shutdown();
+		}
 		stage.dispose();
 	}
 

@@ -42,6 +42,10 @@ public class BloonManager {
 			} else if (map.getBloonManager().getLevel() == 40) {
 				musicPlayer.playFinalBossMusic();
 			}
+			BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+			if (app.getGameStateManager() != null) {
+				app.getGameStateManager().dispatchEvent(new com.hongbao.bloons.event.WaveCompleteEvent(getLevel()));
+			}
 		}
 	}
 
@@ -51,6 +55,14 @@ public class BloonManager {
 
 	public int getLevel() {
 		return bloonQueue.getLevel();
+	}
+
+	public void setLevel(int level) {
+		bloonQueue.setLevel(level);
+		for (BloonActor bloonActor : new java.util.ArrayList<>(onstageBloons)) {
+			bloonActor.remove();
+		}
+		onstageBloons.clear();
 	}
 
 	public boolean hasWonGame() {
