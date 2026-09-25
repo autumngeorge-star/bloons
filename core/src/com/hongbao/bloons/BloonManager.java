@@ -56,6 +56,18 @@ public class BloonManager {
 	public boolean hasWonGame() {
 		return !bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
+
+	public void resetStage() {
+		for (BloonActor bloonActor : new HashSet<>(onstageBloons)) {
+			bloonActor.remove();
+		}
+		onstageBloons.clear();
+		BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+		if (app != null) {
+			app.unloadBloonAssets();
+			app.loadBloonAssets();
+		}
+	}
 	
 	public void createBloons() {
 		Set<Bloon> bloonsToBeCreated = bloonQueue.getBloons();

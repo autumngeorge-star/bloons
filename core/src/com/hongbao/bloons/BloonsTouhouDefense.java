@@ -3,9 +3,11 @@ package com.hongbao.bloons;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -48,15 +50,22 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Map map;
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
+	private AssetManager assetManager;
 	public List<RenderableImageButton> instructions;
 	
 	
 	@Override
 	public void create() {
-		Gdx.graphics.setWindowedMode(1800, 900);
+		if (Gdx.graphics.supportsDisplayModeChange()) {
+			Gdx.graphics.setWindowedMode(1800, 900);
+		}
 		paused = false;
 		tripleSpeed = false;
 		autoContinue = false;
+		assetManager = new AssetManager();
+		assetManager.load("bloons.atlas", TextureAtlas.class);
+		assetManager.finishLoading();
+
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
 		musicPlayer = new MusicPlayer();
@@ -450,6 +459,23 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
 	}
+
+	public AssetManager getAssetManager() {
+		return assetManager;
+	}
+
+	public void unloadBloonAssets() {
+		if (assetManager != null && assetManager.isLoaded("bloons.atlas")) {
+			assetManager.unload("bloons.atlas");
+		}
+	}
+
+	public void loadBloonAssets() {
+		if (assetManager != null && !assetManager.isLoaded("bloons.atlas")) {
+			assetManager.load("bloons.atlas", TextureAtlas.class);
+			assetManager.finishLoading();
+		}
+	}
 	
 	@Override
 	public void resize(int width, int height) {
@@ -574,6 +600,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void dispose() {
 		stage.dispose();
+		if (assetManager != null) {
+			assetManager.dispose();
+		}
 	}
 
 }
