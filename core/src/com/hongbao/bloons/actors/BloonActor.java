@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bloon;
+import com.hongbao.bloons.entities.BloonStateChangeListener;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -15,7 +16,7 @@ import java.util.Random;
 import java.util.Set;
 
 
-public class BloonActor extends RenderableActor {
+public class BloonActor extends RenderableActor implements BloonStateChangeListener {
 	
 	public static final float SCALE = 0.5f;
 	public static final Random RANDOM = new Random();
@@ -27,6 +28,9 @@ public class BloonActor extends RenderableActor {
 	
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
+		if (this.bloon != null) {
+			this.bloon.addStateChangeListener(this);
+		}
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
 
 		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
@@ -48,7 +52,33 @@ public class BloonActor extends RenderableActor {
 	}
 
 	public void setBloon(Bloon bloon) {
+		if (this.bloon != null) {
+			this.bloon.removeStateChangeListener(this);
+		}
 		this.bloon = bloon;
+		if (this.bloon != null) {
+			this.bloon.addStateChangeListener(this);
+			onBloonStateChanged(this.bloon);
+		}
+	}
+
+	@Override
+	public void onBloonStateChanged(Bloon bloon) {
+		if (bloon == null) {
+			return;
+		}
+		float centerX = getCenterX();
+		float centerY = getCenterY();
+
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
+
+		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+		float width = textureRegion.getTexture().getWidth() * SCALE;
+		float height = textureRegion.getTexture().getHeight() * SCALE;
+		collisionRadius = width / 2f;
+		setBounds(centerX - width / 2f, centerY - height / 2f, width, height);
 	}
 	
 	@Override
@@ -84,16 +114,34 @@ public class BloonActor extends RenderableActor {
 	
 	// Please avoid calling this method directly, instead use the BloonManager pop()
 	public BloonPoppedResult pop(int damage) {
+		if (bloon != null) {
+			bloon.removeStateChangeListener(this);
+		}
 		BloonPoppedResult bloonPoppedResult = bloon.pop(damage);
-		textureRegion.getTexture().dispose();
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
 		return bloonPoppedResult;
 	}
 	
 	public void release() {
+		if (bloon != null) {
+			bloon.removeStateChangeListener(this);
+		}
 		((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
-		textureRegion.getTexture().dispose();
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
+	}
+
+	@Override
+	public boolean remove() {
+		if (bloon != null) {
+			bloon.removeStateChangeListener(this);
+		}
+		return super.remove();
 	}
 	
 	public void move(Pair<Float, Float> direction) {

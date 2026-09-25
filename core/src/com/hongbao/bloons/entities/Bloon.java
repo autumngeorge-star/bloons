@@ -3,7 +3,9 @@ package com.hongbao.bloons.entities;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.hongbao.bloons.entities.Bloon.Color.BFB;
 import static com.hongbao.bloons.entities.Bloon.Color.BLACK;
@@ -93,6 +95,7 @@ public class Bloon {
 	private int distanceTravelled;
 	private boolean camo;
 	private boolean regen;
+	private final List<BloonStateChangeListener> stateChangeListeners = new CopyOnWriteArrayList<>();
 
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
@@ -103,12 +106,46 @@ public class Bloon {
 		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
 	}
 
+	public void addStateChangeListener(BloonStateChangeListener listener) {
+		if (listener != null && !stateChangeListeners.contains(listener)) {
+			stateChangeListeners.add(listener);
+		}
+	}
+
+	public void removeStateChangeListener(BloonStateChangeListener listener) {
+		if (listener != null) {
+			stateChangeListeners.remove(listener);
+		}
+	}
+
+	public void notifyStateChanged() {
+		for (BloonStateChangeListener listener : stateChangeListeners) {
+			listener.onBloonStateChanged(this);
+		}
+	}
+
+	private void updateStateProperties() {
+		Color newColor = getColorFromHealth(this.health);
+		if (newColor != null) {
+			this.color = newColor;
+			if (COLOR_TO_SPEED.containsKey(newColor)) {
+				this.speed = COLOR_TO_SPEED.get(newColor);
+			}
+		}
+		this.imageFileName = createImageFileName(this.color.getValue(), this.camo, this.regen);
+	}
+
 	public Color getColor() {
 		return color;
 	}
 
 	public void setColor(Color color) {
 		this.color = color;
+		if (COLOR_TO_SPEED.containsKey(color)) {
+			this.speed = COLOR_TO_SPEED.get(color);
+		}
+		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
+		notifyStateChanged();
 	}
 
 	public String getImageFileName() {
@@ -117,6 +154,7 @@ public class Bloon {
 
 	public void setImageFileName(String imageFileName) {
 		this.imageFileName = imageFileName;
+		notifyStateChanged();
 	}
 
 	public int getHealth() {
@@ -125,6 +163,8 @@ public class Bloon {
 
 	public void setHealth(int health) {
 		this.health = health;
+		updateStateProperties();
+		notifyStateChanged();
 	}
 	
 	public int getSpeed() {
@@ -153,6 +193,8 @@ public class Bloon {
 
 	public void setCamo(boolean camo) {
 		this.camo = camo;
+		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
+		notifyStateChanged();
 	}
 
 	public boolean isRegen() {
@@ -161,6 +203,8 @@ public class Bloon {
 
 	public void setRegen(boolean regen) {
 		this.regen = regen;
+		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
+		notifyStateChanged();
 	}
 	
 	public boolean willPopBloon(int damage) {
@@ -176,6 +220,8 @@ public class Bloon {
 	
 	public void damage(int damage) {
 		this.health -= damage;
+		updateStateProperties();
+		notifyStateChanged();
 	}
 
 	public BloonPoppedResult pop(int damage) {
