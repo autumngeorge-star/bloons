@@ -112,6 +112,10 @@ gradle-app.setting
 .DS_Store
 Thumbs.db
 
+## Save Games
+saves/
+test_saves*/
+
 ## iOS
 /ios/xcode/*.xcodeproj/*
 !/ios/xcode/*.xcodeproj/xcshareddata

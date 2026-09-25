@@ -21,7 +21,11 @@ public class Player {
 	public int getMoney() {
 		return money;
 	}
-	
+
+	public void setMoney(int money) {
+		this.money = money;
+	}
+
 	public void earnMoney(int money) {
 		this.money += money;
 	}
@@ -38,7 +42,11 @@ public class Player {
 	public int getHealth() {
 		return health;
 	}
-	
+
+	public void setHealth(int health) {
+		this.health = health;
+	}
+
 	public void decreaseHealth(int health) {
 		this.health -= health;
 		if (this.health < 0) {
