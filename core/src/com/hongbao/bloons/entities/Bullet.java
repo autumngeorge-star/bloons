@@ -18,6 +18,11 @@ public class Bullet {
 
 	private float initialDXOverride;
 	private float initialDYOverride;
+
+	private StatusType statusType = StatusType.NONE;
+	private float statusDuration = 0f;
+	private int statusDotDamage = 0;
+	private float statusDotInterval = 0f;
 	
 	public Bullet() {
 		speed = 20f;
@@ -37,6 +42,18 @@ public class Bullet {
 		this.imageFileName = IMAGE_FOLDER + imageFileName;
 		distanceTraveled = 0;
 		this.homing = homing;
+	}
+
+	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName, StatusType statusType, float statusDuration) {
+		this(speed, damage, pierce, maxRange, homing, imageFileName);
+		this.statusType = statusType;
+		this.statusDuration = statusDuration;
+	}
+
+	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName, StatusType statusType, float statusDuration, int statusDotDamage, float statusDotInterval) {
+		this(speed, damage, pierce, maxRange, homing, imageFileName, statusType, statusDuration);
+		this.statusDotDamage = statusDotDamage;
+		this.statusDotInterval = statusDotInterval;
 	}
 	
 	public float getSpeed() {
@@ -125,5 +142,48 @@ public class Bullet {
 	
 	public void setInitialDYOverride(float initialDYOverride) {
 		this.initialDYOverride = initialDYOverride;
+	}
+
+	public StatusType getStatusType() {
+		return statusType;
+	}
+
+	public void setStatusType(StatusType statusType) {
+		this.statusType = statusType;
+	}
+
+	public float getStatusDuration() {
+		return statusDuration;
+	}
+
+	public void setStatusDuration(float statusDuration) {
+		this.statusDuration = statusDuration;
+	}
+
+	public int getStatusDotDamage() {
+		return statusDotDamage;
+	}
+
+	public void setStatusDotDamage(int statusDotDamage) {
+		this.statusDotDamage = statusDotDamage;
+	}
+
+	public float getStatusDotInterval() {
+		return statusDotInterval;
+	}
+
+	public void setStatusDotInterval(float statusDotInterval) {
+		this.statusDotInterval = statusDotInterval;
+	}
+
+	public void setStatusEffect(StatusType statusType, float duration) {
+		setStatusEffect(statusType, duration, 0, 0f);
+	}
+
+	public void setStatusEffect(StatusType statusType, float duration, int dotDamage, float dotInterval) {
+		this.statusType = statusType;
+		this.statusDuration = duration;
+		this.statusDotDamage = dotDamage;
+		this.statusDotInterval = dotInterval;
 	}
 }

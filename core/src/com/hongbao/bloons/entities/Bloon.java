@@ -94,6 +94,13 @@ public class Bloon {
 	private boolean camo;
 	private boolean regen;
 
+	private float slowTimer;
+	private float freezeTimer;
+	private float dotTimer;
+	private float dotInterval;
+	private float dotTickTimer;
+	private int dotDamage;
+
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
 		this.health = health;
@@ -128,6 +135,12 @@ public class Bloon {
 	}
 	
 	public int getSpeed() {
+		if (freezeTimer > 0) {
+			return 0;
+		}
+		if (slowTimer > 0) {
+			return Math.max(1, speed / 2);
+		}
 		return speed;
 	}
 	
@@ -144,7 +157,133 @@ public class Bloon {
 	}
 	
 	public void incrementDistanceTravelled() {
-		distanceTravelled += speed;
+		distanceTravelled += getSpeed();
+	}
+
+	public float getSlowTimer() {
+		return slowTimer;
+	}
+
+	public void setSlowTimer(float slowTimer) {
+		this.slowTimer = slowTimer;
+	}
+
+	public float getFreezeTimer() {
+		return freezeTimer;
+	}
+
+	public void setFreezeTimer(float freezeTimer) {
+		this.freezeTimer = freezeTimer;
+	}
+
+	public float getDotTimer() {
+		return dotTimer;
+	}
+
+	public void setDotTimer(float dotTimer) {
+		this.dotTimer = dotTimer;
+	}
+
+	public float getDotInterval() {
+		return dotInterval;
+	}
+
+	public void setDotInterval(float dotInterval) {
+		this.dotInterval = dotInterval;
+	}
+
+	public float getDotTickTimer() {
+		return dotTickTimer;
+	}
+
+	public void setDotTickTimer(float dotTickTimer) {
+		this.dotTickTimer = dotTickTimer;
+	}
+
+	public int getDotDamage() {
+		return dotDamage;
+	}
+
+	public void setDotDamage(int dotDamage) {
+		this.dotDamage = dotDamage;
+	}
+
+	public boolean isSlowed() {
+		return slowTimer > 0;
+	}
+
+	public boolean isFrozen() {
+		return freezeTimer > 0;
+	}
+
+	public boolean hasDot() {
+		return dotTimer > 0;
+	}
+
+	public void resetStatus() {
+		slowTimer = 0f;
+		freezeTimer = 0f;
+		dotTimer = 0f;
+		dotInterval = 0f;
+		dotTickTimer = 0f;
+		dotDamage = 0;
+	}
+
+	public void applyStatusEffect(StatusType statusType, float duration) {
+		applyStatusEffect(statusType, duration, 0, 0f);
+	}
+
+	public void applyStatusEffect(StatusType statusType, float duration, int dotDamage, float dotInterval) {
+		if (statusType == null || statusType == StatusType.NONE) {
+			return;
+		}
+		if (statusType == StatusType.SLOW) {
+			this.slowTimer = Math.max(this.slowTimer, duration);
+		} else if (statusType == StatusType.FREEZE) {
+			this.freezeTimer = Math.max(this.freezeTimer, duration);
+		} else if (statusType == StatusType.DOT || statusType == StatusType.BURN) {
+			this.dotTimer = Math.max(this.dotTimer, duration);
+			this.dotDamage = Math.max(this.dotDamage, dotDamage > 0 ? dotDamage : 1);
+			this.dotInterval = dotInterval > 0 ? dotInterval : 1.0f;
+		}
+	}
+
+	public int updateStatusTimers(float delta) {
+		if (delta <= 0) {
+			return 0;
+		}
+		int pendingDotDamage = 0;
+
+		if (slowTimer > 0) {
+			slowTimer -= delta;
+			if (slowTimer <= 0) {
+				slowTimer = 0f;
+			}
+		}
+
+		if (freezeTimer > 0) {
+			freezeTimer -= delta;
+			if (freezeTimer <= 0) {
+				freezeTimer = 0f;
+			}
+		}
+
+		if (dotTimer > 0) {
+			dotTimer -= delta;
+			dotTickTimer += delta;
+			if (dotInterval > 0 && dotTickTimer >= dotInterval) {
+				pendingDotDamage += this.dotDamage;
+				dotTickTimer -= dotInterval;
+			}
+			if (dotTimer <= 0) {
+				dotTimer = 0f;
+				dotTickTimer = 0f;
+				dotInterval = 0f;
+				this.dotDamage = 0;
+			}
+		}
+
+		return pendingDotDamage;
 	}
 	
 	public boolean isCamo() {

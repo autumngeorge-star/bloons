@@ -77,6 +77,14 @@ public class BloonManager {
 			if (distance < collisionDistance) {
 				if (!bulletActor.hasDamagedBloon(bloonActor)) {
 					bulletActor.damageBloon(bloonActor);
+					if (bulletActor.getBullet().getStatusType() != null && bulletActor.getBullet().getStatusType() != com.hongbao.bloons.entities.StatusType.NONE) {
+						bloonActor.getBloon().applyStatusEffect(
+							bulletActor.getBullet().getStatusType(),
+							bulletActor.getBullet().getStatusDuration(),
+							bulletActor.getBullet().getStatusDotDamage(),
+							bulletActor.getBullet().getStatusDotInterval()
+						);
+					}
 					bloonsToBePopped.add(bloonActor);
 					bulletActor.decrementPierce();
 					
