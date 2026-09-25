@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -49,6 +50,11 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private TextureAtlas actorsAtlas;
+	
+	public TextureAtlas getActorsAtlas() {
+		return actorsAtlas;
+	}
 	
 	
 	@Override
@@ -57,6 +63,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		paused = false;
 		tripleSpeed = false;
 		autoContinue = false;
+		actorsAtlas = new TextureAtlas(Gdx.files.internal("actors.atlas"));
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
 		musicPlayer = new MusicPlayer();
@@ -543,8 +550,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		if (map.getSelectedGirl() != null) {
 			// Draw the range of collision, the range of sight, and range of... well, range
 			if (!map.getSelectedGirl().isActive()) {
-				map.getSelectedGirl().setX(Gdx.input.getX() - map.getSelectedGirl().getTextureRegion().getTexture().getWidth() / 2f);
-				map.getSelectedGirl().setY(Gdx.graphics.getHeight() - (Gdx.input.getY() + map.getSelectedGirl().getTextureRegion().getTexture().getHeight() / 2f));
+				map.getSelectedGirl().setX(Gdx.input.getX() - map.getSelectedGirl().getTextureRegion().getRegionWidth() / 2f);
+				map.getSelectedGirl().setY(Gdx.graphics.getHeight() - (Gdx.input.getY() + map.getSelectedGirl().getTextureRegion().getRegionHeight() / 2f));
 				if (!map.canPlaceGirl(map.getSelectedGirl())) {
 					shapeRenderer.setColor(Color.RED);
 				} else {
@@ -573,7 +580,12 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
-		stage.dispose();
+		if (actorsAtlas != null) {
+			actorsAtlas.dispose();
+		}
+		if (stage != null) {
+			stage.dispose();
+		}
 	}
 
 }
