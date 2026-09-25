@@ -35,6 +35,7 @@ public class Map {
 	public static final int TILE_HEIGHT = 50;
 
 	private String backgroundImage;
+	private MapType mapType;
 	private BloonManager bloonManager;
 	private Pair<Float, Float>[][] directions;
 	private Set<GirlActor> onStageGirls;
@@ -315,6 +316,29 @@ public class Map {
 		stage.addActor(rightDataActor);
 		stage.addActor(upgradeActor);
 		stage.addActor(sellActor);
+	}
+
+	public MapType getMapType() {
+		return mapType;
+	}
+
+	public void setMapType(MapType mapType) {
+		this.mapType = mapType;
+	}
+
+	public void cleanup() {
+		hideGirlDetailsModule();
+		for (GirlActor girlActor : onStageGirls) {
+			girlActor.remove();
+		}
+		onStageGirls.clear();
+		if (selectedGirl != null) {
+			selectedGirl.remove();
+			selectedGirl = null;
+		}
+		if (bloonManager != null) {
+			bloonManager.cleanup();
+		}
 	}
 
 	public void hideGirlDetailsModule() {
