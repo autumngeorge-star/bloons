@@ -3,6 +3,7 @@ package com.hongbao.bloons.factories;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.Map;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.helpers.StageLayers;
 
 
 public class MapFactory {
@@ -10,7 +11,11 @@ public class MapFactory {
 	public static final float ROOT_2_OVER_2 = 0.7071f;
 	
 	public static Map createBasicMap(Stage stage) {
-		Map map = new Map("basic_map.png", stage);
+		return createBasicMap(stage, new StageLayers(stage));
+	}
+
+	public static Map createBasicMap(Stage stage, StageLayers stageLayers) {
+		Map map = new Map("basic_map.png", stage, stageLayers);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		for (int x = 0; x < 32; x++) {
@@ -22,7 +27,11 @@ public class MapFactory {
 	}
 	
 	public static Map createMapWithTurn(Stage stage) {
-		Map map = new Map("map_with_turn.png", stage);
+		return createMapWithTurn(stage, new StageLayers(stage));
+	}
+
+	public static Map createMapWithTurn(Stage stage, StageLayers stageLayers) {
+		Map map = new Map("map_with_turn.png", stage, stageLayers);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		directions[0][8] = new Pair<>(1f, 0f);
 		directions[1][8] = new Pair<>(1f, 0f);
@@ -42,7 +51,11 @@ public class MapFactory {
 	}
 	
 	public static Map createHeaterMap(Stage stage) {
-		Map map = new Map("heater.png", stage);
+		return createHeaterMap(stage, new StageLayers(stage));
+	}
+
+	public static Map createHeaterMap(Stage stage, StageLayers stageLayers) {
+		Map map = new Map("heater.png", stage, stageLayers);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		directions[0][8] = new Pair<>(1f, 0f);
