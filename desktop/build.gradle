@@ -9,7 +9,7 @@ project.ext.assetsDir = new File("../core/assets")
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
+    classpath = sourceSets.main.runtimeClasspath + files("../libs.jar")
     standardInput = System.in
     workingDir = project.assetsDir
     ignoreExitValue = true

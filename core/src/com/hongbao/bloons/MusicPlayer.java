@@ -13,6 +13,9 @@ public class MusicPlayer {
 	}
 
 	private void playMusic(String fileName) {
+		if (Gdx.audio == null) {
+			return;
+		}
 		boolean wasPlaying = true;
 		if (backgroundMusic != null) {
 			wasPlaying = backgroundMusic.isPlaying();
