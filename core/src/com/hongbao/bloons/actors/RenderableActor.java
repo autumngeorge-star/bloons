@@ -21,41 +21,73 @@ public abstract class RenderableActor extends Actor {
 	// This class exists because libgdx doesn't have a decent way to manage z-indexes. Any actor that is drawn
 	// in the game (so really, all of them) needs to extend this class so that z indexes can be done properly.
 
+	protected float centerX;
+	protected float centerY;
+
 	private int zIndex;
 	private Actor actor; // This is kind of stupid, but I want this thing to be able to accommodate many superclasses of actors. If I think of a better way to do things I'll change it.
 	public TextureRegion textureRegion;
-	
+
+	public void updateCenterPosition() {
+		if (actor != null) {
+			centerX = actor.getX() + actor.getWidth() / 2f;
+			centerY = actor.getY() + actor.getHeight() / 2f;
+		} else if (textureRegion != null && textureRegion.getTexture() != null) {
+			centerX = getX() + getCenterOffsetX();
+			centerY = getY() + getCenterOffsetY();
+		} else {
+			centerX = getX() + getWidth() / 2f;
+			centerY = getY() + getHeight() / 2f;
+		}
+	}
+
+	protected float getCenterOffsetX() {
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return textureRegion.getTexture().getWidth() / 2f;
+		}
+		return getWidth() / 2f;
+	}
+
+	protected float getCenterOffsetY() {
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return textureRegion.getTexture().getHeight() / 2f;
+		}
+		return getHeight() / 2f;
+	}
+
 	public int getZIndex() {
 		return zIndex;
 	}
-	
+
 	public boolean setZIndex(int zIndex) {
 		this.zIndex = zIndex;
 		return true;
 	}
-	
+
 	public Actor getActor() {
 		return actor;
 	}
-	
+
 	public void setActor(Actor actor) {
 		this.actor = actor;
+		updateCenterPosition();
 	}
-	
+
 	public TextureRegion getTextureRegion() {
 		return textureRegion;
 	}
-	
+
 	public void setTextureRegion(TextureRegion textureRegion) {
 		this.textureRegion = textureRegion;
+		updateCenterPosition();
 	}
-	
+
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() / 2f;
+		return centerX;
 	}
-	
+
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() / 2f;
+		return centerY;
 	}
 	
 	@Override
@@ -74,6 +106,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.act(delta);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -335,6 +368,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.setX(x);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -344,6 +378,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.setX(x, alignment);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -362,6 +397,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.setY(y);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -371,6 +407,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.setY(y, alignment);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -389,6 +426,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.setPosition(x, y);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -398,6 +436,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.setPosition(x, y, alignment);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -407,6 +446,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.moveBy(x, y);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -425,6 +465,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.setWidth(width);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -443,6 +484,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.setHeight(height);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -470,6 +512,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.setSize(width, height);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -479,6 +522,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.sizeBy(size);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -488,6 +532,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.sizeBy(width, height);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override
@@ -497,6 +542,7 @@ public abstract class RenderableActor extends Actor {
 		} else {
 			actor.setBounds(x, y, width, height);
 		}
+		updateCenterPosition();
 	}
 	
 	@Override

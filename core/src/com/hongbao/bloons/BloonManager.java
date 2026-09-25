@@ -70,11 +70,17 @@ public class BloonManager {
 	public void checkCollision(final BulletActor bulletActor) {
 		Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
 		
+		float bulletCenterX = bulletActor.getCenterX();
+		float bulletCenterY = bulletActor.getCenterY();
+		float bulletRadius = bulletActor.getCollisionRadius();
+
 		for (BloonActor bloonActor : onstageBloons) {
-			float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
-			float distance = Map.distanceBetweenActors(bulletActor, bloonActor);
+			float collisionDistance = bloonActor.getCollisionRadius() + bulletRadius;
+			float dx = bloonActor.getCenterX() - bulletCenterX;
+			float dy = bloonActor.getCenterY() - bulletCenterY;
+			float distanceSq = dx * dx + dy * dy;
 			
-			if (distance < collisionDistance) {
+			if (distanceSq < collisionDistance * collisionDistance) {
 				if (!bulletActor.hasDamagedBloon(bloonActor)) {
 					bulletActor.damageBloon(bloonActor);
 					bloonsToBePopped.add(bloonActor);
@@ -132,10 +138,17 @@ public class BloonManager {
 	public boolean attackBloonIfInRange(GirlActor girlActor) {
 		Set<BloonActor> bloonsInRange = new HashSet<>();
 		
+		float girlCenterX = girlActor.getCenterX();
+		float girlCenterY = girlActor.getCenterY();
+		float visualRange = girlActor.getGirl().getVisualRange();
+
 		for (BloonActor bloonActor : onstageBloons) {
-			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
+			float rangeThreshold = visualRange + bloonActor.getCollisionRadius();
+			float dx = bloonActor.getCenterX() - girlCenterX;
+			float dy = bloonActor.getCenterY() - girlCenterY;
+			float distanceSq = dx * dx + dy * dy;
 			
-			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
+			if (distanceSq < rangeThreshold * rangeThreshold) {
 				bloonsInRange.add(bloonActor);
 			}
 		}
@@ -160,10 +173,17 @@ public class BloonManager {
 	public void lookAtBloon(GirlActor girlActor) {
 		Set<BloonActor> bloonsInRange = new HashSet<>();
 		
+		float girlCenterX = girlActor.getCenterX();
+		float girlCenterY = girlActor.getCenterY();
+		float visualRange = girlActor.getGirl().getVisualRange();
+
 		for (BloonActor bloonActor : onstageBloons) {
-			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
+			float rangeThreshold = visualRange + bloonActor.getCollisionRadius();
+			float dx = bloonActor.getCenterX() - girlCenterX;
+			float dy = bloonActor.getCenterY() - girlCenterY;
+			float distanceSq = dx * dx + dy * dy;
 			
-			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
+			if (distanceSq < rangeThreshold * rangeThreshold) {
 				bloonsInRange.add(bloonActor);
 			}
 		}
@@ -195,19 +215,26 @@ public class BloonManager {
 			return null;
 		}
 		
-		BloonActor bloonActor = null;
-		
+		BloonActor closestBloonActor = null;
+		float minDistanceSq = Float.MAX_VALUE;
+
+		float bulletCenterX = bulletActor.getCenterX();
+		float bulletCenterY = bulletActor.getCenterY();
+
 		for (BloonActor actor : onstageBloons) {
 			if (!bulletActor.hasDamagedBloon(actor)) {
-				if (bloonActor == null) {
-					bloonActor = actor;
-				} else if (Map.distanceBetweenActors(actor, bulletActor) < Map.distanceBetweenActors(bloonActor, bulletActor)) {
-					bloonActor = actor;
+				float dx = actor.getCenterX() - bulletCenterX;
+				float dy = actor.getCenterY() - bulletCenterY;
+				float distanceSq = dx * dx + dy * dy;
+
+				if (closestBloonActor == null || distanceSq < minDistanceSq) {
+					closestBloonActor = actor;
+					minDistanceSq = distanceSq;
 				}
 			}
 		}
 		
-		return bloonActor;
+		return closestBloonActor;
 	}
 	
 }
