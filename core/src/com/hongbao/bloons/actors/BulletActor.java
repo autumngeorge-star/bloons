@@ -80,18 +80,7 @@ public class BulletActor extends RenderableActor {
 	}
 	
 	public boolean hasDamagedBloon(BloonActor bloonActor) {
-		if (damagedBloons.contains(bloonActor.getBloonId())) {
-			return true;
-		}
-		
-		Set<Long> parentIds = bloonActor.getParentBloonIds();
-		for (Long parentId : parentIds) {
-			if (damagedBloons.contains(parentId)) {
-				return true;
-			}
-		}
-		
-		return false;
+		return damagedBloons.contains(bloonActor.getBloonId());
 	}
 	
 	public void damageBloon(BloonActor bloonActor) {

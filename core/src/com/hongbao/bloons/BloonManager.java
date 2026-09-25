@@ -68,31 +68,36 @@ public class BloonManager {
 	}
 	
 	public void checkCollision(final BulletActor bulletActor) {
-		Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
-		
-		for (BloonActor bloonActor : onstageBloons) {
-			float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
-			float distance = Map.distanceBetweenActors(bulletActor, bloonActor);
+		boolean hitAny;
+		do {
+			hitAny = false;
+			Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
 			
-			if (distance < collisionDistance) {
-				if (!bulletActor.hasDamagedBloon(bloonActor)) {
-					bulletActor.damageBloon(bloonActor);
-					bloonsToBePopped.add(bloonActor);
-					bulletActor.decrementPierce();
-					
-					if (bulletActor.getBullet().getPierce() == 0) {
-						// don't bother checking collisions if the bullet is used up.
-						break;
+			for (BloonActor bloonActor : onstageBloons) {
+				float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
+				float distance = Map.distanceBetweenActors(bulletActor, bloonActor);
+				
+				if (distance < collisionDistance) {
+					if (!bulletActor.hasDamagedBloon(bloonActor)) {
+						bulletActor.damageBloon(bloonActor);
+						bloonsToBePopped.add(bloonActor);
+						bulletActor.decrementPierce();
+						hitAny = true;
+						
+						if (bulletActor.getBullet().getPierce() == 0) {
+							// don't bother checking collisions if the bullet is used up.
+							break;
+						}
 					}
 				}
 			}
-		}
+			
+			bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
+		} while (hitAny && bulletActor.getBullet().getPierce() > 0 && !onstageBloons.isEmpty());
 		
 		if (bulletActor.getBullet().isHoming()) {
 			bulletActor.setTarget(null);
 		}
-		
-		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
