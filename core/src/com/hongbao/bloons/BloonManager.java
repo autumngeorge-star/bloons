@@ -57,14 +57,18 @@ public class BloonManager {
 		return !bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 	
-	public void createBloons() {
-		Set<Bloon> bloonsToBeCreated = bloonQueue.getBloons();
+	public void createBloons(float delta) {
+		Set<Bloon> bloonsToBeCreated = bloonQueue.getBloons(delta);
 		
 		for (Bloon bloon : bloonsToBeCreated) {
 			BloonActor actor = new BloonActor(bloon, -25, 425, null); // todo make these numbers an attribute in map or something
 			stage.addActor(actor);
 			onstageBloons.add(actor);
 		}
+	}
+
+	public void createBloons() {
+		createBloons(Gdx.graphics.getDeltaTime());
 	}
 	
 	public void checkCollision(final BulletActor bulletActor) {

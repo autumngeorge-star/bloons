@@ -8,34 +8,41 @@ import java.util.Set;
 
 
 public class BloonQueue {
-	
+
 	// Defines a sequence of bloons appearing on the map as well as when they should appear
-	
-	private List<List<Bloon>> bloons;
-	private List<List<Long>> intervals;
+
+	private final List<List<SpawnEntry>> spawnEntries;
 	private int currentLevel;
 	private int currentIndex;
-	private int clock;
-	
-	public BloonQueue(List<List<Bloon>> bloons, List<List<Long>> intervals) {
-		this.bloons = bloons;
-		this.intervals = intervals;
-		currentLevel = 0;
-		currentIndex = 0;
-		clock = 0;
+	private float spawnTime;
+
+	public BloonQueue(List<List<SpawnEntry>> spawnEntries) {
+		this.spawnEntries = spawnEntries;
+		this.currentLevel = 0;
+		this.currentIndex = 0;
+		this.spawnTime = 0f;
 	}
-	
+
+	public Set<Bloon> getBloons(float delta) {
+		spawnTime += delta;
+		return getBloons();
+	}
+
 	public Set<Bloon> getBloons() {
-		HashSet<Bloon> generatedBloons = new HashSet<>();
-		while (currentIndex < bloons.get(currentLevel).size()) {
-			if (intervals.get(currentLevel).get(currentIndex) == clock) {
-				generatedBloons.add(bloons.get(currentLevel).get(currentIndex));
+		Set<Bloon> generatedBloons = new HashSet<>();
+		if (currentLevel >= spawnEntries.size()) {
+			return generatedBloons;
+		}
+		List<SpawnEntry> currentLevelEntries = spawnEntries.get(currentLevel);
+		while (currentIndex < currentLevelEntries.size()) {
+			SpawnEntry entry = currentLevelEntries.get(currentIndex);
+			if (entry.getSpawnTime() <= spawnTime + 1e-4f) {
+				generatedBloons.add(entry.getBloon());
 				currentIndex++;
 			} else {
 				break;
 			}
 		}
-		clock++;
 		return generatedBloons;
 	}
 
@@ -46,15 +53,30 @@ public class BloonQueue {
 	public void nextLevel() {
 		currentLevel++;
 		currentIndex = 0;
-		clock = 0;
+		spawnTime = 0f;
 	}
 
 	public boolean hasNextLevel() {
-		return currentLevel != bloons.size() - 1;
+		return currentLevel < spawnEntries.size() - 1;
 	}
 
 	public boolean isEmpty() {
-		return currentIndex == bloons.get(currentLevel).size();
+		if (currentLevel >= spawnEntries.size()) {
+			return true;
+		}
+		return currentIndex == spawnEntries.get(currentLevel).size();
 	}
-	
+
+	public float getSpawnTime() {
+		return spawnTime;
+	}
+
+	public int getCurrentIndex() {
+		return currentIndex;
+	}
+
+	public List<List<SpawnEntry>> getSpawnEntries() {
+		return spawnEntries;
+	}
+
 }
