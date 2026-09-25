@@ -536,7 +536,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				}
 			}
 			
-			stage.getActors().sort(new SortByZIndex());
+			stage.getActors().sort(SortByZIndex.INSTANCE);
 		}
 		stage.draw();
 		

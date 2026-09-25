@@ -3,6 +3,7 @@ package com.hongbao.bloons;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Array;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
@@ -11,7 +12,6 @@ import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
 
-import java.util.HashSet;
 import java.util.Set;
 
 
@@ -21,14 +21,16 @@ public class BloonManager {
 	private Map map;
 	// A dedicated collection of onstage bloons is maintained to (probably) speed up collision checking
 	// especially when there are a lot of bullets on screen.
-	private Set<BloonActor> onstageBloons;
+	private Array<BloonActor> onstageBloons;
+	private final Array<BloonActor> bloonsToBePopped;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
 		this.map = map;
-		onstageBloons = new HashSet<>();
+		onstageBloons = new Array<>();
+		bloonsToBePopped = new Array<>(false, 16);
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
@@ -68,9 +70,10 @@ public class BloonManager {
 	}
 	
 	public void checkCollision(final BulletActor bulletActor) {
-		Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
+		bloonsToBePopped.clear();
 		
-		for (BloonActor bloonActor : onstageBloons) {
+		for (int i = 0, n = onstageBloons.size; i < n; i++) {
+			BloonActor bloonActor = onstageBloons.get(i);
 			float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
 			float distance = Map.distanceBetweenActors(bulletActor, bloonActor);
 			
@@ -92,14 +95,16 @@ public class BloonManager {
 			bulletActor.setTarget(null);
 		}
 		
-		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
+		for (int i = 0, n = bloonsToBePopped.size; i < n; i++) {
+			popBloon(bloonsToBePopped.get(i), bulletActor.getBullet().getDamage());
+		}
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
 		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
 		
 		if (bloonActor.getBloon().willPopBloon(damage)) {
-			onstageBloons.remove(bloonActor);
+			onstageBloons.removeValue(bloonActor, true);
 			BloonPoppedResult result = bloonActor.pop(damage);
 			player.earnMoney(result.getCashGenerated());
 			
@@ -130,63 +135,59 @@ public class BloonManager {
 	}
 	
 	public boolean attackBloonIfInRange(GirlActor girlActor) {
-		Set<BloonActor> bloonsInRange = new HashSet<>();
+		BloonActor targetBloon = null;
+		float maxDistanceTravelled = -1f;
 		
-		for (BloonActor bloonActor : onstageBloons) {
+		for (int i = 0, n = onstageBloons.size; i < n; i++) {
+			BloonActor bloonActor = onstageBloons.get(i);
 			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
 			
 			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
-				bloonsInRange.add(bloonActor);
+				float distanceTravelled = bloonActor.getBloon().getDistanceTravelled();
+				if (targetBloon == null || distanceTravelled > maxDistanceTravelled) {
+					targetBloon = bloonActor;
+					maxDistanceTravelled = distanceTravelled;
+				}
 			}
 		}
 		
-		if (bloonsInRange.isEmpty()) {
+		if (targetBloon == null) {
 			return false;
 		} else {
-			BloonActor bloonActor = bloonsInRange.iterator().next();
-			
-			for (BloonActor actor : bloonsInRange) {
-				if (actor.getBloon().getDistanceTravelled() > bloonActor.getBloon().getDistanceTravelled()) {
-					bloonActor = actor;
-				}
-			}
-			
-			BulletActor bulletActor = girlActor.createBulletActor(bloonActor);
+			BulletActor bulletActor = girlActor.createBulletActor(targetBloon);
 			stage.addActor(bulletActor);
 			return true;
 		}
 	}
 	
 	public void lookAtBloon(GirlActor girlActor) {
-		Set<BloonActor> bloonsInRange = new HashSet<>();
+		BloonActor targetBloon = null;
+		float maxDistanceTravelled = -1f;
 		
-		for (BloonActor bloonActor : onstageBloons) {
+		for (int i = 0, n = onstageBloons.size; i < n; i++) {
+			BloonActor bloonActor = onstageBloons.get(i);
 			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
 			
 			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
-				bloonsInRange.add(bloonActor);
+				float distanceTravelled = bloonActor.getBloon().getDistanceTravelled();
+				if (targetBloon == null || distanceTravelled > maxDistanceTravelled) {
+					targetBloon = bloonActor;
+					maxDistanceTravelled = distanceTravelled;
+				}
 			}
 		}
 		
-		if (!bloonsInRange.isEmpty()) {
-			BloonActor bloonActor = bloonsInRange.iterator().next();
-			
-			for (BloonActor actor : bloonsInRange) {
-				if (actor.getBloon().getDistanceTravelled() > bloonActor.getBloon().getDistanceTravelled()) {
-					bloonActor = actor;
-				}
-			}
-			
-			girlActor.lookAtBloon(bloonActor);
+		if (targetBloon != null) {
+			girlActor.lookAtBloon(targetBloon);
 		}
 	}
 	
 	public boolean containsBloon(BloonActor target) {
-		return onstageBloons.contains(target);
+		return onstageBloons.contains(target, true);
 	}
 
 	public void removeBloonFromStage(BloonActor actor) {
-		onstageBloons.remove(actor);
+		onstageBloons.removeValue(actor, true);
 	}
 	
 	public BloonActor getNewHomingTarget(BulletActor bulletActor) {
@@ -197,7 +198,8 @@ public class BloonManager {
 		
 		BloonActor bloonActor = null;
 		
-		for (BloonActor actor : onstageBloons) {
+		for (int i = 0, n = onstageBloons.size; i < n; i++) {
+			BloonActor actor = onstageBloons.get(i);
 			if (!bulletActor.hasDamagedBloon(actor)) {
 				if (bloonActor == null) {
 					bloonActor = actor;
