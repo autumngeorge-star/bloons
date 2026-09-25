@@ -1,15 +1,33 @@
 package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 
 
 public class MusicPlayer {
 	
 	private Music backgroundMusic;
+	private AssetManager assetManager;
 	
 	public MusicPlayer() {
 		backgroundMusic = null;
+		assetManager = null;
+	}
+
+	public MusicPlayer(AssetManager assetManager) {
+		backgroundMusic = null;
+		this.assetManager = assetManager;
+	}
+
+	private AssetManager getAssetManager() {
+		if (assetManager != null) {
+			return assetManager;
+		}
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			return ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getAssetManager();
+		}
+		return null;
 	}
 
 	private void playMusic(String fileName) {
@@ -18,7 +36,12 @@ public class MusicPlayer {
 			wasPlaying = backgroundMusic.isPlaying();
 		}
 		stopMusic();
-		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
+		AssetManager am = getAssetManager();
+		if (am != null && am.isLoaded(fileName, Music.class)) {
+			backgroundMusic = am.get(fileName, Music.class);
+		} else {
+			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
+		}
 		backgroundMusic.setVolume(0.5f);
 		backgroundMusic.setLooping(true);
 		if (wasPlaying) {

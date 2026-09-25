@@ -1,6 +1,7 @@
 package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
@@ -29,7 +30,15 @@ public class BloonManager {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		AssetManager am = null;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			am = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getAssetManager();
+		}
+		if (am != null && am.isLoaded("music/pop.mp3", Sound.class)) {
+			popSound = am.get("music/pop.mp3", Sound.class);
+		} else {
+			popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		}
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
 
