@@ -22,6 +22,10 @@ public class Player {
 		return money;
 	}
 	
+	public void setMoney(int money) {
+		this.money = money;
+	}
+	
 	public void earnMoney(int money) {
 		this.money += money;
 	}
@@ -37,6 +41,10 @@ public class Player {
 	
 	public int getHealth() {
 		return health;
+	}
+	
+	public void setHealth(int health) {
+		this.health = Math.max(0, health);
 	}
 	
 	public void decreaseHealth(int health) {

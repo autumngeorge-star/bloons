@@ -28,6 +28,7 @@ import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.services.GameStatePersistenceService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private GameStatePersistenceService persistenceService;
 	
 	
 	@Override
@@ -62,6 +64,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
+		persistenceService = new GameStatePersistenceService();
 
 		final RunnableAction bloonCreationAction = new RunnableAction();
 		bloonCreationAction.setRunnable(() -> map.getBloonManager().createBloons());
@@ -72,6 +75,11 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMap();
 		createMenu();
 		createInstructions();
+
+		if (persistenceService.hasActiveSession()) {
+			persistenceService.loadGameState(player, map, map.getBloonManager());
+		}
+
 		musicPlayer.playTitleMusic();
 	}
 
@@ -559,10 +567,22 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		}
 	}
 
+	public GameStatePersistenceService getPersistenceService() {
+		return persistenceService;
+	}
+
 	@Override
 	public void pause() {
 		paused = true;
 		musicPlayer.pause();
+		if (persistenceService != null && player != null && map != null) {
+			if (player.getHealth() > 0) {
+				persistenceService.saveGameState(player, map, map.getBloonManager());
+			} else {
+				persistenceService.clearSession();
+			}
+			persistenceService.flush();
+		}
 	}
 
 	@Override
@@ -573,6 +593,14 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		if (persistenceService != null && player != null && map != null) {
+			if (player.getHealth() > 0) {
+				persistenceService.saveGameState(player, map, map.getBloonManager());
+			} else {
+				persistenceService.clearSession();
+			}
+			persistenceService.flush();
+		}
 		stage.dispose();
 	}
 

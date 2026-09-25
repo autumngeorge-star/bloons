@@ -53,6 +53,22 @@ public class BloonManager {
 		return bloonQueue.getLevel();
 	}
 
+	public int getCurrentIndex() {
+		return bloonQueue.getCurrentIndex();
+	}
+
+	public int getClock() {
+		return bloonQueue.getClock();
+	}
+
+	public BloonQueue getBloonQueue() {
+		return bloonQueue;
+	}
+
+	public void restoreLevelState(int level, int index, int clock) {
+		bloonQueue.restoreState(level, index, clock);
+	}
+
 	public boolean hasWonGame() {
 		return !bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}

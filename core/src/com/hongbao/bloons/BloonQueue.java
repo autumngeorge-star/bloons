@@ -43,6 +43,27 @@ public class BloonQueue {
 		return currentLevel;
 	}
 
+	public int getCurrentIndex() {
+		return currentIndex;
+	}
+
+	public int getClock() {
+		return clock;
+	}
+
+	public void restoreState(int level, int index, int clock) {
+		if (bloons != null && level >= 0 && level < bloons.size()) {
+			this.currentLevel = level;
+			List<Bloon> levelBloons = bloons.get(currentLevel);
+			this.currentIndex = Math.max(0, Math.min(index, levelBloons != null ? levelBloons.size() : 0));
+			this.clock = Math.max(0, clock);
+		} else {
+			this.currentLevel = 0;
+			this.currentIndex = 0;
+			this.clock = 0;
+		}
+	}
+
 	public void nextLevel() {
 		currentLevel++;
 		currentIndex = 0;
