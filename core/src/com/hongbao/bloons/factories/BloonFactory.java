@@ -3,6 +3,7 @@ package com.hongbao.bloons.factories;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.hongbao.bloons.BloonQueue;
+import com.hongbao.bloons.SpawnEntry;
 import com.hongbao.bloons.entities.Bloon;
 
 import java.util.ArrayList;
@@ -299,11 +300,8 @@ public class BloonFactory {
 		String[] lines = fileContents.split("\n");
 		long timer = 0;
 
-		List<List<Bloon>> bloonLevels = new ArrayList<>();
-		List<List<Long>> intervalLevels = new ArrayList<>();
-
-		List<Bloon> bloons = new ArrayList<>();
-		List<Long> intervals = new ArrayList<>();
+		List<List<SpawnEntry>> spawnLevels = new ArrayList<>();
+		List<SpawnEntry> levelEntries = new ArrayList<>();
 		
 		for (String line : lines) {
 			if (line.startsWith("//")) {
@@ -319,8 +317,7 @@ public class BloonFactory {
 						String[] types = bloonTypes.split(",");
 						for (String type : types) {
 							Bloon bloon = createBloonOfType(type);
-							bloons.add(bloon);
-							intervals.add(timer);
+							levelEntries.add(new SpawnEntry(bloon, timer));
 							timer += delay;
 						}
 					}
@@ -328,17 +325,15 @@ public class BloonFactory {
 					System.out.println("BloonFactory.createBloonQueue(wtf2) { " + line + " }");
 				}
 			} else if (line.contains("END")) {
-				bloonLevels.add(bloons);
-				intervalLevels.add(intervals);
-				bloons = new ArrayList<>();
-				intervals = new ArrayList<>();
+				spawnLevels.add(levelEntries);
+				levelEntries = new ArrayList<>();
 				timer = 0;
 			} else {
 				System.out.println("BloonFactory.createBloonQueue(wtf1) { " + line + " }");
 			}
 		}
 			
-		return new BloonQueue(bloonLevels, intervalLevels);
+		return new BloonQueue(spawnLevels);
 	}
 	
 }
