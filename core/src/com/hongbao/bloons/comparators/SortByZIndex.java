@@ -8,6 +8,8 @@ import java.util.Comparator;
 
 public class SortByZIndex implements Comparator<Actor> {
 
+	public static final SortByZIndex INSTANCE = new SortByZIndex();
+
 	public int compare(Actor a, Actor b) {
 		if (a instanceof RenderableActor && b instanceof RenderableActor) {
 			return a.getZIndex() - b.getZIndex();
