@@ -6,7 +6,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
+import com.hongbao.bloons.audio.AudioAssetRegistry;
 import com.hongbao.bloons.entities.Bloon;
+import com.hongbao.bloons.events.BloonDamagedEvent;
+import com.hongbao.bloons.events.BloonPoppedEvent;
+import com.hongbao.bloons.events.GameEventBus;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
@@ -29,7 +33,15 @@ public class BloonManager {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		if (Gdx.audio != null && Gdx.files != null) {
+			popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+			AudioAssetRegistry.getInstance().registerSound(popSound);
+			GameEventBus.getInstance().subscribe(BloonPoppedEvent.class, event -> {
+				if (popSound != null) {
+					popSound.play(0.5f);
+				}
+			});
+		}
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
 
@@ -117,11 +129,11 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			GameEventBus.getInstance().publish(new BloonPoppedEvent(bloonActor, result));
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
-			// todo play some other sound I guess
+			GameEventBus.getInstance().publish(new BloonDamagedEvent(bloonActor, damage));
 		}
 	}
 	
