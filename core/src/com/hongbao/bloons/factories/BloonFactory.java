@@ -3,6 +3,7 @@ package com.hongbao.bloons.factories;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.hongbao.bloons.BloonQueue;
+import com.hongbao.bloons.WaveLoader;
 import com.hongbao.bloons.entities.Bloon;
 
 import java.util.ArrayList;
@@ -294,51 +295,12 @@ public class BloonFactory {
 	}
 	
 	public static BloonQueue createBloonQueueFromFile(String fileName) {
-		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
-		String fileContents = file.readString();
-		String[] lines = fileContents.split("\n");
-		long timer = 0;
+		WaveLoader waveLoader = WaveLoader.fromAsset(fileName);
+		return new BloonQueue(waveLoader);
+	}
 
-		List<List<Bloon>> bloonLevels = new ArrayList<>();
-		List<List<Long>> intervalLevels = new ArrayList<>();
-
-		List<Bloon> bloons = new ArrayList<>();
-		List<Long> intervals = new ArrayList<>();
-		
-		for (String line : lines) {
-			if (line.startsWith("//")) {
-				// do nothing
-			} else if (line.contains(" ")) {
-				String[] parts = line.split(" ");
-				if (parts.length == 3) {
-					int amount = Integer.parseInt(parts[0]);
-					long delay = Long.parseLong(parts[1]);
-					String bloonTypes = parts[2];
-					
-					for (int x = 0; x < amount; x++) {
-						String[] types = bloonTypes.split(",");
-						for (String type : types) {
-							Bloon bloon = createBloonOfType(type);
-							bloons.add(bloon);
-							intervals.add(timer);
-							timer += delay;
-						}
-					}
-				} else {
-					System.out.println("BloonFactory.createBloonQueue(wtf2) { " + line + " }");
-				}
-			} else if (line.contains("END")) {
-				bloonLevels.add(bloons);
-				intervalLevels.add(intervals);
-				bloons = new ArrayList<>();
-				intervals = new ArrayList<>();
-				timer = 0;
-			} else {
-				System.out.println("BloonFactory.createBloonQueue(wtf1) { " + line + " }");
-			}
-		}
-			
-		return new BloonQueue(bloonLevels, intervalLevels);
+	public static BloonQueue createBloonQueueFromLoader(WaveLoader waveLoader) {
+		return new BloonQueue(waveLoader);
 	}
 	
 }
