@@ -68,7 +68,7 @@ public class Map {
 		leftDataLabelAction.setRunnable(() -> {
 			Girl girl = getSelectedGirl().getGirl();
 			Girl upgradedStats = girl.getUpgradedStats();
-			if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
+			if (hoveringOverUpgrade && girl.getLevel() < girl.getTiers().size() - 1 && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
 				leftDataActor.getActor().setText(
 				 girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
 				  "Damage: " + girl.getDamage() + " (" + upgradedStats.getDamage() + ")\n" +
@@ -96,7 +96,7 @@ public class Map {
 		rightDataLabelAction.setRunnable(() -> {
 			Girl girl = getSelectedGirl().getGirl();
 			Girl upgradedStats = girl.getUpgradedStats();
-			if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
+			if (hoveringOverUpgrade && girl.getLevel() < girl.getTiers().size() - 1 && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
 				rightDataActor.getActor().setText(
 				  "Range: " + (int)girl.getRange() + " (" + (int)upgradedStats.getRange() + ")\n" +
 				  "Upgrade: " + girl.getUpgradeCostString() + " (" + upgradedStats.getUpgradeCostString() + ")\n" +

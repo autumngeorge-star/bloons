@@ -1,6 +1,7 @@
 package com.hongbao.bloons.entities;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class Girl {
@@ -9,46 +10,55 @@ public class Girl {
 	public static final int NO_UPGRADES_AVAILABLE = -1;
 	
 	private String name;
-	private List<Integer> attackDelay;
+	private List<GirlTier> tiers;
 	private int cooldown;
-	private List<Float> bulletSpeed;
-	private List<Integer> damage;
-	private List<Integer> pierce;
-	private List<Float> range;
-	private List<Float> visualRange;
-	private List<Boolean> homing;
 	private String imageFileName;
 	private String bulletFileName;
 	private int cost;
-	private List<Integer> upgradeCost;
 	private int level;
 	private int totalInvestment;
 	
 	
-	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+	public Girl(String name, List<GirlTier> tiers, String imageFileName, String bulletFileName, int cost) {
+		Objects.requireNonNull(name, "Name cannot be null");
+		Objects.requireNonNull(tiers, "Tiers list cannot be null");
+		if (tiers.isEmpty()) {
+			throw new IllegalArgumentException("Tiers list cannot be empty");
+		}
+		for (GirlTier tier : tiers) {
+			Objects.requireNonNull(tier, "GirlTier elements cannot be null");
+		}
+		Objects.requireNonNull(imageFileName, "Image file name cannot be null");
+		Objects.requireNonNull(bulletFileName, "Bullet file name cannot be null");
+
 		this.name = name;
-		this.attackDelay = attackDelay;
-		this.cooldown = attackDelay.get(0);
-		this.bulletSpeed = bulletSpeed;
-		this.damage = damage;
-		this.pierce = pierce;
-		this.range = range;
-		this.visualRange = visualRange;
-		this.homing = homing;
-		this.imageFileName = IMAGE_FOLDER + imageFileName;
+		this.tiers = tiers;
+		if (imageFileName.startsWith(IMAGE_FOLDER)) {
+			this.imageFileName = imageFileName;
+		} else {
+			this.imageFileName = IMAGE_FOLDER + imageFileName;
+		}
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
-		this.upgradeCost = upgradeCost;
-		level = 0;
-		totalInvestment = cost;
+		this.level = 0;
+		this.totalInvestment = cost;
+		this.cooldown = getCurrentTier().getAttackDelay();
 	}
 
 	public String getName() {
 		return name;
 	}
+
+	public List<GirlTier> getTiers() {
+		return tiers;
+	}
+
+	public GirlTier getCurrentTier() {
+		return tiers.get(level);
+	}
 	
 	public int getAttackDelay() {
-		return attackDelay.get(level);
+		return getCurrentTier().getAttackDelay();
 	}
 	
 	public int getCooldown() {
@@ -60,27 +70,27 @@ public class Girl {
 	}
 	
 	public void resetCooldown() {
-		cooldown = attackDelay.get(level);
+		cooldown = getCurrentTier().getAttackDelay();
 	}
 	
 	public int getDamage() {
-		return damage.get(level);
+		return getCurrentTier().getDamage();
 	}
 	
 	public int getPierce() {
-		return pierce.get(level);
+		return getCurrentTier().getPierce();
 	}
 	
 	public float getRange() {
-		return range.get(level);
+		return getCurrentTier().getRange();
 	}
 	
 	public float getVisualRange() {
-		return visualRange.get(level);
+		return getCurrentTier().getVisualRange();
 	}
 
 	public boolean isHoming() {
-		return homing.get(level);
+		return getCurrentTier().isHoming();
 	}
 
 	public String getImageFileName() {
@@ -100,7 +110,10 @@ public class Girl {
 	}
 	
 	public int getUpgradeCost() {
-		return upgradeCost.get(level);
+		if (level >= tiers.size() - 1 || getCurrentTier().getUpgradeCost() == NO_UPGRADES_AVAILABLE) {
+			return NO_UPGRADES_AVAILABLE;
+		}
+		return getCurrentTier().getUpgradeCost();
 	}
 	
 	public int getSellPrice() {
@@ -112,7 +125,7 @@ public class Girl {
 	}
 
 	public Bullet createBullet() {
-		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
+		return new Bullet(getCurrentTier().getBulletSpeed(), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
 	}
 	
 	public SpellCard createSpellCard() {
@@ -133,27 +146,20 @@ public class Girl {
 	}
 	
 	public boolean canUpgrade(int currentCash) {
-		if (getUpgradeCost() == NO_UPGRADES_AVAILABLE) {
+		if (level >= tiers.size() - 1 || getUpgradeCost() == NO_UPGRADES_AVAILABLE) {
 			return false;
 		}
 		return currentCash >= getUpgradeCost();
 	}
 	
 	public Girl getUpgradedStats() {
-		if (getUpgradeCost() != NO_UPGRADES_AVAILABLE) {
+		if (level < tiers.size() - 1 && getUpgradeCost() != NO_UPGRADES_AVAILABLE) {
 			Girl upgradedGirl = new Girl(
-			 name,
-			 attackDelay,
-			 bulletSpeed,
-			 damage,
-			 pierce,
-			 range,
-			 visualRange,
-			 homing,
-			 imageFileName,
-			 bulletFileName,
-			 cost,
-			 upgradeCost
+				name,
+				tiers,
+				imageFileName,
+				bulletFileName,
+				cost
 			);
 			upgradedGirl.level = level + 1;
 			return upgradedGirl;
