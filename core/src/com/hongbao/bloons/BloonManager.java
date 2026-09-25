@@ -189,6 +189,14 @@ public class BloonManager {
 		onstageBloons.remove(actor);
 	}
 	
+	public void addOnstageBloon(BloonActor actor) {
+		onstageBloons.add(actor);
+	}
+	
+	public Set<BloonActor> getOnstageBloons() {
+		return onstageBloons;
+	}
+	
 	public BloonActor getNewHomingTarget(BulletActor bulletActor) {
 		// Gets the closest bloon to the current bullet
 		if (onstageBloons.isEmpty()) {

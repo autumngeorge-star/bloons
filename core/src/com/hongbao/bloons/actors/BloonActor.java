@@ -37,6 +37,9 @@ public class BloonActor extends RenderableActor {
 		if (parent != null) {
 			parentBloonIds = new HashSet(parent.getParentBloonIds());
 			parentBloonIds.add(parent.getBloonId());
+			if (parent.getBloon() != null && bloon.getDistanceTravelled() == 0) {
+				bloon.setDistanceTravelled(parent.getBloon().getDistanceTravelled());
+			}
 		} else {
 			parentBloonIds = new HashSet<>();
 		}
@@ -97,10 +100,13 @@ public class BloonActor extends RenderableActor {
 	}
 	
 	public void move(Pair<Float, Float> direction) {
-		setX(getX() + direction.getFirst() * bloon.getSpeed() / 5);
-		setY(getY() + direction.getSecond() * bloon.getSpeed() / 5);
+		float dx = direction.getFirst() * bloon.getSpeed() / 5f;
+		float dy = direction.getSecond() * bloon.getSpeed() / 5f;
+		setX(getX() + dx);
+		setY(getY() + dy);
 		
-		bloon.incrementDistanceTravelled();
+		float displacement = (float) Math.sqrt(dx * dx + dy * dy);
+		bloon.incrementDistanceTravelled(displacement);
 
 		if (getCenterX() > 1500) {
 			release();
