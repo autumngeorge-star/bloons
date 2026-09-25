@@ -16,6 +16,8 @@ import java.util.Set;
 
 public class BulletActor extends RenderableActor {
 	
+	public static final float MAX_TURN_RATE_PER_FRAME = 0.10f;
+	
 	private Bullet bullet;
 	private float dx; // This should be a unit vector
 	private float dy;
@@ -46,6 +48,22 @@ public class BulletActor extends RenderableActor {
 		);
 		
 		damagedBloons = new HashSet<>(bullet.getPierce());
+	}
+	
+	public float getDx() {
+		return dx;
+	}
+
+	public void setDx(float dx) {
+		this.dx = dx;
+	}
+
+	public float getDy() {
+		return dy;
+	}
+
+	public void setDy(float dy) {
+		this.dy = dy;
 	}
 	
 	public Bullet getBullet() {
@@ -162,18 +180,49 @@ public class BulletActor extends RenderableActor {
 		}
 		
 		if (bullet.isHoming()) {
+			if (target != null && bloonManager.containsBloon(target)) {
+				float targetDx = target.getCenterX() - getCenterX();
+				float targetDy = target.getCenterY() - getCenterY();
+				float dot = dx * targetDx + dy * targetDy;
+				if (dot <= 0 && bloonManager.hasForwardHomingTarget(this)) {
+					target = null;
+				}
+			}
+			
 			if (!bloonManager.containsBloon(target)) {
 				target = bloonManager.getNewHomingTarget(this);
 			}
 			
 			if (target != null) {
-				dx = target.getCenterX() - getCenterX();
-				dy = target.getCenterY() - getCenterY();
+				float targetDx = target.getCenterX() - getCenterX();
+				float targetDy = target.getCenterY() - getCenterY();
+				float distance = (float) Math.sqrt(targetDx * targetDx + targetDy * targetDy);
 				
-				// make it a unit vector
-				float distance = (float) Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-				dx /= distance;
-				dy /= distance;
+				if (distance > 0) {
+					targetDx /= distance;
+					targetDy /= distance;
+					
+					double desiredAngle = Math.atan2(targetDy, targetDx);
+					double currentAngle = Math.atan2(dy, dx);
+					
+					double angleDiff = Math.atan2(Math.sin(desiredAngle - currentAngle), Math.cos(desiredAngle - currentAngle));
+					
+					if (angleDiff > MAX_TURN_RATE_PER_FRAME) {
+						angleDiff = MAX_TURN_RATE_PER_FRAME;
+					} else if (angleDiff < -MAX_TURN_RATE_PER_FRAME) {
+						angleDiff = -MAX_TURN_RATE_PER_FRAME;
+					}
+					
+					double newAngle = currentAngle + angleDiff;
+					dx = (float) Math.cos(newAngle);
+					dy = (float) Math.sin(newAngle);
+					
+					float newDist = (float) Math.sqrt(dx * dx + dy * dy);
+					if (newDist > 0) {
+						dx /= newDist;
+						dy /= newDist;
+					}
+				}
 			}
 			calculateRotationAngle();
 		}

@@ -442,6 +442,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public Map getMap() {
 		return map;
 	}
+
+	public void setMap(Map map) {
+		this.map = map;
+	}
 	
 	public Player getPlayer() {
 		return player;
