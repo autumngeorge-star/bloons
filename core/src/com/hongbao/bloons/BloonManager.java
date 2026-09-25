@@ -61,7 +61,7 @@ public class BloonManager {
 		Set<Bloon> bloonsToBeCreated = bloonQueue.getBloons();
 		
 		for (Bloon bloon : bloonsToBeCreated) {
-			BloonActor actor = new BloonActor(bloon, -25, 425, null); // todo make these numbers an attribute in map or something
+			BloonActor actor = new BloonActor(bloon, BloonTextureCache.getTextureRegion(bloon.getImageFileName()), -25, 425, null); // todo make these numbers an attribute in map or something
 			stage.addActor(actor);
 			onstageBloons.add(actor);
 		}
@@ -107,10 +107,10 @@ public class BloonManager {
 			for (Bloon bloon : result.getBloonsGenerated()) {
 				BloonActor generatedBloonActor;
 				if (previousBloonActor == null) {
-					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
+					 generatedBloonActor = new BloonActor(bloon, BloonTextureCache.getTextureRegion(bloon.getImageFileName()), bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
 				} else {
 					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
-					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
+					generatedBloonActor = new BloonActor(bloon, BloonTextureCache.getTextureRegion(bloon.getImageFileName()), previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
 				}
 				stage.addActor(generatedBloonActor);
 				onstageBloons.add(generatedBloonActor);
@@ -208,6 +208,21 @@ public class BloonManager {
 		}
 		
 		return bloonActor;
+	}
+	
+	public void reset() {
+		for (BloonActor actor : onstageBloons) {
+			actor.remove();
+		}
+		onstageBloons.clear();
+		BloonTextureCache.clear();
+	}
+
+	public void dispose() {
+		if (popSound != null) {
+			popSound.dispose();
+		}
+		reset();
 	}
 	
 }
