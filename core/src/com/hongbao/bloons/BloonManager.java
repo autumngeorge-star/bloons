@@ -12,6 +12,7 @@ import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -29,8 +30,12 @@ public class BloonManager {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
-		bloonQueue = BloonFactory.createBloonQueue();
+		if (Gdx.audio != null && Gdx.files != null) {
+			popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		}
+		if (Gdx.files != null) {
+			bloonQueue = BloonFactory.createBloonQueue();
+		}
 	}
 
 	public void nextLevel() {
@@ -95,6 +100,8 @@ public class BloonManager {
 		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
 	}
 	
+	public static final float CHILD_SPACING = 12f;
+
 	public void popBloon(BloonActor bloonActor, int damage) {
 		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
 		
@@ -103,21 +110,27 @@ public class BloonManager {
 			BloonPoppedResult result = bloonActor.pop(damage);
 			player.earnMoney(result.getCashGenerated());
 			
-			BloonActor previousBloonActor = null;
-			for (Bloon bloon : result.getBloonsGenerated()) {
-				BloonActor generatedBloonActor;
-				if (previousBloonActor == null) {
-					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
-				} else {
-					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
-					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
-				}
+			float parentCenterX = bloonActor.getCenterX();
+			float parentCenterY = bloonActor.getCenterY();
+			int parentDistance = bloonActor.getBloon().getDistanceTravelled();
+
+			List<Bloon> children = result.getBloonsGenerated();
+			for (int i = 0; i < children.size(); i++) {
+				Bloon bloon = children.get(i);
+				float offset = i * CHILD_SPACING;
+				Pair<Float, Float> pos = map.getBackwardTrackPosition(parentCenterX, parentCenterY, offset);
+				
+				BloonActor generatedBloonActor = new BloonActor(bloon, pos.getFirst(), pos.getSecond(), bloonActor);
+				int childDist = Math.max(0, parentDistance - Math.round(offset));
+				bloon.setDistanceTravelled(childDist);
+
 				stage.addActor(generatedBloonActor);
 				onstageBloons.add(generatedBloonActor);
-				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);

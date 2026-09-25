@@ -163,15 +163,22 @@ public class Bloon {
 		this.regen = regen;
 	}
 	
-	public boolean willPopBloon(int damage) {
-		int resultingHealth = health - damage;
-		
-		if (resultingHealth <= 0) {
-			return true;
+	public int getLayerPopThreshold() {
+		if (health > 918) {
+			return health - 918;
+		} else if (health > 218) {
+			return health - 218;
+		} else if (health > 18) {
+			return health - 18;
+		} else if (health > 8) {
+			return health - 8;
+		} else {
+			return 1;
 		}
-		
-		Color resultingColor = getColorFromHealth(resultingHealth);
-		return resultingColor != color;
+	}
+	
+	public boolean willPopBloon(int damage) {
+		return damage >= getLayerPopThreshold();
 	}
 	
 	public void damage(int damage) {

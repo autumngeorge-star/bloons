@@ -3,10 +3,12 @@ package com.hongbao.bloons.helpers;
 import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.factories.BloonFactory;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Queue;
 
 import static com.hongbao.bloons.entities.Bloon.Color.BFB;
 import static com.hongbao.bloons.entities.Bloon.Color.BLACK;
@@ -44,48 +46,103 @@ public class BloonPoppedResult {
 	};
 	
 	private int cashGenerated;
-	private Set<Bloon> bloonsGenerated;
+	private List<Bloon> bloonsGenerated;
 	
-	public BloonPoppedResult(Bloon bloon, int damage) {
-		bloonsGenerated = new HashSet<>();
-		
-		if (bloon.getHealth() > damage) {
-			Bloon.Color originalColor = bloon.getColor();
-			int newBloonHealth = bloon.getHealth() - damage;
-			Bloon.Color poppedColor = Bloon.getColorFromHealth(newBloonHealth);
-			
-			int bloonsToBeCreated = COLOR_TO_RATIO.get(poppedColor) / COLOR_TO_RATIO.get(originalColor);
-			
-			for (int x = 0; x < bloonsToBeCreated; x++) {
-				Bloon bloonOfType = BloonFactory.createBloonOfType(poppedColor.getValue(), newBloonHealth);
-				bloonOfType.setDistanceTravelled(bloon.getDistanceTravelled());
-				bloonsGenerated.add(bloonOfType);
+	public BloonPoppedResult(Bloon initialBloon, int initialDamage) {
+		bloonsGenerated = new ArrayList<>();
+		cashGenerated = 0;
+
+		Queue<DamageEvent> damageQueue = new ArrayDeque<>();
+		damageQueue.add(DamageEvent.obtain(initialBloon, initialDamage));
+
+		while (!damageQueue.isEmpty()) {
+			DamageEvent event = damageQueue.poll();
+			Bloon currentBloon = event.getBloon();
+			int remDamage = event.getDamage();
+
+			int threshold = currentBloon.getLayerPopThreshold();
+
+			if (remDamage < threshold) {
+				currentBloon.damage(remDamage);
+				cashGenerated += remDamage;
+				bloonsGenerated.add(currentBloon);
+			} else {
+				cashGenerated += threshold;
+				int residualDamage = remDamage - threshold;
+				List<Bloon> children = createChildrenForBloon(currentBloon);
+
+				for (Bloon child : children) {
+					if (residualDamage > 0) {
+						damageQueue.add(DamageEvent.obtain(child, residualDamage));
+					} else {
+						bloonsGenerated.add(child);
+					}
+				}
 			}
+
+			DamageEvent.free(event);
 		}
-		
-		cashGenerated = calculateHealthDifferenceBetweenBloons(bloon, bloonsGenerated);
+	}
+
+	public static List<Bloon> createChildrenForBloon(Bloon parent) {
+		List<Bloon> children = new ArrayList<>();
+		Bloon.Color color = parent.getColor();
+
+		switch (color) {
+			case ZOMG:
+				for (int i = 0; i < 4; i++) children.add(BloonFactory.createBFB());
+				break;
+			case BFB:
+				for (int i = 0; i < 4; i++) children.add(BloonFactory.createMOAB());
+				break;
+			case MOAB:
+				for (int i = 0; i < 4; i++) children.add(BloonFactory.createCeramicBloon());
+				break;
+			case CERAMIC:
+				for (int i = 0; i < 2; i++) children.add(BloonFactory.createRainbowBloon());
+				break;
+			case RAINBOW:
+				for (int i = 0; i < 2; i++) children.add(BloonFactory.createZebraBloon());
+				break;
+			case ZEBRA:
+			case LEAD:
+				for (int i = 0; i < 2; i++) children.add(BloonFactory.createBlackBloon());
+				break;
+			case BLACK:
+				for (int i = 0; i < 2; i++) children.add(BloonFactory.createPinkBloon());
+				break;
+			case PINK:
+				children.add(BloonFactory.createYellowBloon());
+				break;
+			case YELLOW:
+				children.add(BloonFactory.createGreenBloon());
+				break;
+			case GREEN:
+				children.add(BloonFactory.createBlueBloon());
+				break;
+			case BLUE:
+				children.add(BloonFactory.createRedBloon());
+				break;
+			case RED:
+			default:
+				break;
+		}
+
+		for (Bloon child : children) {
+			child.setDistanceTravelled(parent.getDistanceTravelled());
+			child.setCamo(parent.isCamo());
+			child.setRegen(parent.isRegen());
+		}
+
+		return children;
 	}
 	
 	public int getCashGenerated() {
 		return cashGenerated;
 	}
 	
-	public Set<Bloon> getBloonsGenerated() {
+	public List<Bloon> getBloonsGenerated() {
 		return bloonsGenerated;
-	}
-	
-	private static int calculateHealthDifferenceBetweenBloons(Bloon bloon, Set<Bloon> bloons) {
-		int healthDifference = getTotalHealthOfBloon(bloon);
-		
-		for (Bloon resultBloon : bloons) {
-			healthDifference -= getTotalHealthOfBloon(resultBloon);
-		}
-		
-		if (healthDifference <= 0) {
-			throw new RuntimeException("Something went wrong.");
-		}
-		
-		return healthDifference;
 	}
 	
 	public static int getTotalHealthOfBloon(Bloon bloon) {
