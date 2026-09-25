@@ -28,22 +28,28 @@ public class BulletActor extends RenderableActor {
 	
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		if (Gdx.files != null) {
+			textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+			collisionRadius = textureRegion.getTexture().getWidth() / 2f;
+		}
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
 		this.dy = dy;
 		calculateRotationAngle();
-		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
 		target = null; // this'll get automatically set as the bullet moves
 		
 		setZIndex(ZIndex.BULLET_Z_INDEX);
-		setBounds(
-		 x - textureRegion.getTexture().getWidth() / 2f,
-		 y - textureRegion.getTexture().getHeight() / 2f,
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight()
-		);
+		if (textureRegion != null) {
+			setBounds(
+			 x - textureRegion.getTexture().getWidth() / 2f,
+			 y - textureRegion.getTexture().getHeight() / 2f,
+			 textureRegion.getTexture().getWidth(),
+			 textureRegion.getTexture().getHeight()
+			);
+		} else {
+			setBounds(x, y, 0, 0);
+		}
 		
 		damagedBloons = new HashSet<>(bullet.getPierce());
 	}
@@ -108,6 +114,7 @@ public class BulletActor extends RenderableActor {
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
+		if (textureRegion == null) return;
 		batch.draw(
 		 textureRegion,
 		 getX(),
@@ -122,10 +129,17 @@ public class BulletActor extends RenderableActor {
 		);
 	}
 	
+	public int getFrames() {
+		return frames;
+	}
+
 	@Override
 	public void act(float delta) {
 		frames++;
-		BloonManager bloonManager = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager();
+		BloonManager bloonManager = null;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			bloonManager = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMap().getBloonManager();
+		}
 		
 		setDirectionIfApplicable(bloonManager);
 		
@@ -141,7 +155,13 @@ public class BulletActor extends RenderableActor {
 			remove();
 		}
 		
-		bloonManager.checkCollision(this);
+		if (bullet.getMaxFrames() > 0 && frames >= bullet.getMaxFrames()) {
+			remove();
+		}
+		
+		if (bloonManager != null) {
+			bloonManager.checkCollision(this);
+		}
 	}
 	
 	private void setDirectionIfApplicable(BloonManager bloonManager) {
@@ -162,7 +182,7 @@ public class BulletActor extends RenderableActor {
 		}
 		
 		if (bullet.isHoming()) {
-			if (!bloonManager.containsBloon(target)) {
+			if (bloonManager != null && !bloonManager.containsBloon(target)) {
 				target = bloonManager.getNewHomingTarget(this);
 			}
 			

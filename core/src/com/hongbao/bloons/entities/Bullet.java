@@ -18,6 +18,7 @@ public class Bullet {
 
 	private float initialDXOverride;
 	private float initialDYOverride;
+	private int maxFrames = 0;
 	
 	public Bullet() {
 		speed = 20f;
@@ -27,9 +28,14 @@ public class Bullet {
 		distanceTraveled = 0;
 		homing = false;
 		imageFileName = IMAGE_FOLDER + "red_spell_card.png";
+		maxFrames = 0;
 	}
 	
 	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName) {
+		this(speed, damage, pierce, maxRange, homing, imageFileName, 0);
+	}
+
+	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName, int maxFrames) {
 		this.speed = speed;
 		this.damage = damage;
 		this.pierce = pierce;
@@ -37,6 +43,7 @@ public class Bullet {
 		this.imageFileName = IMAGE_FOLDER + imageFileName;
 		distanceTraveled = 0;
 		this.homing = homing;
+		this.maxFrames = maxFrames;
 	}
 	
 	public float getSpeed() {
@@ -125,5 +132,13 @@ public class Bullet {
 	
 	public void setInitialDYOverride(float initialDYOverride) {
 		this.initialDYOverride = initialDYOverride;
+	}
+
+	public int getMaxFrames() {
+		return maxFrames;
+	}
+
+	public void setMaxFrames(int maxFrames) {
+		this.maxFrames = maxFrames;
 	}
 }
