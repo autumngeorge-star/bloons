@@ -1,6 +1,7 @@
 package com.hongbao.bloons;
 
 import com.hongbao.bloons.entities.Bloon;
+import com.hongbao.bloons.factories.BloonFactory;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,13 +12,13 @@ public class BloonQueue {
 	
 	// Defines a sequence of bloons appearing on the map as well as when they should appear
 	
-	private List<List<Bloon>> bloons;
+	private List<List<BloonSpawnSpec>> bloons;
 	private List<List<Long>> intervals;
 	private int currentLevel;
 	private int currentIndex;
 	private int clock;
 	
-	public BloonQueue(List<List<Bloon>> bloons, List<List<Long>> intervals) {
+	public BloonQueue(List<List<BloonSpawnSpec>> bloons, List<List<Long>> intervals) {
 		this.bloons = bloons;
 		this.intervals = intervals;
 		currentLevel = 0;
@@ -29,7 +30,9 @@ public class BloonQueue {
 		HashSet<Bloon> generatedBloons = new HashSet<>();
 		while (currentIndex < bloons.get(currentLevel).size()) {
 			if (intervals.get(currentLevel).get(currentIndex) == clock) {
-				generatedBloons.add(bloons.get(currentLevel).get(currentIndex));
+				BloonSpawnSpec spec = bloons.get(currentLevel).get(currentIndex);
+				Bloon createdBloon = BloonFactory.createBloonOfType(spec.getType());
+				generatedBloons.add(createdBloon);
 				currentIndex++;
 			} else {
 				break;
