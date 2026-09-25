@@ -61,7 +61,7 @@ public class BloonManager {
 		Set<Bloon> bloonsToBeCreated = bloonQueue.getBloons();
 		
 		for (Bloon bloon : bloonsToBeCreated) {
-			BloonActor actor = new BloonActor(bloon, -25, 425, null); // todo make these numbers an attribute in map or something
+			BloonActor actor = new BloonActor(bloon, -25, 425); // todo make these numbers an attribute in map or something
 			stage.addActor(actor);
 			onstageBloons.add(actor);
 		}
@@ -107,10 +107,10 @@ public class BloonManager {
 			for (Bloon bloon : result.getBloonsGenerated()) {
 				BloonActor generatedBloonActor;
 				if (previousBloonActor == null) {
-					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
+					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY());
 				} else {
 					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
-					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
+					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond());
 				}
 				stage.addActor(generatedBloonActor);
 				onstageBloons.add(generatedBloonActor);
