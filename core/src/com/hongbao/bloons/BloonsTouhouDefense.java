@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.Align;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.cache.RefCountedTextureCache;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
@@ -458,6 +459,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void render() {
+		RefCountedTextureCache.getInstance().update(Gdx.graphics.getDeltaTime());
 		if (!paused) {
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 			if (tripleSpeed) {
@@ -573,6 +575,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		RefCountedTextureCache.getInstance().clear();
 		stage.dispose();
 	}
 
