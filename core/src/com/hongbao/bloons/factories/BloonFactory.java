@@ -3,6 +3,7 @@ package com.hongbao.bloons.factories;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.hongbao.bloons.BloonQueue;
+import com.hongbao.bloons.BloonSpawnSpec;
 import com.hongbao.bloons.entities.Bloon;
 
 import java.util.ArrayList;
@@ -299,10 +300,10 @@ public class BloonFactory {
 		String[] lines = fileContents.split("\n");
 		long timer = 0;
 
-		List<List<Bloon>> bloonLevels = new ArrayList<>();
+		List<List<BloonSpawnSpec>> bloonLevels = new ArrayList<>();
 		List<List<Long>> intervalLevels = new ArrayList<>();
 
-		List<Bloon> bloons = new ArrayList<>();
+		List<BloonSpawnSpec> bloons = new ArrayList<>();
 		List<Long> intervals = new ArrayList<>();
 		
 		for (String line : lines) {
@@ -318,8 +319,7 @@ public class BloonFactory {
 					for (int x = 0; x < amount; x++) {
 						String[] types = bloonTypes.split(",");
 						for (String type : types) {
-							Bloon bloon = createBloonOfType(type);
-							bloons.add(bloon);
+							bloons.add(new BloonSpawnSpec(type));
 							intervals.add(timer);
 							timer += delay;
 						}
