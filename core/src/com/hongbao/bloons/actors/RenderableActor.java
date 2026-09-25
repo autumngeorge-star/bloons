@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
+import com.hongbao.bloons.cache.RefCountedTextureCache;
 
 
 public abstract class RenderableActor extends Actor {
@@ -24,6 +25,20 @@ public abstract class RenderableActor extends Actor {
 	private int zIndex;
 	private Actor actor; // This is kind of stupid, but I want this thing to be able to accommodate many superclasses of actors. If I think of a better way to do things I'll change it.
 	public TextureRegion textureRegion;
+	private String texturePath;
+	private boolean textureReleased = false;
+
+	public String getTexturePath() {
+		return texturePath;
+	}
+
+	public void setTexturePath(String texturePath) {
+		this.texturePath = texturePath;
+	}
+
+	public boolean isTextureReleased() {
+		return textureReleased;
+	}
 	
 	public int getZIndex() {
 		return zIndex;
@@ -870,8 +885,9 @@ public abstract class RenderableActor extends Actor {
 
 	@Override
 	public boolean remove() {
-		if (textureRegion != null && textureRegion.getTexture() != null) {
-			textureRegion.getTexture().dispose();
+		if (!textureReleased && texturePath != null) {
+			textureReleased = true;
+			RefCountedTextureCache.getInstance().release(texturePath);
 		}
 		return super.remove();
 	}
