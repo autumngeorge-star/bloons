@@ -4,3 +4,8 @@ sourceCompatibility = 8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.test.java.srcDirs = [ "test/" ]
+
+dependencies {
+    testImplementation files("/usr/share/gradle-8.8/lib/junit-4.13.2.jar", "/usr/share/gradle-8.8/lib/hamcrest-core-1.3.jar")
+}
