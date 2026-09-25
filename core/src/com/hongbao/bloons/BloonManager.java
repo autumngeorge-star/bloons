@@ -26,10 +26,14 @@ public class BloonManager {
 	private BloonQueue bloonQueue;
 	
 	public BloonManager(Stage stage, Map map) {
+		this(stage, map, new AudioResourceRegistry());
+	}
+
+	public BloonManager(Stage stage, Map map, AudioResourceRegistry audioResourceRegistry) {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		popSound = audioResourceRegistry.getSound("music/pop.mp3");
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
 

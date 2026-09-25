@@ -48,8 +48,12 @@ public class Map {
 	private boolean hoveringOverUpgrade;
 
 	public Map(String backgroundImage, Stage stage) {
+		this(backgroundImage, stage, new AudioResourceRegistry());
+	}
+
+	public Map(String backgroundImage, Stage stage, AudioResourceRegistry audioResourceRegistry) {
 		this.backgroundImage = backgroundImage;
-		this.bloonManager = new BloonManager(stage, this);
+		this.bloonManager = new BloonManager(stage, this, audioResourceRegistry);
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;
