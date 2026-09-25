@@ -42,6 +42,7 @@ public class BloonManager {
 			} else if (map.getBloonManager().getLevel() == 40) {
 				musicPlayer.playFinalBossMusic();
 			}
+			SaveManager.saveGame((BloonsTouhouDefense) Gdx.app.getApplicationListener());
 		}
 	}
 
@@ -51,6 +52,10 @@ public class BloonManager {
 
 	public int getLevel() {
 		return bloonQueue.getLevel();
+	}
+
+	public void setLevel(int level) {
+		bloonQueue.setLevel(level);
 	}
 
 	public boolean hasWonGame() {

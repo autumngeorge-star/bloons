@@ -72,6 +72,11 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMap();
 		createMenu();
 		createInstructions();
+
+		if (SaveManager.hasSave()) {
+			SaveManager.loadGame(this);
+		}
+
 		musicPlayer.playTitleMusic();
 	}
 
@@ -563,6 +568,13 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public void pause() {
 		paused = true;
 		musicPlayer.pause();
+		if (player != null) {
+			if (player.getHealth() <= 0) {
+				SaveManager.deleteSave();
+			} else {
+				SaveManager.saveGame(this);
+			}
+		}
 	}
 
 	@Override

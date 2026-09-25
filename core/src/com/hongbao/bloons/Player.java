@@ -22,6 +22,10 @@ public class Player {
 		return money;
 	}
 	
+	public void setMoney(int money) {
+		this.money = money;
+	}
+	
 	public void earnMoney(int money) {
 		this.money += money;
 	}
@@ -38,11 +42,20 @@ public class Player {
 	public int getHealth() {
 		return health;
 	}
+
+	public void setHealth(int health) {
+		this.health = health;
+		if (this.health <= 0) {
+			this.health = 0;
+			SaveManager.deleteSave();
+		}
+	}
 	
 	public void decreaseHealth(int health) {
 		this.health -= health;
-		if (this.health < 0) {
+		if (this.health <= 0) {
 			this.health = 0;
+			SaveManager.deleteSave();
 		}
 	}
 	
