@@ -84,7 +84,19 @@ public class Girl {
 	}
 
 	public String getImageFileName() {
-		return imageFileName;
+		return extractRegionKey(imageFileName);
+	}
+
+	public static String extractRegionKey(String path) {
+		if (path == null) return "";
+		String name = path;
+		if (name.contains("/")) {
+			name = name.substring(name.lastIndexOf('/') + 1);
+		}
+		if (name.endsWith(".png")) {
+			name = name.substring(0, name.length() - 4);
+		}
+		return name;
 	}
 	
 	public int getCost() {

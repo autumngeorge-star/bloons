@@ -1,0 +1,139 @@
+
+actors.png
+size: 1024,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+alice
+  rotate: false
+  xy: 154, 181
+  size: 29, 39
+  orig: 29, 39
+  offset: 0, 0
+  index: -1
+bat
+  rotate: false
+  xy: 88, 152
+  size: 29, 19
+  orig: 29, 19
+  offset: 0, 0
+  index: -1
+black_spell_card
+  rotate: false
+  xy: 32, 82
+  size: 12, 14
+  orig: 12, 14
+  offset: 0, 0
+  index: -1
+blue_knives
+  rotate: false
+  xy: 515, 325
+  size: 15, 29
+  orig: 15, 29
+  offset: 0, 0
+  index: -1
+blue_magic_missile
+  rotate: false
+  xy: 515, 356
+  size: 15, 57
+  orig: 15, 57
+  offset: 0, 0
+  index: -1
+magic_spike
+  rotate: false
+  xy: 2, 2
+  size: 15, 47
+  orig: 15, 47
+  offset: 0, 0
+  index: -1
+marisa
+  rotate: false
+  xy: 120, 180
+  size: 32, 40
+  orig: 32, 40
+  offset: 0, 0
+  index: -1
+pink_butterfly
+  rotate: false
+  xy: 48, 110
+  size: 28, 24
+  orig: 28, 24
+  offset: 0, 0
+  index: -1
+purple_energy
+  rotate: false
+  xy: 515, 415
+  size: 15, 67
+  orig: 15, 67
+  offset: 0, 0
+  index: -1
+red_spell_card
+  rotate: false
+  xy: 532, 369
+  size: 12, 14
+  orig: 12, 14
+  offset: 0, 0
+  index: -1
+reimu
+  rotate: false
+  xy: 2, 51
+  size: 28, 45
+  orig: 28, 45
+  offset: 0, 0
+  index: -1
+reimu_spell
+  rotate: false
+  xy: 2, 136
+  size: 84, 84
+  orig: 84, 84
+  offset: 0, 0
+  index: -1
+remilia
+  rotate: false
+  xy: 2, 98
+  size: 44, 36
+  orig: 44, 36
+  offset: 0, 0
+  index: -1
+sakuya
+  rotate: false
+  xy: 532, 385
+  size: 23, 49
+  orig: 23, 49
+  offset: 0, 0
+  index: -1
+sword_slash
+  rotate: false
+  xy: 591, 440
+  size: 16, 42
+  orig: 16, 42
+  offset: 0, 0
+  index: -1
+youmu
+  rotate: false
+  xy: 562, 439
+  size: 27, 43
+  orig: 27, 43
+  offset: 0, 0
+  index: -1
+yukari
+  rotate: false
+  xy: 88, 173
+  size: 30, 47
+  orig: 30, 47
+  offset: 0, 0
+  index: -1
+yuyuko
+  rotate: false
+  xy: 532, 436
+  size: 28, 46
+  orig: 28, 46
+  offset: 0, 0
+  index: -1
+yuyuko_fan
+  rotate: false
+  xy: 2, 222
+  size: 511, 260
+  orig: 511, 260
+  offset: 0, 0
+  index: -1

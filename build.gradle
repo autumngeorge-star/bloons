@@ -10,8 +10,7 @@ buildscript {
         google()
     }
     dependencies {
-        
-
+        classpath files("game.jar")
     }
 }
 
@@ -37,31 +36,57 @@ allprojects {
     }
 }
 
+task packActors {
+    doLast {
+        def inputDir = new File(project.buildDir, "actor_inputs")
+        inputDir.mkdirs()
+        copy {
+            from "core/assets/img/characters"
+            include "*.png"
+            exclude "characters.png"
+            into inputDir
+        }
+        copy {
+            from "core/assets/img/projectiles"
+            include "*.png"
+            exclude "projectiles.png"
+            into inputDir
+        }
+        copy {
+            from "core/assets/img/spellcards"
+            include "*.png"
+            into inputDir
+        }
+        
+        def settings = new com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings()
+        settings.maxWidth = 2048
+        settings.maxHeight = 2048
+
+        com.badlogic.gdx.tools.texturepacker.TexturePacker.process(
+            settings,
+            inputDir.getAbsolutePath(),
+            file("core/assets").getAbsolutePath(),
+            "actors"
+        )
+    }
+}
+
 project(":desktop") {
     apply plugin: "java-library"
 
 
     dependencies {
         implementation project(":core")
-        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-        
+        api files("${rootProject.projectDir}/game.jar")
     }
 }
 
 project(":core") {
     apply plugin: "java-library"
 
+    processResources.dependsOn rootProject.packActors
 
     dependencies {
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
-        api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-        api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        
+        api files("${rootProject.projectDir}/game.jar")
     }
 }
