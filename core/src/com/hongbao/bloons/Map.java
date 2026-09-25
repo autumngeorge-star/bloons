@@ -21,6 +21,7 @@ import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.helpers.TextureCache;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
 
@@ -57,7 +58,7 @@ public class Map {
 
 		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
 
-		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
+		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(TextureCache.getTextureRegion("img/ui/girl_details_template.png")));
 		infoBackground.setPosition(1504, 4);
 		this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
