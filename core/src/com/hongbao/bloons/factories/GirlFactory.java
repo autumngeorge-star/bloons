@@ -3,13 +3,88 @@ package com.hongbao.bloons.factories;
 import com.hongbao.bloons.entities.Girl;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Supplier;
 
 import static com.hongbao.bloons.entities.Girl.NO_UPGRADES_AVAILABLE;
 
 
 public class GirlFactory {
 
+	static {
+		registerDefaultTowers();
+	}
+
+	public static synchronized void registerDefaultTowers() {
+		if (TowerRegistry.getTower("Reimu") == null) {
+			registerTower("Reimu", GirlFactory::buildReimu, "img/ui/reimu_box.png");
+			registerTower("Yukari", GirlFactory::buildYukari, "img/ui/yukari_box.png");
+			registerTower("Marisa", GirlFactory::buildMarisa, "img/ui/marisa_box.png");
+			registerTower("Alice", GirlFactory::buildAlice, "img/ui/alice_box.png");
+			registerTower("Sakuya", GirlFactory::buildSakuya, "img/ui/sakuya_box.png");
+			registerTower("Remilia", GirlFactory::buildRemilia, "img/ui/remilia_box.png");
+			registerTower("Youmu", GirlFactory::buildYoumu, "img/ui/youmu_box.png");
+			registerTower("Yuyuko", GirlFactory::buildYuyuko, "img/ui/yuyuko_box.png");
+		}
+	}
+
+	public static void registerTower(TowerDefinition definition) {
+		TowerRegistry.registerTower(definition);
+	}
+
+	public static void registerTower(String id, Supplier<Girl> supplier, String uiIconPath) {
+		TowerRegistry.registerTower(id, supplier, uiIconPath);
+	}
+
+	public static List<TowerDefinition> getRegisteredTowers() {
+		return TowerRegistry.getRegisteredTowers();
+	}
+
+	public static TowerDefinition getTower(String id) {
+		return TowerRegistry.getTower(id);
+	}
+
 	public static Girl createReimu() {
+		TowerDefinition def = getTower("Reimu");
+		return def != null ? def.createGirl() : buildReimu();
+	}
+
+	public static Girl createYukari() {
+		TowerDefinition def = getTower("Yukari");
+		return def != null ? def.createGirl() : buildYukari();
+	}
+
+	public static Girl createMarisa() {
+		TowerDefinition def = getTower("Marisa");
+		return def != null ? def.createGirl() : buildMarisa();
+	}
+
+	public static Girl createAlice() {
+		TowerDefinition def = getTower("Alice");
+		return def != null ? def.createGirl() : buildAlice();
+	}
+
+	public static Girl createSakuya() {
+		TowerDefinition def = getTower("Sakuya");
+		return def != null ? def.createGirl() : buildSakuya();
+	}
+
+	public static Girl createRemilia() {
+		TowerDefinition def = getTower("Remilia");
+		return def != null ? def.createGirl() : buildRemilia();
+	}
+
+	public static Girl createYoumu() {
+		TowerDefinition def = getTower("Youmu");
+		return def != null ? def.createGirl() : buildYoumu();
+	}
+
+	public static Girl createYuyuko() {
+		TowerDefinition def = getTower("Yuyuko");
+		return def != null ? def.createGirl() : buildYuyuko();
+	}
+
+	private static Girl buildReimu() {
 		return new Girl(
 				"Reimu",
 				Arrays.asList(86, 86, 75),
@@ -26,7 +101,7 @@ public class GirlFactory {
 		);
 	}
 
-	public static Girl createYukari() {
+	private static Girl buildYukari() {
 		return new Girl("Yukari",
 				Arrays.asList(4, 4, 4),
 				Arrays.asList(100f, 100f, 100f),
@@ -42,7 +117,7 @@ public class GirlFactory {
 		);
 	}
 
-	public static Girl createMarisa() {
+	private static Girl buildMarisa() {
 		return new Girl(
 				"Marisa",
 				Arrays.asList(56, 56, 56),
@@ -59,7 +134,7 @@ public class GirlFactory {
 		);
 	}
 
-	public static Girl createAlice() {
+	private static Girl buildAlice() {
 		return new Girl(
 				"Alice",
 				Arrays.asList(53, 53, 53),
@@ -76,7 +151,7 @@ public class GirlFactory {
 		);
 	}
 
-	public static Girl createSakuya() {
+	private static Girl buildSakuya() {
 		return new Girl(
 				"Sakuya",
 				Arrays.asList(30, 20, 20),
@@ -93,7 +168,7 @@ public class GirlFactory {
 		);
 	}
 
-	public static Girl createRemilia() { // 3000
+	private static Girl buildRemilia() {
 		return new Girl(
 				"Remilia",
 				Arrays.asList(4, 2, 2),
@@ -110,7 +185,7 @@ public class GirlFactory {
 		);
 	}
 
-	public static Girl createYoumu() {
+	private static Girl buildYoumu() {
 		return new Girl(
 				"Youmu",
 				Arrays.asList(90, 90, 90),
@@ -127,7 +202,7 @@ public class GirlFactory {
 		);
 	}
 
-	public static Girl createYuyuko() {
+	private static Girl buildYuyuko() {
 		return new Girl(
 				"Yuyuko",
 				Arrays.asList(40, 30, 20),
