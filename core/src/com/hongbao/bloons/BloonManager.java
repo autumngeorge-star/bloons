@@ -72,9 +72,9 @@ public class BloonManager {
 		
 		for (BloonActor bloonActor : onstageBloons) {
 			float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
-			float distance = Map.distanceBetweenActors(bulletActor, bloonActor);
+			float distanceSquared = Map.distanceSquaredBetweenActors(bulletActor, bloonActor);
 			
-			if (distance < collisionDistance) {
+			if (distanceSquared < collisionDistance * collisionDistance) {
 				if (!bulletActor.hasDamagedBloon(bloonActor)) {
 					bulletActor.damageBloon(bloonActor);
 					bloonsToBePopped.add(bloonActor);
@@ -133,9 +133,10 @@ public class BloonManager {
 		Set<BloonActor> bloonsInRange = new HashSet<>();
 		
 		for (BloonActor bloonActor : onstageBloons) {
-			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
+			float maxDistance = girlActor.getGirl().getVisualRange() + bloonActor.getCollisionRadius();
+			float distanceSquared = Map.distanceSquaredBetweenActors(girlActor, bloonActor);
 			
-			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
+			if (distanceSquared < maxDistance * maxDistance) {
 				bloonsInRange.add(bloonActor);
 			}
 		}
@@ -161,9 +162,10 @@ public class BloonManager {
 		Set<BloonActor> bloonsInRange = new HashSet<>();
 		
 		for (BloonActor bloonActor : onstageBloons) {
-			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
+			float maxDistance = girlActor.getGirl().getVisualRange() + bloonActor.getCollisionRadius();
+			float distanceSquared = Map.distanceSquaredBetweenActors(girlActor, bloonActor);
 			
-			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
+			if (distanceSquared < maxDistance * maxDistance) {
 				bloonsInRange.add(bloonActor);
 			}
 		}
@@ -201,7 +203,7 @@ public class BloonManager {
 			if (!bulletActor.hasDamagedBloon(actor)) {
 				if (bloonActor == null) {
 					bloonActor = actor;
-				} else if (Map.distanceBetweenActors(actor, bulletActor) < Map.distanceBetweenActors(bloonActor, bulletActor)) {
+				} else if (Map.distanceSquaredBetweenActors(actor, bulletActor) < Map.distanceSquaredBetweenActors(bloonActor, bulletActor)) {
 					bloonActor = actor;
 				}
 			}

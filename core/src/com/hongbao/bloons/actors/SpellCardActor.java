@@ -21,14 +21,15 @@ public class SpellCardActor extends RenderableActor {
 	public SpellCardActor(SpellCard spellCard, float x, float y) {
 		this.spellCard = spellCard;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(spellCard.getImageFileName())));
+		updateCenterOffsets();
 		rotationAngle = 0;
 		
 		setZIndex(ZIndex.SPELL_CARD_Z_INDEX);
 		setBounds(
-		 x - textureRegion.getTexture().getWidth() / 2f,
-		 y - textureRegion.getTexture().getHeight() / 2f,
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight()
+		 x - centerOffsetX,
+		 y - centerOffsetY,
+		 centerOffsetX * 2f,
+		 centerOffsetY * 2f
 		);
 	}
 	

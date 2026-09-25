@@ -29,20 +29,21 @@ public class BulletActor extends RenderableActor {
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		updateCenterOffsets();
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
 		this.dy = dy;
 		calculateRotationAngle();
-		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
+		collisionRadius = centerOffsetX;
 		target = null; // this'll get automatically set as the bullet moves
 		
 		setZIndex(ZIndex.BULLET_Z_INDEX);
 		setBounds(
-		 x - textureRegion.getTexture().getWidth() / 2f,
-		 y - textureRegion.getTexture().getHeight() / 2f,
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight()
+		 x - centerOffsetX,
+		 y - centerOffsetY,
+		 centerOffsetX * 2f,
+		 centerOffsetY * 2f
 		);
 		
 		damagedBloons = new HashSet<>(bullet.getPierce());
@@ -171,7 +172,7 @@ public class BulletActor extends RenderableActor {
 				dy = target.getCenterY() - getCenterY();
 				
 				// make it a unit vector
-				float distance = (float) Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+				float distance = (float) Math.sqrt(dx * dx + dy * dy);
 				dx /= distance;
 				dy /= distance;
 			}

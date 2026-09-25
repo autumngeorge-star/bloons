@@ -28,11 +28,12 @@ public class BloonActor extends RenderableActor {
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+		updateCenterOffsets();
 
-		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
+		collisionRadius = centerOffsetX;
 		
 		setZIndex(ZIndex.BLOON_Z_INDEX);
-		setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
+		setBounds(x - centerOffsetX, y - centerOffsetY, centerOffsetX * 2f, centerOffsetY * 2f);
 		
 		if (parent != null) {
 			parentBloonIds = new HashSet(parent.getParentBloonIds());
@@ -41,6 +42,14 @@ public class BloonActor extends RenderableActor {
 			parentBloonIds = new HashSet<>();
 		}
 		bloonId = RANDOM.nextLong();
+	}
+
+	@Override
+	public void updateCenterOffsets() {
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			centerOffsetX = textureRegion.getTexture().getWidth() * SCALE / 2f;
+			centerOffsetY = textureRegion.getTexture().getHeight() * SCALE / 2f;
+		}
 	}
 
 	public Bloon getBloon() {
@@ -53,12 +62,12 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		return getX() + centerOffsetX;
 	}
 	
 	@Override
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		return getY() + centerOffsetY;
 	}
 	
 	public float getCollisionRadius() {
