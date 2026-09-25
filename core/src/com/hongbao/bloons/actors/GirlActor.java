@@ -87,8 +87,7 @@ public class GirlActor extends RenderableActor {
 	
 	public SpellCardActor createSpellCardActor() {
 		if (true) { // todo Girl should have a method that checks the cooldown or something
-			// maybe some direction based on the girl's direction
-			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
+			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY(), rotationAngle);
 		}
 		return null;
 	}

@@ -114,7 +114,7 @@ public class SpellCard {
 				bullet.setSpeed(5f);
 				bullet.setMaxRange(5000);
 				double currentAngle = offset * i;
-				double desiredAngle = currentAngle + (x * Math.PI / 500);
+				double desiredAngle = Math.PI / 2 + currentAngle + (x * Math.PI / 500);
 				bullet.setInitialXOffset(-125);
 				bullet.setInitialDXOverride((float) Math.cos(desiredAngle));
 				bullet.setInitialDYOverride((float) Math.sin(desiredAngle));
@@ -127,7 +127,7 @@ public class SpellCard {
 				bullet.setSpeed(5f);
 				bullet.setMaxRange(5000);
 				double currentAngle = offset * i;
-				double desiredAngle = currentAngle - (x * Math.PI / 500);
+				double desiredAngle = Math.PI / 2 + currentAngle - (x * Math.PI / 500);
 				bullet.setInitialXOffset(125);
 				bullet.setInitialDXOverride((float) Math.cos(desiredAngle));
 				bullet.setInitialDYOverride((float) Math.sin(desiredAngle));

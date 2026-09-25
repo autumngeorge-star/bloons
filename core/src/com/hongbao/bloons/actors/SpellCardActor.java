@@ -19,9 +19,13 @@ public class SpellCardActor extends RenderableActor {
 	private float rotationAngle;
 	
 	public SpellCardActor(SpellCard spellCard, float x, float y) {
+		this(spellCard, x, y, 0f);
+	}
+
+	public SpellCardActor(SpellCard spellCard, float x, float y, float rotationAngle) {
 		this.spellCard = spellCard;
+		this.rotationAngle = rotationAngle;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(spellCard.getImageFileName())));
-		rotationAngle = 0;
 		
 		setZIndex(ZIndex.SPELL_CARD_Z_INDEX);
 		setBounds(
@@ -34,6 +38,14 @@ public class SpellCardActor extends RenderableActor {
 	
 	public SpellCard getSpellCard() {
 		return spellCard;
+	}
+
+	public float getRotationAngle() {
+		return rotationAngle;
+	}
+
+	public void setRotationAngle(float rotationAngle) {
+		this.rotationAngle = rotationAngle;
 	}
 	
 	@Override
@@ -62,14 +74,38 @@ public class SpellCardActor extends RenderableActor {
 			if (bulletsToCreate != null) {
 				BloonManager bloonManager = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager();
 				
+				double rad = Math.toRadians(rotationAngle);
+				float cos = (float) Math.cos(rad);
+				float sin = (float) Math.sin(rad);
+
 				for (Bullet bullet : bulletsToCreate) {
+					float localXOffset = bullet.getInitialXOffset();
+					float localYOffset = bullet.getInitialYOffset();
+					float localDX = bullet.getInitialDXOverride();
+					float localDY = bullet.getInitialDYOverride();
+
+					float worldXOffset = localXOffset * cos + localYOffset * sin;
+					float worldYOffset = -localXOffset * sin + localYOffset * cos;
+
+					float worldDX = localDX * cos + localDY * sin;
+					float worldDY = -localDX * sin + localDY * cos;
+
+					float len = (float) Math.sqrt(worldDX * worldDX + worldDY * worldDY);
+					if (len > 0) {
+						worldDX /= len;
+						worldDY /= len;
+					}
+
+					bullet.setInitialXOffset(worldXOffset);
+					bullet.setInitialYOffset(worldYOffset);
+
 					BulletActor bulletActor = new BulletActor(
 					 bullet,
 					 getCenterX(),
 					 getCenterY(),
-					 bullet.getInitialDXOverride(),
-					 bullet.getInitialDYOverride()
-					); // todo the spell needs a direction maybe
+					 worldDX,
+					 worldDY
+					);
 					bulletActor.setSpellCardOverride(spellCard.getOverrideName());
 					bloonManager.addBulletToStage(bulletActor);
 				}
