@@ -28,7 +28,13 @@ public class BulletActor extends RenderableActor {
 	
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		Texture texture;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			texture = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getTexture(bullet.getImageFileName());
+		} else {
+			texture = new Texture(Gdx.files.internal(bullet.getImageFileName()));
+		}
+		textureRegion = new TextureRegion(texture);
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;

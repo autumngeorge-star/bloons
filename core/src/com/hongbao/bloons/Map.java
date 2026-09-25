@@ -1,6 +1,7 @@
 package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -55,9 +56,26 @@ public class Map {
 		this.stage = stage;
 		hoveringOverUpgrade = false;
 
-		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
+		AssetManager assetManager = null;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			assetManager = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getAssetManager();
+		}
 
-		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
+		Skin skin;
+		Texture templateTex;
+		if (assetManager != null && assetManager.isLoaded("uiskins/uiskin.json")) {
+			skin = assetManager.get("uiskins/uiskin.json", Skin.class);
+		} else {
+			skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
+		}
+
+		if (assetManager != null && assetManager.isLoaded("img/ui/girl_details_template.png")) {
+			templateTex = assetManager.get("img/ui/girl_details_template.png", Texture.class);
+		} else {
+			templateTex = new Texture(Gdx.files.internal("img/ui/girl_details_template.png"));
+		}
+
+		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(templateTex)));
 		infoBackground.setPosition(1504, 4);
 		this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
