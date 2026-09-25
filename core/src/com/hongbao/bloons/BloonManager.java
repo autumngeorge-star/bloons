@@ -24,13 +24,24 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private PreferencesManager preferencesManager;
+	private int lastClearedLevel;
 	
 	public BloonManager(Stage stage, Map map) {
+		this(stage, map, new PreferencesManager());
+	}
+
+	public BloonManager(Stage stage, Map map, PreferencesManager preferencesManager) {
 		this.stage = stage;
 		this.map = map;
+		this.preferencesManager = preferencesManager;
 		onstageBloons = new HashSet<>();
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
+
+		int unlockedLevel = preferencesManager != null ? preferencesManager.getUnlockedLevel(0) : 0;
+		bloonQueue.setLevel(unlockedLevel);
+		this.lastClearedLevel = unlockedLevel > 0 ? unlockedLevel - 1 : 0;
 	}
 
 	public void nextLevel() {
@@ -45,8 +56,45 @@ public class BloonManager {
 		}
 	}
 
+	public void checkLevelCleared() {
+		if (canGoToNextLevelInternal()) {
+			int currentLevel = getLevel();
+			if (currentLevel > lastClearedLevel) {
+				lastClearedLevel = currentLevel;
+				int nextUnlockedLevel = currentLevel + 1;
+				if (preferencesManager != null) {
+					int currentUnlocked = preferencesManager.getUnlockedLevel(0);
+					if (nextUnlockedLevel > currentUnlocked) {
+						preferencesManager.saveUnlockedLevel(nextUnlockedLevel);
+						preferencesManager.flush();
+					}
+				}
+			}
+		}
+	}
+
+	private boolean canGoToNextLevelInternal() {
+		boolean instructionsEmpty = true;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			instructionsEmpty = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).instructions.isEmpty();
+		}
+		return instructionsEmpty && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+	}
+
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean canGo = canGoToNextLevelInternal();
+		if (canGo) {
+			checkLevelCleared();
+		}
+		return canGo;
+	}
+
+	public PreferencesManager getPreferencesManager() {
+		return preferencesManager;
+	}
+
+	public BloonQueue getBloonQueue() {
+		return bloonQueue;
 	}
 
 	public int getLevel() {
