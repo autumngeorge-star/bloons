@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -250,7 +251,7 @@ public class Map {
 		}
 		
 		for (GirlActor stageActor : onStageGirls) {
-			if (distanceBetweenActors(girlActor, stageActor) < r + stageActor.getCollisionRadius()) {
+			if (Intersector.overlaps(girlActor.getCircle(), stageActor.getCircle())) {
 				return false;
 			}
 		}
@@ -287,8 +288,11 @@ public class Map {
 	}
 	
 	public static float distanceBetweenActors(RenderableActor actor1, RenderableActor actor2) {
-		return (float)Math.sqrt(
-		 Math.pow(actor1.getCenterX() - actor2.getCenterX(), 2) + Math.pow(actor1.getCenterY() - actor2.getCenterY(), 2));
+		return actor1.getCenter().dst(actor2.getCenter());
+	}
+
+	public static float distanceSquaredBetweenActors(RenderableActor actor1, RenderableActor actor2) {
+		return actor1.getCenter().dst2(actor2.getCenter());
 	}
 
 	public void showGirlDetailsModule() {

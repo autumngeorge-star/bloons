@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Vector2;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
@@ -18,6 +20,8 @@ public class GirlActor extends RenderableActor {
 	private float rotationAngle;
 	private float collisionRadius;
 	private boolean active;
+	protected final Circle rangeCircle = new Circle();
+	private final Vector2 tempDir = new Vector2();
 	
 	public GirlActor(Girl girl, float x, float y) {
 		this.girl = girl;
@@ -33,6 +37,11 @@ public class GirlActor extends RenderableActor {
 		 textureRegion.getTexture().getWidth(),
 		 textureRegion.getTexture().getHeight()
 		);
+	}
+
+	public Circle getRangeCircle() {
+		rangeCircle.set(getCenter(), girl != null ? girl.getVisualRange() : 0f);
+		return rangeCircle;
 	}
 	
 	public Girl getGirl() {
@@ -51,6 +60,7 @@ public class GirlActor extends RenderableActor {
 		this.rotationAngle = rotationAngle;
 	}
 	
+	@Override
 	public float getCollisionRadius() {
 		return collisionRadius;
 	}
@@ -64,25 +74,17 @@ public class GirlActor extends RenderableActor {
 	}
 	
 	public BulletActor createBulletActor(BloonActor target) {
-		float dx = target.getCenterX() - getCenterX();
-		float dy = target.getCenterY() - getCenterY();
-		
-		// make it a unit vector
-		float distance = (float) Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-		dx /= distance;
-		dy /= distance;
+		tempDir.set(target.getCenter()).sub(getCenter()).nor();
 		
 		lookAtBloon(target);
 		
 		Bullet bullet = girl.createBullet();
-		return new BulletActor(bullet, getCenterX(), getCenterY(), dx, dy);
+		return new BulletActor(bullet, getCenterX(), getCenterY(), tempDir.x, tempDir.y);
 	}
 	
 	public void lookAtBloon(BloonActor target) {
-		float dx = target.getCenterX() - getCenterX();
-		float dy = target.getCenterY() - getCenterY();
-		
-		rotationAngle = (float)(Math.atan2(dx, dy) / Math.PI * 180);
+		tempDir.set(target.getCenter()).sub(getCenter());
+		rotationAngle = (float)(Math.atan2(tempDir.x, tempDir.y) / Math.PI * 180);
 	}
 	
 	public SpellCardActor createSpellCardActor() {

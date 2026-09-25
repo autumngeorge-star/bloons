@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -24,7 +25,58 @@ public abstract class RenderableActor extends Actor {
 	private int zIndex;
 	private Actor actor; // This is kind of stupid, but I want this thing to be able to accommodate many superclasses of actors. If I think of a better way to do things I'll change it.
 	public TextureRegion textureRegion;
+	protected final Vector2 center = new Vector2();
+	protected final Circle bounds = new Circle();
 	
+	public Vector2 getCenter() {
+		updateCenterAndBounds();
+		return center;
+	}
+
+	public Circle getCircle() {
+		updateCenterAndBounds();
+		return bounds;
+	}
+
+	public Circle getCollisionBounds() {
+		return getCircle();
+	}
+
+	public Circle getBoundsCircle() {
+		return getCircle();
+	}
+
+	public float getCollisionRadius() {
+		return getWidth() / 2f;
+	}
+
+	public void updateCenterAndBounds() {
+		float width = getWidth();
+		float height = getHeight();
+		if (width == 0 && textureRegion != null && textureRegion.getTexture() != null) {
+			width = textureRegion.getTexture().getWidth();
+		}
+		if (height == 0 && textureRegion != null && textureRegion.getTexture() != null) {
+			height = textureRegion.getTexture().getHeight();
+		}
+		float cx = getX() + width / 2f;
+		float cy = getY() + height / 2f;
+		center.set(cx, cy);
+		bounds.set(cx, cy, getCollisionRadius());
+	}
+
+	@Override
+	protected void positionChanged() {
+		super.positionChanged();
+		updateCenterAndBounds();
+	}
+
+	@Override
+	protected void sizeChanged() {
+		super.sizeChanged();
+		updateCenterAndBounds();
+	}
+
 	public int getZIndex() {
 		return zIndex;
 	}
@@ -48,14 +100,15 @@ public abstract class RenderableActor extends Actor {
 	
 	public void setTextureRegion(TextureRegion textureRegion) {
 		this.textureRegion = textureRegion;
+		updateCenterAndBounds();
 	}
 	
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() / 2f;
+		return getCenter().x;
 	}
 	
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() / 2f;
+		return getCenter().y;
 	}
 	
 	@Override
