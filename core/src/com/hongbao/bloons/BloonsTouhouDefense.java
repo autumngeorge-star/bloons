@@ -49,6 +49,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	public Label scoreLabel;
+	public Label highScoreLabel;
 	
 	
 	@Override
@@ -211,6 +213,22 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		});
 		healthLabel.addAction(Actions.repeat(RepeatAction.FOREVER, healthLabelAction));
 		stage.addActor(new RenderableLabel(healthLabel, ZIndex.MENU_ITEM_Z_INDEX));
+		
+		scoreLabel = new Label("Score: " + player.getScore(), skin);
+		scoreLabel.setPosition(1510, 742);
+		scoreLabel.setFontScale(1.1f, 1.1f);
+		final RunnableAction scoreLabelAction = new RunnableAction();
+		scoreLabelAction.setRunnable(() -> ((Label)scoreLabelAction.getActor()).setText("Score: " + player.getScore()));
+		scoreLabel.addAction(Actions.repeat(RepeatAction.FOREVER, scoreLabelAction));
+		stage.addActor(new RenderableLabel(scoreLabel, ZIndex.MENU_ITEM_Z_INDEX));
+
+		highScoreLabel = new Label("High Score: " + player.getHighScore(), skin);
+		highScoreLabel.setPosition(1630, 742);
+		highScoreLabel.setFontScale(1.1f, 1.1f);
+		final RunnableAction highScoreLabelAction = new RunnableAction();
+		highScoreLabelAction.setRunnable(() -> ((Label)highScoreLabelAction.getActor()).setText("High Score: " + player.getHighScore()));
+		highScoreLabel.addAction(Actions.repeat(RepeatAction.FOREVER, highScoreLabelAction));
+		stage.addActor(new RenderableLabel(highScoreLabel, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseReimu = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/reimu_box.png")))));
 		purchaseReimu.setPosition(1504, 676);

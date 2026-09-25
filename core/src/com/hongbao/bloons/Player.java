@@ -1,5 +1,7 @@
 package com.hongbao.bloons;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.hongbao.bloons.entities.Girl;
 
 
@@ -7,15 +9,24 @@ public class Player {
 	
 	private int money;
 	private int health;
+	private int score;
+	private int highScore;
+	private Preferences preferences;
 	
 	public Player() {
-		money = 200;
-		health = 200;
+		this(200, 200);
 	}
 	
 	public Player(int money, int health) {
 		this.money = money;
 		this.health = health;
+		this.score = 0;
+		if (Gdx.app != null) {
+			this.preferences = Gdx.app.getPreferences("bloons");
+			this.highScore = preferences.getInteger("highScore", 0);
+		} else {
+			this.highScore = 0;
+		}
 	}
 	
 	public int getMoney() {
@@ -43,6 +54,25 @@ public class Player {
 		this.health -= health;
 		if (this.health < 0) {
 			this.health = 0;
+		}
+	}
+	
+	public int getScore() {
+		return score;
+	}
+	
+	public int getHighScore() {
+		return highScore;
+	}
+	
+	public void addScore(int amount) {
+		this.score += amount;
+		if (this.score > this.highScore) {
+			this.highScore = this.score;
+			if (this.preferences != null) {
+				this.preferences.putInteger("highScore", this.highScore);
+				this.preferences.flush();
+			}
 		}
 	}
 	

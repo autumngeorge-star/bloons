@@ -25,6 +25,12 @@ public class BloonActor extends RenderableActor {
 	private Bloon bloon;
 	private float collisionRadius;
 	
+	public BloonActor(Bloon bloon) {
+		this.bloon = bloon;
+		this.bloonId = RANDOM.nextLong();
+		this.parentBloonIds = new HashSet<>();
+	}
+
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
