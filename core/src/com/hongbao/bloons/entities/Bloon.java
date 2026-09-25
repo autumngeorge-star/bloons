@@ -176,6 +176,9 @@ public class Bloon {
 	
 	public void damage(int damage) {
 		this.health -= damage;
+		this.color = getColorFromHealth(this.health);
+		this.speed = COLOR_TO_SPEED.get(this.color);
+		this.imageFileName = createImageFileName(this.color.getValue(), this.camo, this.regen);
 	}
 
 	public BloonPoppedResult pop(int damage) {
@@ -198,6 +201,10 @@ public class Bloon {
 	}
 	
 	public static Color getColorFromHealth(int health) {
+		if (health <= 1) {
+			return RED;
+		}
+
 		if (HEALTH_TO_COLOR.containsKey(health)) {
 			return HEALTH_TO_COLOR.get(health);
 		}

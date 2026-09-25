@@ -27,7 +27,7 @@ public class BloonActor extends RenderableActor {
 	
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+		textureRegion = loadTextureRegion(bloon.getImageFileName());
 
 		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
 		
@@ -79,7 +79,21 @@ public class BloonActor extends RenderableActor {
 	
 	// Please avoid calling this method directly, instead use the BloonManager damage()
 	public void damage(int damage) {
+		float centerX = getCenterX();
+		float centerY = getCenterY();
 		bloon.damage(damage);
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
+		textureRegion = loadTextureRegion(bloon.getImageFileName());
+		float newWidth = textureRegion.getTexture().getWidth() * SCALE;
+		float newHeight = textureRegion.getTexture().getHeight() * SCALE;
+		collisionRadius = newWidth / 2f;
+		setBounds(centerX - newWidth / 2f, centerY - newHeight / 2f, newWidth, newHeight);
+	}
+
+	protected TextureRegion loadTextureRegion(String imageFileName) {
+		return new TextureRegion(new Texture(Gdx.files.internal(imageFileName)));
 	}
 	
 	// Please avoid calling this method directly, instead use the BloonManager pop()
