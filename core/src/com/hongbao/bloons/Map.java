@@ -46,18 +46,24 @@ public class Map {
 	private RenderableLabel upgradeActor;
 	private RenderableLabel sellActor;
 	private boolean hoveringOverUpgrade;
+	private UIManager uiManager;
 
 	public Map(String backgroundImage, Stage stage) {
+		this(backgroundImage, stage, UIManager.getInstance());
+	}
+
+	public Map(String backgroundImage, Stage stage, UIManager uiManager) {
 		this.backgroundImage = backgroundImage;
 		this.bloonManager = new BloonManager(stage, this);
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;
+		this.uiManager = uiManager != null ? uiManager : UIManager.getInstance();
 		hoveringOverUpgrade = false;
 
-		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
+		Skin skin = this.uiManager.getSkin();
 
-		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
+		ImageButton infoBackground = new ImageButton(this.uiManager.getDrawable("img/ui/girl_details_template.png"));
 		infoBackground.setPosition(1504, 4);
 		this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
