@@ -11,20 +11,37 @@ import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
 
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 public class BloonActor extends RenderableActor {
 	
 	public static final float SCALE = 0.5f;
-	public static final Random RANDOM = new Random();
+	private static final AtomicLong ID_GENERATOR = new AtomicLong(0);
 	
 	private Set<Long> parentBloonIds;
 	private Long bloonId;
 	private Bloon bloon;
 	private float collisionRadius;
+
+	public static void resetIdGenerator() {
+		ID_GENERATOR.set(0);
+	}
+
+	public static void resetIdGenerator(long initialValue) {
+		ID_GENERATOR.set(initialValue);
+	}
 	
+	public BloonActor(Bloon bloon, float x, float y, float collisionRadius) {
+		this.bloon = bloon;
+		this.collisionRadius = collisionRadius;
+		setZIndex(ZIndex.BLOON_Z_INDEX);
+		setBounds(x - collisionRadius, y - collisionRadius, collisionRadius * 2, collisionRadius * 2);
+		parentBloonIds = new HashSet<>();
+		bloonId = ID_GENERATOR.incrementAndGet();
+	}
+
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
@@ -40,7 +57,7 @@ public class BloonActor extends RenderableActor {
 		} else {
 			parentBloonIds = new HashSet<>();
 		}
-		bloonId = RANDOM.nextLong();
+		bloonId = ID_GENERATOR.incrementAndGet();
 	}
 
 	public Bloon getBloon() {
@@ -53,12 +70,18 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		}
+		return getX() + getWidth() / 2f;
 	}
 	
 	@Override
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		}
+		return getY() + getHeight() / 2f;
 	}
 	
 	public float getCollisionRadius() {
@@ -85,14 +108,20 @@ public class BloonActor extends RenderableActor {
 	// Please avoid calling this method directly, instead use the BloonManager pop()
 	public BloonPoppedResult pop(int damage) {
 		BloonPoppedResult bloonPoppedResult = bloon.pop(damage);
-		textureRegion.getTexture().dispose();
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
 		return bloonPoppedResult;
 	}
 	
 	public void release() {
-		((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
-		textureRegion.getTexture().dispose();
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
+		}
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
 	}
 	

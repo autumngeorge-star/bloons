@@ -11,7 +11,9 @@ import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -68,7 +70,7 @@ public class BloonManager {
 	}
 	
 	public void checkCollision(final BulletActor bulletActor) {
-		Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
+		List<BloonActor> collisionCandidates = new ArrayList<>();
 		
 		for (BloonActor bloonActor : onstageBloons) {
 			float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
@@ -76,32 +78,50 @@ public class BloonManager {
 			
 			if (distance < collisionDistance) {
 				if (!bulletActor.hasDamagedBloon(bloonActor)) {
-					bulletActor.damageBloon(bloonActor);
-					bloonsToBePopped.add(bloonActor);
-					bulletActor.decrementPierce();
-					
-					if (bulletActor.getBullet().getPierce() == 0) {
-						// don't bother checking collisions if the bullet is used up.
-						break;
-					}
+					collisionCandidates.add(bloonActor);
 				}
 			}
+		}
+
+		if (!collisionCandidates.isEmpty()) {
+			collisionCandidates.sort((a, b) -> {
+				int distCompare = Integer.compare(b.getBloon().getDistanceTravelled(), a.getBloon().getDistanceTravelled());
+				if (distCompare != 0) {
+					return distCompare;
+				}
+				return Long.compare(a.getBloonId(), b.getBloonId());
+			});
+
+			List<BloonActor> bloonsToBePopped = new ArrayList<>();
+			for (BloonActor bloonActor : collisionCandidates) {
+				if (bulletActor.getBullet().getPierce() == 0) {
+					break;
+				}
+				bulletActor.damageBloon(bloonActor);
+				bloonsToBePopped.add(bloonActor);
+				bulletActor.decrementPierce();
+			}
+
+			bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
 		}
 		
 		if (bulletActor.getBullet().isHoming()) {
 			bulletActor.setTarget(null);
 		}
-		
-		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
-		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+		Player player = null;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			player = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getPlayer();
+		}
 		
 		if (bloonActor.getBloon().willPopBloon(damage)) {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
-			player.earnMoney(result.getCashGenerated());
+			if (player != null) {
+				player.earnMoney(result.getCashGenerated());
+			}
 			
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
@@ -109,19 +129,24 @@ public class BloonManager {
 				if (previousBloonActor == null) {
 					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
 				} else {
-					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
+					Pair<Float, Float> direction = map != null ? map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY()) : new Pair<>(0f, 0f);
 					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
 				}
-				stage.addActor(generatedBloonActor);
+				if (stage != null) {
+					stage.addActor(generatedBloonActor);
+				}
 				onstageBloons.add(generatedBloonActor);
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
-			player.earnMoney(damage);
-			// todo play some other sound I guess
+			if (player != null) {
+				player.earnMoney(damage);
+			}
 		}
 	}
 	
@@ -130,54 +155,56 @@ public class BloonManager {
 	}
 	
 	public boolean attackBloonIfInRange(GirlActor girlActor) {
-		Set<BloonActor> bloonsInRange = new HashSet<>();
+		BloonActor targetBloon = null;
 		
 		for (BloonActor bloonActor : onstageBloons) {
 			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
 			
 			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
-				bloonsInRange.add(bloonActor);
+				if (targetBloon == null) {
+					targetBloon = bloonActor;
+				} else {
+					int comp = Integer.compare(bloonActor.getBloon().getDistanceTravelled(), targetBloon.getBloon().getDistanceTravelled());
+					if (comp > 0) {
+						targetBloon = bloonActor;
+					} else if (comp == 0 && Long.compare(bloonActor.getBloonId(), targetBloon.getBloonId()) < 0) {
+						targetBloon = bloonActor;
+					}
+				}
 			}
 		}
 		
-		if (bloonsInRange.isEmpty()) {
+		if (targetBloon == null) {
 			return false;
 		} else {
-			BloonActor bloonActor = bloonsInRange.iterator().next();
-			
-			for (BloonActor actor : bloonsInRange) {
-				if (actor.getBloon().getDistanceTravelled() > bloonActor.getBloon().getDistanceTravelled()) {
-					bloonActor = actor;
-				}
-			}
-			
-			BulletActor bulletActor = girlActor.createBulletActor(bloonActor);
+			BulletActor bulletActor = girlActor.createBulletActor(targetBloon);
 			stage.addActor(bulletActor);
 			return true;
 		}
 	}
 	
 	public void lookAtBloon(GirlActor girlActor) {
-		Set<BloonActor> bloonsInRange = new HashSet<>();
+		BloonActor targetBloon = null;
 		
 		for (BloonActor bloonActor : onstageBloons) {
 			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
 			
 			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
-				bloonsInRange.add(bloonActor);
+				if (targetBloon == null) {
+					targetBloon = bloonActor;
+				} else {
+					int comp = Integer.compare(bloonActor.getBloon().getDistanceTravelled(), targetBloon.getBloon().getDistanceTravelled());
+					if (comp > 0) {
+						targetBloon = bloonActor;
+					} else if (comp == 0 && Long.compare(bloonActor.getBloonId(), targetBloon.getBloonId()) < 0) {
+						targetBloon = bloonActor;
+					}
+				}
 			}
 		}
 		
-		if (!bloonsInRange.isEmpty()) {
-			BloonActor bloonActor = bloonsInRange.iterator().next();
-			
-			for (BloonActor actor : bloonsInRange) {
-				if (actor.getBloon().getDistanceTravelled() > bloonActor.getBloon().getDistanceTravelled()) {
-					bloonActor = actor;
-				}
-			}
-			
-			girlActor.lookAtBloon(bloonActor);
+		if (targetBloon != null) {
+			girlActor.lookAtBloon(targetBloon);
 		}
 	}
 	
@@ -195,19 +222,32 @@ public class BloonManager {
 			return null;
 		}
 		
-		BloonActor bloonActor = null;
+		BloonActor closestActor = null;
+		float closestDistance = Float.MAX_VALUE;
 		
 		for (BloonActor actor : onstageBloons) {
 			if (!bulletActor.hasDamagedBloon(actor)) {
-				if (bloonActor == null) {
-					bloonActor = actor;
-				} else if (Map.distanceBetweenActors(actor, bulletActor) < Map.distanceBetweenActors(bloonActor, bulletActor)) {
-					bloonActor = actor;
+				float distance = Map.distanceBetweenActors(actor, bulletActor);
+				if (closestActor == null) {
+					closestActor = actor;
+					closestDistance = distance;
+				} else if (distance < closestDistance) {
+					closestActor = actor;
+					closestDistance = distance;
+				} else if (distance == closestDistance) {
+					int distComp = Integer.compare(actor.getBloon().getDistanceTravelled(), closestActor.getBloon().getDistanceTravelled());
+					if (distComp > 0) {
+						closestActor = actor;
+						closestDistance = distance;
+					} else if (distComp == 0 && Long.compare(actor.getBloonId(), closestActor.getBloonId()) < 0) {
+						closestActor = actor;
+						closestDistance = distance;
+					}
 				}
 			}
 		}
 		
-		return bloonActor;
+		return closestActor;
 	}
 	
 }
