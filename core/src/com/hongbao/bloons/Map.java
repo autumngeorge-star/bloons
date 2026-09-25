@@ -250,7 +250,8 @@ public class Map {
 		}
 		
 		for (GirlActor stageActor : onStageGirls) {
-			if (distanceBetweenActors(girlActor, stageActor) < r + stageActor.getCollisionRadius()) {
+			float minDistance = r + stageActor.getCollisionRadius();
+			if (distanceSquaredBetweenActors(girlActor, stageActor) < minDistance * minDistance) {
 				return false;
 			}
 		}
@@ -286,9 +287,14 @@ public class Map {
 		return tile * TILE_HEIGHT + (TILE_HEIGHT / 2f);
 	}
 	
+	public static float distanceSquaredBetweenActors(RenderableActor actor1, RenderableActor actor2) {
+		float dx = actor1.getCenterX() - actor2.getCenterX();
+		float dy = actor1.getCenterY() - actor2.getCenterY();
+		return dx * dx + dy * dy;
+	}
+
 	public static float distanceBetweenActors(RenderableActor actor1, RenderableActor actor2) {
-		return (float)Math.sqrt(
-		 Math.pow(actor1.getCenterX() - actor2.getCenterX(), 2) + Math.pow(actor1.getCenterY() - actor2.getCenterY(), 2));
+		return (float)Math.sqrt(distanceSquaredBetweenActors(actor1, actor2));
 	}
 
 	public void showGirlDetailsModule() {
