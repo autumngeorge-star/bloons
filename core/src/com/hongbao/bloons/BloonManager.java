@@ -58,7 +58,12 @@ public class BloonManager {
 	}
 	
 	public void createBloons() {
-		Set<Bloon> bloonsToBeCreated = bloonQueue.getBloons();
+		float delta = (Gdx.graphics != null) ? Gdx.graphics.getDeltaTime() : BloonQueue.TICK_DELTA;
+		createBloons(delta);
+	}
+
+	public void createBloons(float delta) {
+		Set<Bloon> bloonsToBeCreated = bloonQueue.getBloons(delta);
 		
 		for (Bloon bloon : bloonsToBeCreated) {
 			BloonActor actor = new BloonActor(bloon, -25, 425, null); // todo make these numbers an attribute in map or something
