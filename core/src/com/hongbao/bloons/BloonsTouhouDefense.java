@@ -172,7 +172,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					if (map.getBloonManager().getLevel() == 0) {
 						titleActor.setText("START\n(click here)");
 					} else {
-						titleActor.setText("NEXT LEVEL\n(click here)");
+						titleActor.setText("START Level " + map.getBloonManager().getLevel() + "\n(click here)");
 					}
 					titleActor.setColor(Color.BLACK);
 				}
@@ -526,6 +526,12 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
 				autoContinue = !autoContinue;
+			} else if (instructions.isEmpty() && map.getBloonManager().canGoToNextLevel()) {
+				if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) || Gdx.input.isKeyJustPressed(Input.Keys.UP) || Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+					map.getBloonManager().incrementLevel();
+				} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) || Gdx.input.isKeyJustPressed(Input.Keys.DOWN) || Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+					map.getBloonManager().decrementLevel();
+				}
 			}
 			
 			if (girl != null) {
