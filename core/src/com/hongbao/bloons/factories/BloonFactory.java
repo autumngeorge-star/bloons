@@ -3,6 +3,7 @@ package com.hongbao.bloons.factories;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.hongbao.bloons.BloonQueue;
+import com.hongbao.bloons.descriptors.BloonSpawnDescriptor;
 import com.hongbao.bloons.entities.Bloon;
 
 import java.util.ArrayList;
@@ -186,6 +187,20 @@ public class BloonFactory {
 		return new Bloon(Bloon.Color.ZOMG, 4918, false, false);
 	}
 	
+	public static Bloon createBloonFromDescriptor(BloonSpawnDescriptor descriptor) {
+		if (descriptor == null) {
+			return null;
+		}
+		Bloon bloon = createBloonOfType(descriptor.getBloonType());
+		if (descriptor.isCamo()) {
+			bloon.setCamo(true);
+		}
+		if (descriptor.isRegen()) {
+			bloon.setRegen(true);
+		}
+		return bloon;
+	}
+
 	public static Bloon createBloonOfType(String type, int health) {
 		// In the case of bullets that do more than 1 damage, we could (for example) pop a parent bloon so hard that the resulting bloons end up damaged.
 		Bloon createdBloon = createBloonOfType(type);
@@ -194,59 +209,56 @@ public class BloonFactory {
 	}
 	
 	public static Bloon createBloonOfType(String type) {
-		// todo george at some point add all the variations of bloons too :(
+		if (type == null) {
+			throw new RuntimeException("Null bloon type");
+		}
 		if (type.endsWith("\r")) {
 			type = type.substring(0, type.length() - 1);
 		}
-		if ("red".equals(type)) {
-			return createRedBloon();
+		boolean camo = type.contains("_camo");
+		boolean regen = type.contains("_regen") || type.contains("_regrowth");
+		String baseType = type.replace("_camo", "").replace("_regen", "").replace("_regrowth", "");
+
+		if ("red".equals(baseType)) {
+			return new Bloon(Bloon.Color.RED, 1, camo, regen);
 		}
-		if ("red_camo".equals(type)) {
-			return createRedCamoBloon();
+		if ("blue".equals(baseType)) {
+			return new Bloon(Bloon.Color.BLUE, 2, camo, regen);
 		}
-		if ("red_regen".equals(type)) {
-			return createRedRegenBloon();
+		if ("green".equals(baseType)) {
+			return new Bloon(Bloon.Color.GREEN, 3, camo, regen);
 		}
-		if ("red_camo_regen".equals(type)) {
-			return createRedCamoRegenBloon();
+		if ("yellow".equals(baseType)) {
+			return new Bloon(Bloon.Color.YELLOW, 4, camo, regen);
 		}
-		if ("blue".equals(type)) {
-			return createBlueBloon();
+		if ("pink".equals(baseType)) {
+			return new Bloon(Bloon.Color.PINK, 5, camo, regen);
 		}
-		if ("green".equals(type)) {
-			return createGreenBloon();
+		if ("black".equals(baseType)) {
+			return new Bloon(Bloon.Color.BLACK, 6, camo, regen);
 		}
-		if ("yellow".equals(type)) {
-			return createYellowBloon();
+		if ("lead".equals(baseType)) {
+			return new Bloon(Bloon.Color.LEAD, 7, camo, regen);
 		}
-		if ("pink".equals(type)) {
-			return createPinkBloon();
+		if ("zebra".equals(baseType)) {
+			return new Bloon(Bloon.Color.ZEBRA, 7, camo, regen);
 		}
-		if ("black".equals(type)) {
-			return createBlackBloon();
+		if ("rainbow".equals(baseType)) {
+			return new Bloon(Bloon.Color.RAINBOW, 8, camo, regen);
 		}
-		if ("lead".equals(type)) {
-			return createLeadBloon();
+		if ("ceramic".equals(baseType)) {
+			return new Bloon(Bloon.Color.CERAMIC, 18, camo, regen);
 		}
-		if ("zebra".equals(type)) {
-			return createZebraBloon();
+		if ("moab".equals(baseType)) {
+			return new Bloon(Bloon.Color.MOAB, 218, camo, regen);
 		}
-		if ("rainbow".equals(type)) {
-			return createRainbowBloon();
+		if ("bfb".equals(baseType)) {
+			return new Bloon(Bloon.Color.BFB, 918, camo, regen);
 		}
-		if ("ceramic".equals(type)) {
-			return createCeramicBloon();
+		if ("zomg".equals(baseType)) {
+			return new Bloon(Bloon.Color.ZOMG, 4918, camo, regen);
 		}
-		if ("moab".equals(type)) {
-			return createMOAB();
-		}
-		if ("bfb".equals(type)) {
-			return createBFB();
-		}
-		if ("zomg".equals(type)) {
-			return createZOMG();
-		}
-		throw new RuntimeException("Unexpected bloon type: " +type);
+		throw new RuntimeException("Unexpected bloon type: " + type);
 	}
 	
 	public static Bloon createRandomBloon() {
@@ -299,12 +311,9 @@ public class BloonFactory {
 		String[] lines = fileContents.split("\n");
 		long timer = 0;
 
-		List<List<Bloon>> bloonLevels = new ArrayList<>();
-		List<List<Long>> intervalLevels = new ArrayList<>();
+		List<List<BloonSpawnDescriptor>> bloonLevels = new ArrayList<>();
+		List<BloonSpawnDescriptor> currentLevelDescriptors = new ArrayList<>();
 
-		List<Bloon> bloons = new ArrayList<>();
-		List<Long> intervals = new ArrayList<>();
-		
 		for (String line : lines) {
 			if (line.startsWith("//")) {
 				// do nothing
@@ -318,9 +327,13 @@ public class BloonFactory {
 					for (int x = 0; x < amount; x++) {
 						String[] types = bloonTypes.split(",");
 						for (String type : types) {
-							Bloon bloon = createBloonOfType(type);
-							bloons.add(bloon);
-							intervals.add(timer);
+							if (type.endsWith("\r")) {
+								type = type.substring(0, type.length() - 1);
+							}
+							boolean camo = type.contains("_camo");
+							boolean regen = type.contains("_regen") || type.contains("_regrowth");
+							BloonSpawnDescriptor descriptor = new BloonSpawnDescriptor(type, timer, camo, regen);
+							currentLevelDescriptors.add(descriptor);
 							timer += delay;
 						}
 					}
@@ -328,17 +341,19 @@ public class BloonFactory {
 					System.out.println("BloonFactory.createBloonQueue(wtf2) { " + line + " }");
 				}
 			} else if (line.contains("END")) {
-				bloonLevels.add(bloons);
-				intervalLevels.add(intervals);
-				bloons = new ArrayList<>();
-				intervals = new ArrayList<>();
+				bloonLevels.add(currentLevelDescriptors);
+				currentLevelDescriptors = new ArrayList<>();
 				timer = 0;
 			} else {
 				System.out.println("BloonFactory.createBloonQueue(wtf1) { " + line + " }");
 			}
 		}
+
+		if (!currentLevelDescriptors.isEmpty()) {
+			bloonLevels.add(currentLevelDescriptors);
+		}
 			
-		return new BloonQueue(bloonLevels, intervalLevels);
+		return new BloonQueue(bloonLevels);
 	}
 	
 }
