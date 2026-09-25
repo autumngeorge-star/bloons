@@ -1,8 +1,11 @@
 package com.hongbao.bloons.entities;
 
 import com.hongbao.bloons.helpers.BloonPoppedResult;
+import com.hongbao.bloons.statuseffects.StatusEffect;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.hongbao.bloons.entities.Bloon.Color.BFB;
@@ -90,9 +93,10 @@ public class Bloon {
 	private String imageFileName;
 	private int health;
 	private int speed;
-	private int distanceTravelled;
+	private float distanceTravelled;
 	private boolean camo;
 	private boolean regen;
+	private List<StatusEffect> statusEffects = new ArrayList<>();
 
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
@@ -101,6 +105,30 @@ public class Bloon {
 		this.camo = camo;
 		this.regen = regen;
 		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
+	}
+
+	public List<StatusEffect> getStatusEffects() {
+		return statusEffects;
+	}
+
+	public void addStatusEffect(StatusEffect effect) {
+		if (effect != null) {
+			statusEffects.add(effect);
+		}
+	}
+
+	public void removeStatusEffect(StatusEffect effect) {
+		statusEffects.remove(effect);
+	}
+
+	public float getEffectiveSpeed() {
+		float multiplier = 1.0f;
+		for (StatusEffect effect : statusEffects) {
+			if (!effect.isExpired()) {
+				multiplier *= effect.getSpeedMultiplier();
+			}
+		}
+		return speed * multiplier;
 	}
 
 	public Color getColor() {
@@ -136,15 +164,23 @@ public class Bloon {
 	}
 	
 	public int getDistanceTravelled() {
-		return distanceTravelled;
+		return (int) distanceTravelled;
 	}
 	
 	public void setDistanceTravelled(int distanceTravelled) {
 		this.distanceTravelled = distanceTravelled;
 	}
+
+	public void setDistanceTravelled(float distanceTravelled) {
+		this.distanceTravelled = distanceTravelled;
+	}
 	
 	public void incrementDistanceTravelled() {
-		distanceTravelled += speed;
+		distanceTravelled += getEffectiveSpeed();
+	}
+
+	public void incrementDistanceTravelled(float amount) {
+		distanceTravelled += amount;
 	}
 	
 	public boolean isCamo() {
