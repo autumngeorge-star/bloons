@@ -20,6 +20,7 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.actors.SpellCardActor;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -101,7 +102,7 @@ public class Map {
 				  "Range: " + (int)girl.getRange() + " (" + (int)upgradedStats.getRange() + ")\n" +
 				  "Upgrade: " + girl.getUpgradeCostString() + " (" + upgradedStats.getUpgradeCostString() + ")\n" +
 				  "Sell: $" + girl.getSellPrice() + "\n" +
-				  " \n" +
+				  girl.getSpellCardStatus() + "\n" +
 				  " "
 				);
 			} else {
@@ -109,7 +110,7 @@ public class Map {
 				 "Range: " + (int)girl.getRange() +"\n" +
 				  "Upgrade: " + girl.getUpgradeCostString() + "\n" +
 				  "Sell: $" + girl.getSellPrice() + "\n" +
-				  " \n" +
+				  girl.getSpellCardStatus() + "\n" +
 				  " "
 				);
 			}
@@ -273,8 +274,11 @@ public class Map {
 	}
 	
 	public void placeSpellCard() {
-		if (selectedGirl != null) {
-			stage.addActor(selectedGirl.createSpellCardActor());
+		if (selectedGirl != null && selectedGirl.isActive()) {
+			SpellCardActor spellCardActor = selectedGirl.createSpellCardActor();
+			if (spellCardActor != null) {
+				stage.addActor(spellCardActor);
+			}
 		}
 	}
 	
@@ -307,7 +311,7 @@ public class Map {
 				"Range: " + (int)girl.getRange() +"\n" +
 				"Upgrade: " + girl.getUpgradeCostString() + "\n" +
 				"Sell: $" + girl.getSellPrice() + "\n" +
-				" \n" +
+				girl.getSpellCardStatus() + "\n" +
 				" "
 		);
 		stage.addActor(infoBackground);
