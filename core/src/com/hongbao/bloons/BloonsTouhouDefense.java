@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.Align;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.audio.AudioSystem;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
@@ -557,6 +558,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			shapeRenderer.circle(map.getSelectedGirl().getCenterX(), map.getSelectedGirl().getCenterY(), map.getSelectedGirl().getGirl().getRange());
 			shapeRenderer.end();
 		}
+		AudioSystem.getInstance().processFrame();
 	}
 
 	@Override
@@ -574,6 +576,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void dispose() {
 		stage.dispose();
+		AudioSystem.getInstance().dispose();
 	}
 
 }
