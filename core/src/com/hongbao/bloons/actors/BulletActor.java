@@ -137,7 +137,8 @@ public class BulletActor extends RenderableActor {
 		}
 		
 		bullet.incrementDistanceTraveled();
-		if (bullet.getDistanceTraveled() >= bullet.getMaxRange()) {
+		bullet.incrementDuration(delta);
+		if (bullet.getLifecyclePolicy() != null && bullet.getLifecyclePolicy().isExpired(bullet)) {
 			remove();
 		}
 		

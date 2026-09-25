@@ -1,5 +1,8 @@
 package com.hongbao.bloons.entities;
 
+import com.hongbao.bloons.policies.BulletLifecyclePolicy;
+import com.hongbao.bloons.policies.RangeLifecyclePolicy;
+
 public class Bullet {
 	
 	public static final String IMAGE_FOLDER = "img/projectiles/";
@@ -9,6 +12,9 @@ public class Bullet {
 	private int pierce;
 	private float maxRange; // Because of how actions are evaluated, this is an approximation. But that's fine.
 	private float distanceTraveled;
+	private float maxDuration;
+	private float duration;
+	private BulletLifecyclePolicy lifecyclePolicy;
 	private boolean homing;
 	private String imageFileName;
 
@@ -25,17 +31,27 @@ public class Bullet {
 		pierce = 2;
 		maxRange = 500;
 		distanceTraveled = 0;
+		maxDuration = 10f;
+		duration = 0;
+		lifecyclePolicy = RangeLifecyclePolicy.DEFAULT;
 		homing = false;
 		imageFileName = IMAGE_FOLDER + "red_spell_card.png";
 	}
 	
 	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName) {
+		this(speed, damage, pierce, maxRange, homing, imageFileName, RangeLifecyclePolicy.DEFAULT);
+	}
+
+	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName, BulletLifecyclePolicy lifecyclePolicy) {
 		this.speed = speed;
 		this.damage = damage;
 		this.pierce = pierce;
 		this.maxRange = maxRange;
 		this.imageFileName = IMAGE_FOLDER + imageFileName;
 		distanceTraveled = 0;
+		maxDuration = 10f;
+		duration = 0;
+		this.lifecyclePolicy = lifecyclePolicy != null ? lifecyclePolicy : RangeLifecyclePolicy.DEFAULT;
 		this.homing = homing;
 	}
 	
@@ -77,6 +93,41 @@ public class Bullet {
 	
 	public void incrementDistanceTraveled() {
 		distanceTraveled += speed / 5;
+	}
+
+	public float getMaxDuration() {
+		return maxDuration;
+	}
+
+	public void setMaxDuration(float maxDuration) {
+		this.maxDuration = maxDuration;
+	}
+
+	public float getDuration() {
+		return duration;
+	}
+
+	public void setDuration(float duration) {
+		this.duration = duration;
+	}
+
+	public void incrementDuration(float delta) {
+		duration += delta;
+	}
+
+	public BulletLifecyclePolicy getLifecyclePolicy() {
+		return lifecyclePolicy;
+	}
+
+	public void setLifecyclePolicy(BulletLifecyclePolicy lifecyclePolicy) {
+		this.lifecyclePolicy = lifecyclePolicy != null ? lifecyclePolicy : RangeLifecyclePolicy.DEFAULT;
+	}
+
+	public boolean isExpired() {
+		if (lifecyclePolicy != null) {
+			return lifecyclePolicy.isExpired(this);
+		}
+		return distanceTraveled >= maxRange;
 	}
 	
 	public boolean isHoming() {

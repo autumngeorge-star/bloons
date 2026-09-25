@@ -1,5 +1,7 @@
 package com.hongbao.bloons.entities;
 
+import com.hongbao.bloons.policies.RangeLifecyclePolicy;
+
 import java.util.List;
 
 
@@ -112,7 +114,7 @@ public class Girl {
 	}
 
 	public Bullet createBullet() {
-		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
+		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName, RangeLifecyclePolicy.DEFAULT);
 	}
 	
 	public SpellCard createSpellCard() {
