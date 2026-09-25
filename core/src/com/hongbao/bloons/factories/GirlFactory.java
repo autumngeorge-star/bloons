@@ -1,6 +1,8 @@
 package com.hongbao.bloons.factories;
 
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.entities.GirlTier;
+import com.hongbao.bloons.entities.UpgradeNode;
 
 import java.util.Arrays;
 
@@ -10,20 +12,43 @@ import static com.hongbao.bloons.entities.Girl.NO_UPGRADES_AVAILABLE;
 public class GirlFactory {
 
 	public static Girl createReimu() {
-		return new Girl(
-				"Reimu",
-				Arrays.asList(86, 86, 75),
-				Arrays.asList(20f, 20f, 20f),
-				Arrays.asList(1, 1, 1),
-				Arrays.asList(4, 8, 13),
-				Arrays.asList(500f, 500f, 500f),
-				Arrays.asList(200f, 220f, 250f),
-				Arrays.asList(true, true, true),
-				"reimu.png",
-				"red_spell_card.png",
-				325,
-				Arrays.asList(200, 280, NO_UPGRADES_AVAILABLE)
-		);
+		GirlTier baseTier = new GirlTier(86, 20f, 1, 4, 500f, 200f, true);
+		
+		GirlTier homingTier2 = new GirlTier(60, 25f, 3, 12, 550f, 250f, true);
+		UpgradeNode node1A = new UpgradeNode("Divine Spirit", 350, homingTier2, 2);
+
+		GirlTier homingTier1 = new GirlTier(75, 22f, 2, 8, 500f, 220f, true);
+		UpgradeNode node1 = new UpgradeNode("Homing Master", 200, homingTier1, Arrays.asList(node1A), 1);
+
+		GirlTier barrierTier2 = new GirlTier(70, 20f, 2, 32, 600f, 250f, true);
+		UpgradeNode node2A = new UpgradeNode("Fantasy Seal", 400, barrierTier2, 2);
+
+		GirlTier barrierTier1 = new GirlTier(86, 20f, 1, 16, 550f, 220f, true);
+		UpgradeNode node2 = new UpgradeNode("Shrine Maiden Barrier", 250, barrierTier1, Arrays.asList(node2A), 1);
+
+		UpgradeNode root = new UpgradeNode("Base Reimu", 0, baseTier, Arrays.asList(node1, node2), 0);
+
+		return new Girl("Reimu", root, "reimu.png", "red_spell_card.png", 325);
+	}
+
+	public static Girl createMarisa() {
+		GirlTier baseTier = new GirlTier(56, 35f, 1, 1, 500f, 100f, false);
+
+		GirlTier sparkTier2 = new GirlTier(45, 75f, 4, 5, 600f, 150f, false);
+		UpgradeNode node1A = new UpgradeNode("Final Spark", 300, sparkTier2, 2);
+
+		GirlTier sparkTier1 = new GirlTier(56, 50f, 2, 2, 500f, 125f, false);
+		UpgradeNode node1 = new UpgradeNode("Master Spark", 140, sparkTier1, Arrays.asList(node1A), 1);
+
+		GirlTier meteorTier2 = new GirlTier(30, 50f, 2, 6, 700f, 200f, true);
+		UpgradeNode node2A = new UpgradeNode("Meteor Swarm", 280, meteorTier2, 2);
+
+		GirlTier starlightTier1 = new GirlTier(40, 40f, 1, 3, 600f, 150f, true);
+		UpgradeNode node2 = new UpgradeNode("Starlight Missile", 160, starlightTier1, Arrays.asList(node2A), 1);
+
+		UpgradeNode root = new UpgradeNode("Base Marisa", 0, baseTier, Arrays.asList(node1, node2), 0);
+
+		return new Girl("Marisa", root, "marisa.png", "blue_magic_missile.png", 200);
 	}
 
 	public static Girl createYukari() {
@@ -39,23 +64,6 @@ public class GirlFactory {
 				"purple_energy.png",
 				2500,
 				Arrays.asList(2500, 4500, NO_UPGRADES_AVAILABLE)
-		);
-	}
-
-	public static Girl createMarisa() {
-		return new Girl(
-				"Marisa",
-				Arrays.asList(56, 56, 56),
-				Arrays.asList(35f, 50f, 75f),
-				Arrays.asList(1, 1, 1),
-				Arrays.asList(1, 2, 4),
-				Arrays.asList(500f, 500f, 500f),
-				Arrays.asList(100f, 125f, 150f),
-				Arrays.asList(false, false, false),
-				"marisa.png",
-				"blue_magic_missile.png",
-				200,
-				Arrays.asList(140, 220, NO_UPGRADES_AVAILABLE)
 		);
 	}
 
@@ -93,7 +101,7 @@ public class GirlFactory {
 		);
 	}
 
-	public static Girl createRemilia() { // 3000
+	public static Girl createRemilia() {
 		return new Girl(
 				"Remilia",
 				Arrays.asList(4, 2, 2),
