@@ -23,6 +23,8 @@ import com.badlogic.gdx.utils.Align;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.audio.AudioService;
+import com.hongbao.bloons.audio.LibGDXAudioService;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
@@ -46,6 +48,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Stage stage;
 	private Player player;
 	private Map map;
+	private AudioService audioService;
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
@@ -59,7 +62,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		autoContinue = false;
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
-		musicPlayer = new MusicPlayer();
+		audioService = new LibGDXAudioService();
+		musicPlayer = audioService instanceof LibGDXAudioService ? ((LibGDXAudioService) audioService).getMusicPlayer() : new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -72,7 +76,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMap();
 		createMenu();
 		createInstructions();
-		musicPlayer.playTitleMusic();
+		audioService.playTitleMusic();
 	}
 
 	private void createInstructions() {
@@ -221,7 +225,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					map.setSelectedGirl(null);
 					Girl girl = GirlFactory.createReimu();
 					if (player.canPurchaseGirl(girl)) {
-						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), audioService);
 						map.setSelectedGirl(girlActor);
 						stage.addActor(girlActor);
 					}
@@ -245,7 +249,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					map.setSelectedGirl(null);
 					Girl girl = GirlFactory.createYukari();
 					if (player.canPurchaseGirl(girl)) {
-						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), audioService);
 						map.setSelectedGirl(girlActor);
 						stage.addActor(girlActor);
 					}
@@ -269,7 +273,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					map.setSelectedGirl(null);
 					Girl girl = GirlFactory.createMarisa();
 					if (player.canPurchaseGirl(girl)) {
-						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), audioService);
 						map.setSelectedGirl(girlActor);
 						stage.addActor(girlActor);
 					}
@@ -293,7 +297,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					map.setSelectedGirl(null);
 					Girl girl = GirlFactory.createAlice();
 					if (player.canPurchaseGirl(girl)) {
-						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), audioService);
 						map.setSelectedGirl(girlActor);
 						stage.addActor(girlActor);
 					}
@@ -317,7 +321,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					map.setSelectedGirl(null);
 					Girl girl = GirlFactory.createSakuya();
 					if (player.canPurchaseGirl(girl)) {
-						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), audioService);
 						map.setSelectedGirl(girlActor);
 						stage.addActor(girlActor);
 					}
@@ -341,7 +345,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					map.setSelectedGirl(null);
 					Girl girl = GirlFactory.createRemilia();
 					if (player.canPurchaseGirl(girl)) {
-						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), audioService);
 						map.setSelectedGirl(girlActor);
 						stage.addActor(girlActor);
 					}
@@ -365,7 +369,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					map.setSelectedGirl(null);
 					Girl girl = GirlFactory.createYoumu();
 					if (player.canPurchaseGirl(girl)) {
-						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), audioService);
 						map.setSelectedGirl(girlActor);
 						stage.addActor(girlActor);
 					}
@@ -389,7 +393,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					map.setSelectedGirl(null);
 					Girl girl = GirlFactory.createYuyuko();
 					if (player.canPurchaseGirl(girl)) {
-						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), audioService);
 						map.setSelectedGirl(girlActor);
 						stage.addActor(girlActor);
 					}
@@ -431,7 +435,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			}
 		});
 		
-		map = MapFactory.createHeaterMap(stage);
+		map = MapFactory.createHeaterMap(stage, audioService);
 		
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
 		ImageButton backgroundMap = new ImageButton(drawable);
@@ -449,6 +453,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
+	}
+
+	public AudioService getAudioService() {
+		return audioService;
 	}
 	
 	@Override
@@ -521,7 +529,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					updateInstructions();
 				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.V)) {
-				musicPlayer.toggleMusic();
+				audioService.toggleMusic();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
@@ -530,7 +538,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			
 			if (girl != null) {
 				if (player.canPurchaseGirl(girl)) {
-					GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+					GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), audioService);
 					map.setSelectedGirl(girlActor);
 					stage.addActor(girlActor);
 				}
@@ -562,18 +570,19 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void pause() {
 		paused = true;
-		musicPlayer.pause();
+		audioService.pauseMusic();
 	}
 
 	@Override
 	public void resume() {
 		paused = false;
-		musicPlayer.resume();
+		audioService.resumeMusic();
 	}
 
 	@Override
 	public void dispose() {
 		stage.dispose();
+		audioService.dispose();
 	}
 
 }

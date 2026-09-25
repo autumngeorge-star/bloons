@@ -2,6 +2,7 @@ package com.hongbao.bloons.factories;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.Map;
+import com.hongbao.bloons.audio.AudioService;
 import com.hongbao.bloons.helpers.Pair;
 
 
@@ -9,8 +10,8 @@ public class MapFactory {
 	
 	public static final float ROOT_2_OVER_2 = 0.7071f;
 	
-	public static Map createBasicMap(Stage stage) {
-		Map map = new Map("basic_map.png", stage);
+	public static Map createBasicMap(Stage stage, AudioService audioService) {
+		Map map = new Map("basic_map.png", stage, audioService);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		for (int x = 0; x < 32; x++) {
@@ -21,8 +22,8 @@ public class MapFactory {
 		return map;
 	}
 	
-	public static Map createMapWithTurn(Stage stage) {
-		Map map = new Map("map_with_turn.png", stage);
+	public static Map createMapWithTurn(Stage stage, AudioService audioService) {
+		Map map = new Map("map_with_turn.png", stage, audioService);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		directions[0][8] = new Pair<>(1f, 0f);
 		directions[1][8] = new Pair<>(1f, 0f);
@@ -41,8 +42,8 @@ public class MapFactory {
 		return map;
 	}
 	
-	public static Map createHeaterMap(Stage stage) {
-		Map map = new Map("heater.png", stage);
+	public static Map createHeaterMap(Stage stage, AudioService audioService) {
+		Map map = new Map("heater.png", stage, audioService);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		directions[0][8] = new Pair<>(1f, 0f);

@@ -1,11 +1,12 @@
 package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
+import com.hongbao.bloons.audio.AudioService;
+import com.hongbao.bloons.audio.NullAudioService;
 import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
@@ -22,25 +23,30 @@ public class BloonManager {
 	// A dedicated collection of onstage bloons is maintained to (probably) speed up collision checking
 	// especially when there are a lot of bullets on screen.
 	private Set<BloonActor> onstageBloons;
-	private Sound popSound; // todo another sound for damaging bloons
+	private AudioService audioService;
 	private BloonQueue bloonQueue;
-	
-	public BloonManager(Stage stage, Map map) {
+
+	public BloonManager(Stage stage, Map map, AudioService audioService) {
 		this.stage = stage;
 		this.map = map;
+		this.audioService = audioService != null ? audioService : new NullAudioService();
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
+	}
+
+	public BloonManager(Stage stage, Map map) {
+		this(stage, map, new NullAudioService());
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			if (audioService != null) {
+				if (map.getBloonManager().getLevel() == 1) {
+					audioService.playStageMusic();
+				} else if (map.getBloonManager().getLevel() == 40) {
+					audioService.playFinalBossMusic();
+				}
 			}
 		}
 	}
@@ -117,11 +123,15 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (audioService != null) {
+				audioService.playPopSound();
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
-			// todo play some other sound I guess
+			if (audioService != null) {
+				audioService.playDamageSound();
+			}
 		}
 	}
 	
