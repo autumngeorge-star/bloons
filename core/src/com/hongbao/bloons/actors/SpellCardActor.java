@@ -8,6 +8,8 @@ import com.hongbao.bloons.BloonManager;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.SpellCard;
+import com.hongbao.bloons.events.GameEventBus;
+import com.hongbao.bloons.events.SpellCardActivatedEvent;
 import com.hongbao.bloons.helpers.ZIndex;
 
 import java.util.List;
@@ -30,6 +32,7 @@ public class SpellCardActor extends RenderableActor {
 		 textureRegion.getTexture().getWidth(),
 		 textureRegion.getTexture().getHeight()
 		);
+		GameEventBus.getInstance().publish(new SpellCardActivatedEvent(this));
 	}
 	
 	public SpellCard getSpellCard() {

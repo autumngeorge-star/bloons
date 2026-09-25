@@ -573,6 +573,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		com.hongbao.bloons.events.GameEventBus.getInstance().publish(new com.hongbao.bloons.events.ApplicationDisposeEvent());
 		stage.dispose();
 	}
 

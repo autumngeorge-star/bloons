@@ -20,7 +20,12 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.actors.SpellCardActor;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.events.GameEventBus;
+import com.hongbao.bloons.events.SpellCardActivatedEvent;
+import com.hongbao.bloons.events.TowerPlacedEvent;
+import com.hongbao.bloons.events.TowerUpgradedEvent;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
 
@@ -270,11 +275,15 @@ public class Map {
 				event.setStage(null); // a somewhat hacky way of communicating to the stage that this event has already handled.
 			}
 		});
+		GameEventBus.getInstance().publish(new TowerPlacedEvent(girlActor));
 	}
 	
 	public void placeSpellCard() {
 		if (selectedGirl != null) {
-			stage.addActor(selectedGirl.createSpellCardActor());
+			SpellCardActor spellCardActor = selectedGirl.createSpellCardActor();
+			if (spellCardActor != null) {
+				stage.addActor(spellCardActor);
+			}
 		}
 	}
 	
@@ -338,6 +347,7 @@ public class Map {
 			int cost = selectedGirl.getGirl().upgrade();
 			player.spendMoney(cost);
 			showGirlDetailsModule();
+			GameEventBus.getInstance().publish(new TowerUpgradedEvent(selectedGirl));
 		}
 	}
 

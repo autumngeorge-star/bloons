@@ -2,6 +2,7 @@ package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.hongbao.bloons.audio.AudioAssetRegistry;
 
 
 public class MusicPlayer {
@@ -16,9 +17,11 @@ public class MusicPlayer {
 		boolean wasPlaying = true;
 		if (backgroundMusic != null) {
 			wasPlaying = backgroundMusic.isPlaying();
+			AudioAssetRegistry.getInstance().unregister(backgroundMusic);
 		}
 		stopMusic();
 		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
+		AudioAssetRegistry.getInstance().registerMusic(backgroundMusic);
 		backgroundMusic.setVolume(0.5f);
 		backgroundMusic.setLooping(true);
 		if (wasPlaying) {
