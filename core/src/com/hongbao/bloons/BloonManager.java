@@ -7,11 +7,14 @@ import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.entities.Bloon;
+import com.hongbao.bloons.events.BloonEventListener;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -24,6 +27,7 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private final List<BloonEventListener> listeners;
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
@@ -31,11 +35,42 @@ public class BloonManager {
 		onstageBloons = new HashSet<>();
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
+		listeners = new ArrayList<>();
+	}
+
+	public void addListener(BloonEventListener listener) {
+		if (listener != null && !listeners.contains(listener)) {
+			listeners.add(listener);
+		}
+	}
+
+	public void removeListener(BloonEventListener listener) {
+		listeners.remove(listener);
+	}
+
+	private void notifyBloonDamaged(BloonActor bloonActor, int damage) {
+		for (int i = 0; i < listeners.size(); i++) {
+			listeners.get(i).onBloonDamaged(bloonActor, damage);
+		}
+	}
+
+	private void notifyBloonPopped(BloonActor bloonActor, BloonPoppedResult result) {
+		for (int i = 0; i < listeners.size(); i++) {
+			listeners.get(i).onBloonPopped(bloonActor, result);
+		}
+	}
+
+	private void notifyLevelCleared(int level) {
+		for (int i = 0; i < listeners.size(); i++) {
+			listeners.get(i).onLevelCleared(level);
+		}
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
+			int clearedLevel = getLevel();
 			bloonQueue.nextLevel();
+			notifyLevelCleared(clearedLevel);
 			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
 			if (map.getBloonManager().getLevel() == 1) {
 				musicPlayer.playStageMusic();
@@ -102,6 +137,7 @@ public class BloonManager {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
 			player.earnMoney(result.getCashGenerated());
+			notifyBloonPopped(bloonActor, result);
 			
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
@@ -121,6 +157,7 @@ public class BloonManager {
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
+			notifyBloonDamaged(bloonActor, damage);
 			// todo play some other sound I guess
 		}
 	}
