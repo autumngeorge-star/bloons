@@ -1,69 +1,63 @@
 package com.hongbao.bloons;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
-
+import com.hongbao.bloons.audio.AudioAssets;
+import com.hongbao.bloons.audio.SoundManager;
 
 public class MusicPlayer {
 	
-	private Music backgroundMusic;
-	
+	private final SoundManager soundManager;
+
 	public MusicPlayer() {
-		backgroundMusic = null;
+		this(new SoundManager());
 	}
 
-	private void playMusic(String fileName) {
-		boolean wasPlaying = true;
-		if (backgroundMusic != null) {
-			wasPlaying = backgroundMusic.isPlaying();
-		}
-		stopMusic();
-		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
-		backgroundMusic.setVolume(0.5f);
-		backgroundMusic.setLooping(true);
-		if (wasPlaying) {
-			backgroundMusic.play();
-		}
+	public MusicPlayer(SoundManager soundManager) {
+		this.soundManager = soundManager;
 	}
 
 	public void playTitleMusic() {
-		playMusic("music/title.mp3");
+		if (soundManager != null) {
+			soundManager.playTitleMusic();
+		}
 	}
 
 	public void playStageMusic() {
-		playMusic("music/demystify_feast.mp3");
+		if (soundManager != null) {
+			soundManager.playStageMusic();
+		}
 	}
 
 	public void playFinalBossMusic() {
-		playMusic("music/night_falls.mp3");
+		if (soundManager != null) {
+			soundManager.playFinalBossMusic();
+		}
 	}
 	
 	public void pause() {
-		if (backgroundMusic != null) {
-			backgroundMusic.pause();
+		if (soundManager != null) {
+			soundManager.pauseMusic();
 		}
 	}
 	
 	public void resume() {
-		if (backgroundMusic != null) {
-			backgroundMusic.play();
+		if (soundManager != null) {
+			soundManager.resumeMusic();
 		}
 	}
 	
 	public void stopMusic() {
-		if (backgroundMusic != null) {
-			backgroundMusic.stop();
+		if (soundManager != null) {
+			soundManager.stopMusic();
 		}
 	}
 
 	public void toggleMusic() {
-		if (backgroundMusic != null) {
-			if (backgroundMusic.isPlaying()) {
-				pause();
-			} else {
-				resume();
-			}
+		if (soundManager != null) {
+			soundManager.toggleMusic();
 		}
 	}
 
+	public SoundManager getSoundManager() {
+		return soundManager;
+	}
 }

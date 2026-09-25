@@ -1,12 +1,15 @@
 package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.entities.Bloon;
+import com.hongbao.bloons.event.BloonPoppedEvent;
+import com.hongbao.bloons.event.DefaultEventBus;
+import com.hongbao.bloons.event.EventBus;
+import com.hongbao.bloons.event.LevelChangedEvent;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
@@ -22,25 +25,26 @@ public class BloonManager {
 	// A dedicated collection of onstage bloons is maintained to (probably) speed up collision checking
 	// especially when there are a lot of bullets on screen.
 	private Set<BloonActor> onstageBloons;
-	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private EventBus eventBus;
 	
 	public BloonManager(Stage stage, Map map) {
+		this(stage, map, DefaultEventBus.getDefault());
+	}
+
+	public BloonManager(Stage stage, Map map, EventBus eventBus) {
 		this.stage = stage;
 		this.map = map;
+		this.eventBus = eventBus;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			if (eventBus != null) {
+				eventBus.publish(new LevelChangedEvent(getLevel()));
 			}
 		}
 	}
@@ -117,7 +121,9 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (eventBus != null) {
+				eventBus.publish(new BloonPoppedEvent(bloonActor, damage));
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);

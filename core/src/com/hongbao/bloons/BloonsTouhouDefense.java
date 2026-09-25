@@ -23,8 +23,11 @@ import com.badlogic.gdx.utils.Align;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.audio.SoundManager;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.event.DefaultEventBus;
+import com.hongbao.bloons.event.EventBus;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
@@ -46,6 +49,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Stage stage;
 	private Player player;
 	private Map map;
+	private EventBus eventBus;
+	private SoundManager soundManager;
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
@@ -59,7 +64,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		autoContinue = false;
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
-		musicPlayer = new MusicPlayer();
+		eventBus = DefaultEventBus.getDefault();
+		soundManager = new SoundManager(eventBus);
+		musicPlayer = new MusicPlayer(soundManager);
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -449,6 +456,14 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
+	}
+
+	public SoundManager getSoundManager() {
+		return soundManager;
+	}
+
+	public EventBus getEventBus() {
+		return eventBus;
 	}
 	
 	@Override
