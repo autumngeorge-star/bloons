@@ -7,15 +7,26 @@ public class Player {
 	
 	private int money;
 	private int health;
+	private int score;
+	private int highScore;
+	private PreferenceManager preferenceManager;
 	
 	public Player() {
-		money = 200;
-		health = 200;
+		this(200, 200);
 	}
 	
 	public Player(int money, int health) {
 		this.money = money;
 		this.health = health;
+		this.score = 0;
+		this.highScore = 0;
+	}
+
+	public void setPreferenceManager(PreferenceManager preferenceManager) {
+		this.preferenceManager = preferenceManager;
+		if (preferenceManager != null) {
+			this.highScore = preferenceManager.getHighScore();
+		}
 	}
 	
 	public int getMoney() {
@@ -24,6 +35,32 @@ public class Player {
 	
 	public void earnMoney(int money) {
 		this.money += money;
+		addScore(money);
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void addScore(int points) {
+		this.score += points;
+		if (this.score > this.highScore) {
+			this.highScore = this.score;
+			if (preferenceManager != null) {
+				preferenceManager.updateHighScore(this.highScore);
+			}
+		}
+	}
+
+	public int getHighScore() {
+		return highScore;
+	}
+
+	public void setHighScore(int highScore) {
+		this.highScore = highScore;
+		if (preferenceManager != null) {
+			preferenceManager.setHighScore(highScore);
+		}
 	}
 	
 	public boolean spendMoney(int money) {

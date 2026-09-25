@@ -47,19 +47,22 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Player player;
 	private Map map;
 	private MusicPlayer musicPlayer;
+	private PreferenceManager preferenceManager;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
 	
 	
 	@Override
 	public void create() {
+		preferenceManager = new PreferenceManager();
 		Gdx.graphics.setWindowedMode(1800, 900);
 		paused = false;
-		tripleSpeed = false;
-		autoContinue = false;
+		tripleSpeed = preferenceManager.isTripleSpeed();
+		autoContinue = preferenceManager.isAutoContinue();
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
-		musicPlayer = new MusicPlayer();
+		player.setPreferenceManager(preferenceManager);
+		musicPlayer = new MusicPlayer(preferenceManager);
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -450,6 +453,20 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
 	}
+
+	public PreferenceManager getPreferenceManager() {
+		return preferenceManager;
+	}
+
+	public void onLevelCompleted(int level) {
+		if (preferenceManager != null) {
+			preferenceManager.updateHighScore(player.getScore());
+			if (map != null && map.getBloonManager().hasWonGame()) {
+				preferenceManager.unlockMap("heater.png");
+			}
+			preferenceManager.flush();
+		}
+	}
 	
 	@Override
 	public void resize(int width, int height) {
@@ -514,6 +531,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				girl = GirlFactory.createYuyuko();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
 				tripleSpeed = !tripleSpeed;
+				if (preferenceManager != null) {
+					preferenceManager.setTripleSpeed(tripleSpeed);
+				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
 				if (instructions.isEmpty()) {
 					map.getBloonManager().nextLevel();
@@ -526,6 +546,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
 				autoContinue = !autoContinue;
+				if (preferenceManager != null) {
+					preferenceManager.setAutoContinue(autoContinue);
+				}
 			}
 			
 			if (girl != null) {
@@ -563,6 +586,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public void pause() {
 		paused = true;
 		musicPlayer.pause();
+		if (preferenceManager != null) {
+			preferenceManager.flush();
+		}
 	}
 
 	@Override
@@ -573,6 +599,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		if (preferenceManager != null) {
+			preferenceManager.flush();
+		}
 		stage.dispose();
 	}
 
