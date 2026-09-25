@@ -4,7 +4,7 @@ import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.factories.BloonFactory;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,22 +47,8 @@ public class BloonPoppedResult {
 	private Set<Bloon> bloonsGenerated;
 	
 	public BloonPoppedResult(Bloon bloon, int damage) {
-		bloonsGenerated = new HashSet<>();
-		
-		if (bloon.getHealth() > damage) {
-			Bloon.Color originalColor = bloon.getColor();
-			int newBloonHealth = bloon.getHealth() - damage;
-			Bloon.Color poppedColor = Bloon.getColorFromHealth(newBloonHealth);
-			
-			int bloonsToBeCreated = COLOR_TO_RATIO.get(poppedColor) / COLOR_TO_RATIO.get(originalColor);
-			
-			for (int x = 0; x < bloonsToBeCreated; x++) {
-				Bloon bloonOfType = BloonFactory.createBloonOfType(poppedColor.getValue(), newBloonHealth);
-				bloonOfType.setDistanceTravelled(bloon.getDistanceTravelled());
-				bloonsGenerated.add(bloonOfType);
-			}
-		}
-		
+		bloonsGenerated = new LinkedHashSet<>();
+		processBloonDamage(bloon, damage, bloonsGenerated);
 		cashGenerated = calculateHealthDifferenceBetweenBloons(bloon, bloonsGenerated);
 	}
 	
@@ -72,6 +58,134 @@ public class BloonPoppedResult {
 	
 	public Set<Bloon> getBloonsGenerated() {
 		return bloonsGenerated;
+	}
+	
+	private static void processBloonDamage(Bloon currentBloon, int remainingDamage, Set<Bloon> resultBloons) {
+		int currentHealth = currentBloon.getHealth();
+		int threshold = getPopThresholdHealth(currentHealth);
+		int shellHp = currentHealth - threshold;
+		
+		if (remainingDamage < shellHp) {
+			int newHealth = currentHealth - remainingDamage;
+			currentBloon.setHealth(newHealth);
+			currentBloon.setColor(Bloon.getColorFromHealth(newHealth));
+			currentBloon.setSpeed(Bloon.COLOR_TO_SPEED.get(currentBloon.getColor()));
+			resultBloons.add(currentBloon);
+		} else {
+			int excessDamage = remainingDamage - shellHp;
+			Set<Bloon> children = createChildrenForThreshold(currentBloon, threshold);
+			if (children.isEmpty() || excessDamage == 0) {
+				resultBloons.addAll(children);
+			} else {
+				for (Bloon child : children) {
+					processBloonDamage(child, excessDamage, resultBloons);
+				}
+			}
+		}
+	}
+
+	private static int getPopThresholdHealth(int health) {
+		if (health > 918) {
+			return 918;
+		} else if (health > 218) {
+			return 218;
+		} else if (health > 18) {
+			return 18;
+		} else if (health > 8) {
+			return 8;
+		} else {
+			return health - 1;
+		}
+	}
+
+	private static Set<Bloon> createChildrenForThreshold(Bloon parent, int threshold) {
+		Set<Bloon> children = new LinkedHashSet<>();
+		boolean camo = parent.isCamo();
+		boolean regen = parent.isRegen();
+		int dist = parent.getDistanceTravelled();
+
+		if (threshold == 918) {
+			for (int i = 0; i < 4; i++) {
+				Bloon child = BloonFactory.createBFB();
+				child.setCamo(camo);
+				child.setRegen(regen);
+				child.setDistanceTravelled(dist);
+				children.add(child);
+			}
+		} else if (threshold == 218) {
+			for (int i = 0; i < 4; i++) {
+				Bloon child = BloonFactory.createMOAB();
+				child.setCamo(camo);
+				child.setRegen(regen);
+				child.setDistanceTravelled(dist);
+				children.add(child);
+			}
+		} else if (threshold == 18) {
+			for (int i = 0; i < 4; i++) {
+				Bloon child = BloonFactory.createCeramicBloon();
+				child.setCamo(camo);
+				child.setRegen(regen);
+				child.setDistanceTravelled(dist);
+				children.add(child);
+			}
+		} else if (threshold == 8) {
+			for (int i = 0; i < 2; i++) {
+				Bloon child = BloonFactory.createRainbowBloon();
+				child.setCamo(camo);
+				child.setRegen(regen);
+				child.setDistanceTravelled(dist);
+				children.add(child);
+			}
+		} else if (threshold == 7) {
+			for (int i = 0; i < 2; i++) {
+				Bloon child = BloonFactory.createZebraBloon();
+				child.setCamo(camo);
+				child.setRegen(regen);
+				child.setDistanceTravelled(dist);
+				children.add(child);
+			}
+		} else if (threshold == 6) {
+			for (int i = 0; i < 2; i++) {
+				Bloon child = BloonFactory.createBlackBloon();
+				child.setCamo(camo);
+				child.setRegen(regen);
+				child.setDistanceTravelled(dist);
+				children.add(child);
+			}
+		} else if (threshold == 5) {
+			for (int i = 0; i < 2; i++) {
+				Bloon child = BloonFactory.createPinkBloon();
+				child.setCamo(camo);
+				child.setRegen(regen);
+				child.setDistanceTravelled(dist);
+				children.add(child);
+			}
+		} else if (threshold == 4) {
+			Bloon child = BloonFactory.createYellowBloon();
+			child.setCamo(camo);
+			child.setRegen(regen);
+			child.setDistanceTravelled(dist);
+			children.add(child);
+		} else if (threshold == 3) {
+			Bloon child = BloonFactory.createGreenBloon();
+			child.setCamo(camo);
+			child.setRegen(regen);
+			child.setDistanceTravelled(dist);
+			children.add(child);
+		} else if (threshold == 2) {
+			Bloon child = BloonFactory.createBlueBloon();
+			child.setCamo(camo);
+			child.setRegen(regen);
+			child.setDistanceTravelled(dist);
+			children.add(child);
+		} else if (threshold == 1) {
+			Bloon child = BloonFactory.createRedBloon();
+			child.setCamo(camo);
+			child.setRegen(regen);
+			child.setDistanceTravelled(dist);
+			children.add(child);
+		}
+		return children;
 	}
 	
 	private static int calculateHealthDifferenceBetweenBloons(Bloon bloon, Set<Bloon> bloons) {
