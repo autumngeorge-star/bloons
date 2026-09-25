@@ -1,5 +1,6 @@
 package com.hongbao.bloons;
 
+import com.badlogic.gdx.Gdx;
 import com.hongbao.bloons.entities.Girl;
 
 
@@ -7,15 +8,33 @@ public class Player {
 	
 	private int money;
 	private int health;
+	private PreferencesManager preferencesManager;
 	
 	public Player() {
-		money = 200;
-		health = 200;
+		this(200, 200, null);
 	}
 	
 	public Player(int money, int health) {
+		this(money, health, null);
+	}
+
+	public Player(int money, int health, PreferencesManager preferencesManager) {
 		this.money = money;
 		this.health = health;
+		this.preferencesManager = preferencesManager;
+		syncPreferences();
+	}
+
+	public PreferencesManager getPreferencesManager() {
+		if (preferencesManager == null && Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			preferencesManager = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getPreferencesManager();
+		}
+		return preferencesManager;
+	}
+
+	public void setPreferencesManager(PreferencesManager preferencesManager) {
+		this.preferencesManager = preferencesManager;
+		syncPreferences();
 	}
 	
 	public int getMoney() {
@@ -24,6 +43,7 @@ public class Player {
 	
 	public void earnMoney(int money) {
 		this.money += money;
+		syncPreferences();
 	}
 	
 	public boolean spendMoney(int money) {
@@ -31,6 +51,7 @@ public class Player {
 			return false;
 		} else {
 			this.money -= money;
+			syncPreferences();
 			return true;
 		}
 	}
@@ -44,6 +65,7 @@ public class Player {
 		if (this.health < 0) {
 			this.health = 0;
 		}
+		syncPreferences();
 	}
 	
 	public boolean canPurchaseGirl(Girl girl) {
@@ -54,5 +76,15 @@ public class Player {
 		// really regretting the class name choice now
 		spendMoney(girl.getCost());
 	}
+
+	private void syncPreferences() {
+		PreferencesManager prefs = getPreferencesManager();
+		if (prefs != null) {
+			prefs.saveMoney(this.money);
+			prefs.saveHealth(this.health);
+			prefs.flush();
+		}
+	}
 	
 }
+
