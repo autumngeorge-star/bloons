@@ -6,10 +6,16 @@ import com.badlogic.gdx.audio.Music;
 
 public class MusicPlayer {
 	
+	private AudioResourceRegistry audioResourceRegistry;
 	private Music backgroundMusic;
 	
 	public MusicPlayer() {
-		backgroundMusic = null;
+		this(new AudioResourceRegistry());
+	}
+
+	public MusicPlayer(AudioResourceRegistry audioResourceRegistry) {
+		this.audioResourceRegistry = audioResourceRegistry;
+		this.backgroundMusic = null;
 	}
 
 	private void playMusic(String fileName) {
@@ -18,7 +24,7 @@ public class MusicPlayer {
 			wasPlaying = backgroundMusic.isPlaying();
 		}
 		stopMusic();
-		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
+		backgroundMusic = audioResourceRegistry.loadMusic(fileName);
 		backgroundMusic.setVolume(0.5f);
 		backgroundMusic.setLooping(true);
 		if (wasPlaying) {
