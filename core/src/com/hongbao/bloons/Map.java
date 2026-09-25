@@ -36,7 +36,7 @@ public class Map {
 
 	private String backgroundImage;
 	private BloonManager bloonManager;
-	private Pair<Float, Float>[][] directions;
+	private WaypointGrid waypointGrid;
 	private Set<GirlActor> onStageGirls;
 	private GirlActor selectedGirl;
 	private Stage stage;
@@ -50,6 +50,7 @@ public class Map {
 	public Map(String backgroundImage, Stage stage) {
 		this.backgroundImage = backgroundImage;
 		this.bloonManager = new BloonManager(stage, this);
+		this.waypointGrid = new WaypointGrid();
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;
@@ -180,8 +181,24 @@ public class Map {
 		sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
 	}
 
+	public WaypointGrid getWaypointGrid() {
+		return waypointGrid;
+	}
+
+	public void setWaypointGrid(WaypointGrid waypointGrid) {
+		this.waypointGrid = waypointGrid != null ? waypointGrid : new WaypointGrid();
+	}
+
 	public void setDirections(Pair<Float, Float>[][] directions) {
-		this.directions = directions;
+		if (this.waypointGrid == null) {
+			this.waypointGrid = new WaypointGrid(directions);
+		} else {
+			this.waypointGrid.setDirections(directions);
+		}
+	}
+
+	public Pair<Float, Float>[][] getDirections() {
+		return waypointGrid != null ? waypointGrid.getDirections() : null;
 	}
 
 	public void setBackgroundImage(String backgroundImage) {
@@ -210,15 +227,10 @@ public class Map {
 	}
 
 	public Pair<Float, Float> getDirection(float balloonX, float balloonY) {
-		// Each "direction tile" is 50x50 px, maybe some minor tweaking later
-		// There is an extra tile on the left and right of the screen so we have a smol x offset for that
-		int xTile = (int)(balloonX + TILE_LENGTH) / TILE_LENGTH;
-		int yTile = (int)balloonY / TILE_HEIGHT;
-		if (xTile < directions.length && yTile < directions[xTile].length) {
-			return directions[xTile][yTile];
-		} else {
+		if (waypointGrid == null) {
 			return new Pair<>(0f, 0f);
 		}
+		return waypointGrid.getDirection(balloonX, balloonY);
 	}
 
 	public BloonManager getBloonManager() {
@@ -239,11 +251,14 @@ public class Map {
 			return false;
 		}
 		
-		for (int i = 0; i < directions.length; i++) {
-			for (int j = 0; j < directions[i].length; j++) {
-				if (directions[i][j] != null && (directions[i][j].getFirst() != 0 || directions[i][j].getSecond() != 0)) {
-					if (Math.abs(x - getCenterXOfTile(i)) < r + (TILE_LENGTH / 2f) && Math.abs(y - getCenterYOfTile(j)) < r + (TILE_HEIGHT / 2f)) {
-						return false;
+		if (waypointGrid != null) {
+			for (int i = 0; i < waypointGrid.getWidth(); i++) {
+				for (int j = 0; j < waypointGrid.getHeight(); j++) {
+					Pair<Float, Float> dir = waypointGrid.getDirectionAtTile(i, j);
+					if (dir != null && (dir.getFirst() != 0 || dir.getSecond() != 0)) {
+						if (Math.abs(x - getCenterXOfTile(i)) < r + (TILE_LENGTH / 2f) && Math.abs(y - getCenterYOfTile(j)) < r + (TILE_HEIGHT / 2f)) {
+							return false;
+						}
 					}
 				}
 			}

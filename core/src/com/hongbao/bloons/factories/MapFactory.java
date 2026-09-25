@@ -183,14 +183,13 @@ public class MapFactory {
 	}
 	
 	
-	private static Pair<Float, Float>[][] initializeEmptyDirections() {
+	public static Pair<Float, Float>[][] initializeEmptyDirections() {
 		Pair<Float, Float>[][] directions = new Pair[32][18];
-		for (int x = 0; x < directions.length - 1; x++) {
+		for (int x = 0; x < directions.length; x++) {
 			for (int y = 0; y < directions[x].length; y++) {
 				directions[x][y] = new Pair<>(0f, 0f);
 			}
 		}
-		
 		
 		return directions;
 	}
