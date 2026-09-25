@@ -133,6 +133,15 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public void act(float delta) {
+		bloon.update(delta);
+		if (bloon.getHealth() <= 0) {
+			BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
+			if (app != null && app.getMap() != null && app.getMap().getBloonManager() != null) {
+				app.getMap().getBloonManager().popBloon(this, 0);
+			}
+			return;
+		}
+
 		BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
 		Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
 		if (direction.getFirst() < 0) {

@@ -1,5 +1,8 @@
 package com.hongbao.bloons.factories;
 
+import com.hongbao.bloons.effects.StatusEffectBuilder;
+import com.hongbao.bloons.effects.StatusEffectFactory;
+import com.hongbao.bloons.effects.StatusEffectType;
 import com.hongbao.bloons.entities.Girl;
 
 import java.util.Arrays;
@@ -60,7 +63,7 @@ public class GirlFactory {
 	}
 
 	public static Girl createAlice() {
-		return new Girl(
+		Girl alice = new Girl(
 				"Alice",
 				Arrays.asList(53, 53, 53),
 				Arrays.asList(50f, 50f, 50f),
@@ -74,10 +77,19 @@ public class GirlFactory {
 				450,
 				Arrays.asList(150, 600, NO_UPGRADES_AVAILABLE)
 		);
+		StatusEffectFactory freezeEffect = new StatusEffectBuilder()
+				.effectType(StatusEffectType.FREEZE)
+				.duration(1.5f)
+				.intensity(1.0f)
+				.tickInterval(0.5f)
+				.tickDamage(1)
+				.build();
+		alice.setStatusEffectFactory(freezeEffect);
+		return alice;
 	}
 
 	public static Girl createSakuya() {
-		return new Girl(
+		Girl sakuya = new Girl(
 				"Sakuya",
 				Arrays.asList(30, 20, 20),
 				Arrays.asList(20f, 20f, 20f),
@@ -91,6 +103,15 @@ public class GirlFactory {
 				500,
 				Arrays.asList(300, 350, NO_UPGRADES_AVAILABLE)
 		);
+		StatusEffectFactory slowEffect = new StatusEffectBuilder()
+				.effectType(StatusEffectType.SLOW)
+				.duration(3.0f)
+				.intensity(0.3f)
+				.stackable(true)
+				.maxStacks(3)
+				.build();
+		sakuya.setStatusEffectFactory(slowEffect);
+		return sakuya;
 	}
 
 	public static Girl createRemilia() { // 3000
@@ -128,7 +149,7 @@ public class GirlFactory {
 	}
 
 	public static Girl createYuyuko() {
-		return new Girl(
+		Girl yuyuko = new Girl(
 				"Yuyuko",
 				Arrays.asList(40, 30, 20),
 				Arrays.asList(10f, 11f, 12f),
@@ -142,6 +163,16 @@ public class GirlFactory {
 				2000,
 				Arrays.asList(500, 1500, NO_UPGRADES_AVAILABLE)
 		);
+		StatusEffectFactory dotEffect = new StatusEffectBuilder()
+				.effectType(StatusEffectType.DOT)
+				.duration(2.0f)
+				.tickInterval(0.5f)
+				.tickDamage(1)
+				.stackable(true)
+				.maxStacks(2)
+				.build();
+		yuyuko.setStatusEffectFactory(dotEffect);
+		return yuyuko;
 	}
 
 }
