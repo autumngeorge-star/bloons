@@ -3,6 +3,8 @@ package com.hongbao.bloons.factories;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.hongbao.bloons.BloonQueue;
+import com.hongbao.bloons.Wave;
+import com.hongbao.bloons.exceptions.WaveParseException;
 import com.hongbao.bloons.entities.Bloon;
 
 import java.util.ArrayList;
@@ -110,6 +112,22 @@ public class BloonFactory {
 		return new Bloon(Bloon.Color.BLACK, 6, true, true);
 	}
 	
+	public static Bloon createWhiteBloon() {
+		return new Bloon(Bloon.Color.WHITE, 6, false, false);
+	}
+	
+	public static Bloon createWhiteCamoBloon() {
+		return new Bloon(Bloon.Color.WHITE, 6, true, false);
+	}
+	
+	public static Bloon createWhiteRegenBloon() {
+		return new Bloon(Bloon.Color.WHITE, 6, false, true);
+	}
+	
+	public static Bloon createWhiteCamoRegenBloon() {
+		return new Bloon(Bloon.Color.WHITE, 6, true, true);
+	}
+	
 	public static Bloon createLeadBloon() {
 		return new Bloon(Bloon.Color.LEAD, 7, false, false);
 	}
@@ -194,59 +212,11 @@ public class BloonFactory {
 	}
 	
 	public static Bloon createBloonOfType(String type) {
-		// todo george at some point add all the variations of bloons too :(
-		if (type.endsWith("\r")) {
-			type = type.substring(0, type.length() - 1);
+		BloonType bloonType = BloonType.fromKey(type);
+		if (bloonType != null) {
+			return bloonType.createBloon();
 		}
-		if ("red".equals(type)) {
-			return createRedBloon();
-		}
-		if ("red_camo".equals(type)) {
-			return createRedCamoBloon();
-		}
-		if ("red_regen".equals(type)) {
-			return createRedRegenBloon();
-		}
-		if ("red_camo_regen".equals(type)) {
-			return createRedCamoRegenBloon();
-		}
-		if ("blue".equals(type)) {
-			return createBlueBloon();
-		}
-		if ("green".equals(type)) {
-			return createGreenBloon();
-		}
-		if ("yellow".equals(type)) {
-			return createYellowBloon();
-		}
-		if ("pink".equals(type)) {
-			return createPinkBloon();
-		}
-		if ("black".equals(type)) {
-			return createBlackBloon();
-		}
-		if ("lead".equals(type)) {
-			return createLeadBloon();
-		}
-		if ("zebra".equals(type)) {
-			return createZebraBloon();
-		}
-		if ("rainbow".equals(type)) {
-			return createRainbowBloon();
-		}
-		if ("ceramic".equals(type)) {
-			return createCeramicBloon();
-		}
-		if ("moab".equals(type)) {
-			return createMOAB();
-		}
-		if ("bfb".equals(type)) {
-			return createBFB();
-		}
-		if ("zomg".equals(type)) {
-			return createZOMG();
-		}
-		throw new RuntimeException("Unexpected bloon type: " +type);
+		throw new WaveParseException("Invalid bloon type '" + type + "'");
 	}
 	
 	public static Bloon createRandomBloon() {
@@ -296,49 +266,117 @@ public class BloonFactory {
 	public static BloonQueue createBloonQueueFromFile(String fileName) {
 		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
 		String fileContents = file.readString();
-		String[] lines = fileContents.split("\n");
-		long timer = 0;
+		return createBloonQueueFromText(fileContents, fileName);
+	}
 
-		List<List<Bloon>> bloonLevels = new ArrayList<>();
-		List<List<Long>> intervalLevels = new ArrayList<>();
+	public static BloonQueue createBloonQueueFromText(String fileContents, String fileName) {
+		String[] lines = fileContents != null ? fileContents.split("\\r?\\n") : new String[0];
+
+		List<Wave> waves = new ArrayList<>();
 
 		List<Bloon> bloons = new ArrayList<>();
 		List<Long> intervals = new ArrayList<>();
-		
-		for (String line : lines) {
-			if (line.startsWith("//")) {
-				// do nothing
-			} else if (line.contains(" ")) {
-				String[] parts = line.split(" ");
-				if (parts.length == 3) {
-					int amount = Integer.parseInt(parts[0]);
-					long delay = Long.parseLong(parts[1]);
-					String bloonTypes = parts[2];
-					
-					for (int x = 0; x < amount; x++) {
-						String[] types = bloonTypes.split(",");
-						for (String type : types) {
-							Bloon bloon = createBloonOfType(type);
-							bloons.add(bloon);
-							intervals.add(timer);
-							timer += delay;
-						}
+		long timer = 0;
+
+		String currentTitle = null;
+		String currentMusic = null;
+		int currentBonus = 0;
+
+		for (int i = 0; i < lines.length; i++) {
+			int lineNumber = i + 1;
+			String rawLine = lines[i];
+			if (rawLine == null) {
+				continue;
+			}
+			String line = rawLine.trim();
+
+			if (line.isEmpty() || line.startsWith("//")) {
+				continue;
+			}
+
+			if (line.startsWith("#")) {
+				String content = line.substring(1).trim();
+				String key;
+				String value;
+				if (content.contains(":")) {
+					String[] parts = content.split(":", 2);
+					key = parts[0].trim().toUpperCase();
+					value = parts[1].trim();
+				} else {
+					String[] parts = content.split("\\s+", 2);
+					key = parts[0].trim().toUpperCase();
+					value = parts.length > 1 ? parts[1].trim() : "";
+				}
+
+				if ("TITLE".equals(key)) {
+					currentTitle = value;
+				} else if ("MUSIC".equals(key)) {
+					currentMusic = value;
+				} else if ("BONUS".equals(key)) {
+					try {
+						currentBonus = Integer.parseInt(value);
+					} catch (NumberFormatException e) {
+						throw new WaveParseException("Invalid bonus amount '" + value + "'", fileName, lineNumber, value);
 					}
 				} else {
-					System.out.println("BloonFactory.createBloonQueue(wtf2) { " + line + " }");
+					throw new WaveParseException("Unknown directive '#" + key + "'", fileName, lineNumber, key);
 				}
-			} else if (line.contains("END")) {
-				bloonLevels.add(bloons);
-				intervalLevels.add(intervals);
+			} else if (line.equals("END")) {
+				waves.add(new Wave(bloons, intervals, currentTitle, currentMusic, currentBonus));
 				bloons = new ArrayList<>();
 				intervals = new ArrayList<>();
 				timer = 0;
+				currentTitle = null;
+				currentMusic = null;
+				currentBonus = 0;
 			} else {
-				System.out.println("BloonFactory.createBloonQueue(wtf1) { " + line + " }");
+				String[] parts = line.split("\\s+");
+				if (parts.length != 3) {
+					throw new WaveParseException("Invalid spawn entry line token count (" + parts.length + ")", fileName, lineNumber, line);
+				}
+
+				int amount;
+				try {
+					amount = Integer.parseInt(parts[0]);
+				} catch (NumberFormatException e) {
+					throw new WaveParseException("Invalid amount '" + parts[0] + "'", fileName, lineNumber, parts[0]);
+				}
+
+				long delay;
+				try {
+					delay = Long.parseLong(parts[1]);
+				} catch (NumberFormatException e) {
+					throw new WaveParseException("Invalid delay '" + parts[1] + "'", fileName, lineNumber, parts[1]);
+				}
+
+				String bloonTypes = parts[2];
+				String[] types = bloonTypes.split(",");
+				for (int x = 0; x < amount; x++) {
+					for (String type : types) {
+						String trimmedType = type.trim();
+						if (trimmedType.endsWith("\r")) {
+							trimmedType = trimmedType.substring(0, trimmedType.length() - 1).trim();
+						}
+						try {
+							Bloon bloon = createBloonOfType(trimmedType);
+							bloons.add(bloon);
+							intervals.add(timer);
+							timer += delay;
+						} catch (WaveParseException e) {
+							throw new WaveParseException("Invalid bloon type '" + trimmedType + "'", fileName, lineNumber, trimmedType);
+						} catch (Exception e) {
+							throw new WaveParseException("Error creating bloon of type '" + trimmedType + "'", fileName, lineNumber, trimmedType);
+						}
+					}
+				}
 			}
 		}
-			
-		return new BloonQueue(bloonLevels, intervalLevels);
+
+		if (!bloons.isEmpty() || currentTitle != null || currentMusic != null || currentBonus > 0) {
+			waves.add(new Wave(bloons, intervals, currentTitle, currentMusic, currentBonus));
+		}
+
+		return new BloonQueue(waves);
 	}
 	
 }
