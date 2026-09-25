@@ -1,0 +1,19 @@
+{
+  "name": "Hella Bloons Waves",
+  "waves": [
+    {
+      "level": 1,
+      "title": "Hella Bloons",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 10000,
+          "delay": 15,
+          "types": [
+            "ceramic"
+          ]
+        }
+      ]
+    }
+  ]
+}

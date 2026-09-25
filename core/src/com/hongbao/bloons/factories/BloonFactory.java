@@ -2,8 +2,12 @@ package com.hongbao.bloons.factories;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.hongbao.bloons.BloonQueue;
+import com.hongbao.bloons.Wave;
 import com.hongbao.bloons.entities.Bloon;
+import com.hongbao.bloons.exceptions.WaveSchemaValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -287,58 +291,132 @@ public class BloonFactory {
 	
 	public static BloonQueue createBloonQueue() {
 		if (HELLA_BLOONS) {
-			return createBloonQueueFromFile("hella_bloons.txt");
+			return createBloonQueueFromJson("hella_bloons.json");
 		} else {
-			return createBloonQueueFromFile("default.txt");
+			return createBloonQueueFromJson("default.json");
 		}
 	}
 	
-	public static BloonQueue createBloonQueueFromFile(String fileName) {
+	public static BloonQueue createBloonQueueFromJson(String fileName) {
 		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
-		String fileContents = file.readString();
-		String[] lines = fileContents.split("\n");
-		long timer = 0;
+		if (!file.exists()) {
+			file = Gdx.files.internal("assets/bloon_queues/" + fileName);
+		}
+		if (!file.exists()) {
+			file = Gdx.files.internal(fileName);
+		}
+		if (!file.exists()) {
+			file = Gdx.files.absolute(fileName);
+		}
+		if (!file.exists()) {
+			throw new WaveSchemaValidationException("Wave definition file not found: bloon_queues/" + fileName);
+		}
 
-		List<List<Bloon>> bloonLevels = new ArrayList<>();
-		List<List<Long>> intervalLevels = new ArrayList<>();
+		JsonReader reader = new JsonReader();
+		JsonValue root;
+		try {
+			root = reader.parse(file);
+		} catch (Exception e) {
+			throw new WaveSchemaValidationException("Failed to parse wave JSON file '" + fileName + "': " + e.getMessage(), e);
+		}
 
-		List<Bloon> bloons = new ArrayList<>();
-		List<Long> intervals = new ArrayList<>();
-		
-		for (String line : lines) {
-			if (line.startsWith("//")) {
-				// do nothing
-			} else if (line.contains(" ")) {
-				String[] parts = line.split(" ");
-				if (parts.length == 3) {
-					int amount = Integer.parseInt(parts[0]);
-					long delay = Long.parseLong(parts[1]);
-					String bloonTypes = parts[2];
-					
-					for (int x = 0; x < amount; x++) {
-						String[] types = bloonTypes.split(",");
-						for (String type : types) {
-							Bloon bloon = createBloonOfType(type);
-							bloons.add(bloon);
-							intervals.add(timer);
-							timer += delay;
-						}
+		if (root == null || !root.isObject()) {
+			throw new WaveSchemaValidationException("Root element in '" + fileName + "' must be a JSON object");
+		}
+		if (!root.has("name") || root.get("name").isNull()) {
+			throw new WaveSchemaValidationException("Missing required property 'name' in JSON root of file '" + fileName + "'");
+		}
+		if (!root.has("waves") || root.get("waves").isNull()) {
+			throw new WaveSchemaValidationException("Missing required property 'waves' in JSON root of file '" + fileName + "'");
+		}
+		JsonValue wavesArray = root.get("waves");
+		if (!wavesArray.isArray()) {
+			throw new WaveSchemaValidationException("Property 'waves' must be an array in file '" + fileName + "'");
+		}
+
+		List<Wave> waveList = new ArrayList<>();
+
+		for (int i = 0; i < wavesArray.size; i++) {
+			JsonValue waveVal = wavesArray.get(i);
+			if (waveVal == null || !waveVal.isObject()) {
+				throw new WaveSchemaValidationException("Wave element at index " + i + " must be an object in file '" + fileName + "'");
+			}
+			if (!waveVal.has("level") || waveVal.get("level").isNull()) {
+				throw new WaveSchemaValidationException("Missing required property 'level' in wave at index " + i + " in file '" + fileName + "'");
+			}
+			int level = waveVal.getInt("level");
+
+			if (!waveVal.has("title") || waveVal.get("title").isNull()) {
+				throw new WaveSchemaValidationException("Missing required property 'title' in wave level " + level + " in file '" + fileName + "'");
+			}
+			String title = waveVal.getString("title");
+
+			if (!waveVal.has("musicTrack") || waveVal.get("musicTrack").isNull()) {
+				throw new WaveSchemaValidationException("Missing required property 'musicTrack' in wave level " + level + " in file '" + fileName + "'");
+			}
+			String musicTrack = waveVal.getString("musicTrack");
+
+			if (!waveVal.has("bloons") || waveVal.get("bloons").isNull()) {
+				throw new WaveSchemaValidationException("Missing required property 'bloons' in wave level " + level + " in file '" + fileName + "'");
+			}
+			JsonValue bloonsArray = waveVal.get("bloons");
+			if (!bloonsArray.isArray()) {
+				throw new WaveSchemaValidationException("Property 'bloons' in wave level " + level + " must be an array in file '" + fileName + "'");
+			}
+
+			List<Bloon> bloons = new ArrayList<>();
+			List<Long> intervals = new ArrayList<>();
+			long timer = 0;
+
+			for (int j = 0; j < bloonsArray.size; j++) {
+				JsonValue groupVal = bloonsArray.get(j);
+				if (groupVal == null || !groupVal.isObject()) {
+					throw new WaveSchemaValidationException("Bloon group element at index " + j + " in wave level " + level + " must be an object in file '" + fileName + "'");
+				}
+
+				if (!groupVal.has("amount") || groupVal.get("amount").isNull()) {
+					throw new WaveSchemaValidationException("Missing required property 'amount' in bloon group " + j + " of wave level " + level + " in file '" + fileName + "'");
+				}
+				int amount = groupVal.getInt("amount");
+
+				if (!groupVal.has("delay") || groupVal.get("delay").isNull()) {
+					throw new WaveSchemaValidationException("Missing required property 'delay' in bloon group " + j + " of wave level " + level + " in file '" + fileName + "'");
+				}
+				long delay = groupVal.getLong("delay");
+
+				if (!groupVal.has("types") && !groupVal.has("type")) {
+					throw new WaveSchemaValidationException("Missing required property 'types' in bloon group " + j + " of wave level " + level + " in file '" + fileName + "'");
+				}
+
+				List<String> typesList = new ArrayList<>();
+				JsonValue typesVal = groupVal.has("types") ? groupVal.get("types") : groupVal.get("type");
+				if (typesVal.isArray()) {
+					for (int k = 0; k < typesVal.size; k++) {
+						typesList.add(typesVal.getString(k));
+					}
+				} else if (typesVal.isString()) {
+					String[] split = typesVal.asString().split(",");
+					for (String s : split) {
+						typesList.add(s.trim());
 					}
 				} else {
-					System.out.println("BloonFactory.createBloonQueue(wtf2) { " + line + " }");
+					throw new WaveSchemaValidationException("Property 'types' in bloon group " + j + " of wave level " + level + " must be a string or string array in file '" + fileName + "'");
 				}
-			} else if (line.contains("END")) {
-				bloonLevels.add(bloons);
-				intervalLevels.add(intervals);
-				bloons = new ArrayList<>();
-				intervals = new ArrayList<>();
-				timer = 0;
-			} else {
-				System.out.println("BloonFactory.createBloonQueue(wtf1) { " + line + " }");
+
+				for (int x = 0; x < amount; x++) {
+					for (String type : typesList) {
+						Bloon bloon = createBloonOfType(type);
+						bloons.add(bloon);
+						intervals.add(timer);
+						timer += delay;
+					}
+				}
 			}
+
+			waveList.add(new Wave(level, title, musicTrack, bloons, intervals));
 		}
-			
-		return new BloonQueue(bloonLevels, intervalLevels);
+
+		return new BloonQueue(waveList);
 	}
 	
 }
