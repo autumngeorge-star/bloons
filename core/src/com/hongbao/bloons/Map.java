@@ -221,6 +221,10 @@ public class Map {
 		}
 	}
 
+	public Stage getStage() {
+		return stage;
+	}
+
 	public BloonManager getBloonManager() {
 		return bloonManager;
 	}

@@ -447,6 +447,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		return player;
 	}
 
+	public Stage getStage() {
+		return stage;
+	}
+
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
 	}
