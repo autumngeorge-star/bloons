@@ -2,6 +2,7 @@ buildscript {
     
 
     repositories {
+        maven { url "https://maven-central.storage-download.googleapis.com/maven2/" }
         mavenLocal()
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
@@ -28,6 +29,7 @@ allprojects {
     }
 
     repositories {
+        maven { url "https://maven-central.storage-download.googleapis.com/maven2/" }
         mavenLocal()
         mavenCentral()
         jcenter()
@@ -55,6 +57,19 @@ project(":desktop") {
 project(":core") {
     apply plugin: "java-library"
 
+    sourceSets {
+        main {
+            java {
+                srcDirs = ["src"]
+            }
+        }
+        test {
+            java {
+                srcDirs = ["test/java"]
+            }
+        }
+    }
+
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -62,6 +77,6 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
         api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        
+        testImplementation 'junit:junit:4.12'
     }
 }
