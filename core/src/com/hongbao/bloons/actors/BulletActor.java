@@ -25,6 +25,8 @@ public class BulletActor extends RenderableActor {
 	private BloonActor target;
 	private Set<Long> damagedBloons;
 	private String spellCardOverride; // todo could be an enum
+	private float prevCenterX;
+	private float prevCenterY;
 	
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
@@ -45,6 +47,9 @@ public class BulletActor extends RenderableActor {
 		 textureRegion.getTexture().getHeight()
 		);
 		
+		prevCenterX = getCenterX();
+		prevCenterY = getCenterY();
+
 		damagedBloons = new HashSet<>(bullet.getPierce());
 	}
 	
@@ -122,6 +127,14 @@ public class BulletActor extends RenderableActor {
 		);
 	}
 	
+	public float getPrevCenterX() {
+		return prevCenterX;
+	}
+
+	public float getPrevCenterY() {
+		return prevCenterY;
+	}
+
 	@Override
 	public void act(float delta) {
 		frames++;
@@ -129,6 +142,9 @@ public class BulletActor extends RenderableActor {
 		
 		setDirectionIfApplicable(bloonManager);
 		
+		prevCenterX = getCenterX();
+		prevCenterY = getCenterY();
+
 		setX(getX() + dx * bullet.getSpeed() / 5);
 		setY(getY() + dy * bullet.getSpeed() / 5);
 		
