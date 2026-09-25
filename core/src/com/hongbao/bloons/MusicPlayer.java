@@ -1,29 +1,15 @@
 package com.hongbao.bloons;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
+import com.hongbao.bloons.audio.AudioSystem;
 
 
 public class MusicPlayer {
 	
-	private Music backgroundMusic;
-	
 	public MusicPlayer() {
-		backgroundMusic = null;
 	}
 
 	private void playMusic(String fileName) {
-		boolean wasPlaying = true;
-		if (backgroundMusic != null) {
-			wasPlaying = backgroundMusic.isPlaying();
-		}
-		stopMusic();
-		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
-		backgroundMusic.setVolume(0.5f);
-		backgroundMusic.setLooping(true);
-		if (wasPlaying) {
-			backgroundMusic.play();
-		}
+		AudioSystem.getInstance().playMusic(fileName, 0.5f, true);
 	}
 
 	public void playTitleMusic() {
@@ -39,31 +25,19 @@ public class MusicPlayer {
 	}
 	
 	public void pause() {
-		if (backgroundMusic != null) {
-			backgroundMusic.pause();
-		}
+		AudioSystem.getInstance().pauseMusic();
 	}
 	
 	public void resume() {
-		if (backgroundMusic != null) {
-			backgroundMusic.play();
-		}
+		AudioSystem.getInstance().resumeMusic();
 	}
 	
 	public void stopMusic() {
-		if (backgroundMusic != null) {
-			backgroundMusic.stop();
-		}
+		AudioSystem.getInstance().stopMusic();
 	}
 
 	public void toggleMusic() {
-		if (backgroundMusic != null) {
-			if (backgroundMusic.isPlaying()) {
-				pause();
-			} else {
-				resume();
-			}
-		}
+		AudioSystem.getInstance().toggleMusic();
 	}
 
 }
