@@ -7,10 +7,13 @@ import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.entities.Bloon;
-import com.hongbao.bloons.factories.BloonFactory;
+import com.hongbao.bloons.events.EventBus;
+import com.hongbao.bloons.events.LevelStartedEvent;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.registry.WaveRegistry;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,29 +27,45 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private WaveRegistry waveRegistry;
+	private EventBus eventBus;
 	
 	public BloonManager(Stage stage, Map map) {
+		this(stage, map, WaveRegistry.getInstance(), EventBus.getInstance());
+	}
+
+	public BloonManager(Stage stage, Map map, WaveRegistry waveRegistry, EventBus eventBus) {
+		this(stage, map, waveRegistry, eventBus, waveRegistry != null ? waveRegistry.getActiveProfileKey() : WaveRegistry.DEFAULT_KEY);
+	}
+
+	public BloonManager(Stage stage, Map map, WaveRegistry waveRegistry, EventBus eventBus, String waveKey) {
 		this.stage = stage;
 		this.map = map;
-		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
-		bloonQueue = BloonFactory.createBloonQueue();
+		this.waveRegistry = waveRegistry != null ? waveRegistry : WaveRegistry.getInstance();
+		this.eventBus = eventBus != null ? eventBus : EventBus.getInstance();
+		this.onstageBloons = new HashSet<>();
+		if (Gdx.audio != null && Gdx.files != null) {
+			this.popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		}
+		this.bloonQueue = this.waveRegistry.getWaveQueue(waveKey != null ? waveKey : this.waveRegistry.getActiveProfileKey());
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
-			}
+			int currentLevel = getLevel();
+			java.util.Map<String, Object> metadata = new HashMap<>();
+			metadata.put("map", map);
+			metadata.put("stage", stage);
+			eventBus.publish(new LevelStartedEvent(currentLevel, metadata));
 		}
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean instructionsEmpty = Gdx.app == null || Gdx.app.getApplicationListener() == null
+				|| !(Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense)
+				|| ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).instructions.isEmpty();
+		return instructionsEmpty && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 
 	public int getLevel() {
@@ -62,7 +81,9 @@ public class BloonManager {
 		
 		for (Bloon bloon : bloonsToBeCreated) {
 			BloonActor actor = new BloonActor(bloon, -25, 425, null); // todo make these numbers an attribute in map or something
-			stage.addActor(actor);
+			if (stage != null) {
+				stage.addActor(actor);
+			}
 			onstageBloons.add(actor);
 		}
 	}
