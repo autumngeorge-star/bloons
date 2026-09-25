@@ -225,6 +225,10 @@ public class Map {
 		return bloonManager;
 	}
 
+	public Set<GirlActor> getOnStageGirls() {
+		return onStageGirls;
+	}
+
 	public boolean canPlaceGirl(GirlActor girlActor) {
 		// You can't place a girl down if it violates any of the following rules:
 		// It's out of bounds

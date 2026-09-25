@@ -43,6 +43,12 @@ public class BloonQueue {
 		return currentLevel;
 	}
 
+	public void setLevel(int level) {
+		this.currentLevel = level;
+		this.currentIndex = 0;
+		this.clock = 0;
+	}
+
 	public void nextLevel() {
 		currentLevel++;
 		currentIndex = 0;
