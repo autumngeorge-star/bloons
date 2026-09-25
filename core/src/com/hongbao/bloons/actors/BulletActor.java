@@ -1,7 +1,6 @@
 package com.hongbao.bloons.actors;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonManager;
@@ -9,6 +8,7 @@ import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.services.AssetProviderService;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,10 +25,12 @@ public class BulletActor extends RenderableActor {
 	private BloonActor target;
 	private Set<Long> damagedBloons;
 	private String spellCardOverride; // todo could be an enum
+	private AssetProviderService assetProviderService;
 	
-	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
+	public BulletActor(Bullet bullet, float x, float y, float dx, float dy, AssetProviderService assetProviderService) {
 		this.bullet = bullet;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		this.assetProviderService = assetProviderService;
+		textureRegion = new TextureRegion(assetProviderService.getBulletTexture(bullet));
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
