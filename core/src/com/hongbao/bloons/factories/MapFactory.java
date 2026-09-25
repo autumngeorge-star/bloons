@@ -10,7 +10,11 @@ public class MapFactory {
 	public static final float ROOT_2_OVER_2 = 0.7071f;
 	
 	public static Map createBasicMap(Stage stage) {
-		Map map = new Map("basic_map.png", stage);
+		return createBasicMap(stage, "default.txt");
+	}
+
+	public static Map createBasicMap(Stage stage, String waveFilePath) {
+		Map map = new Map("basic_map.png", stage, waveFilePath);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		for (int x = 0; x < 32; x++) {
@@ -22,7 +26,11 @@ public class MapFactory {
 	}
 	
 	public static Map createMapWithTurn(Stage stage) {
-		Map map = new Map("map_with_turn.png", stage);
+		return createMapWithTurn(stage, "default.txt");
+	}
+
+	public static Map createMapWithTurn(Stage stage, String waveFilePath) {
+		Map map = new Map("map_with_turn.png", stage, waveFilePath);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		directions[0][8] = new Pair<>(1f, 0f);
 		directions[1][8] = new Pair<>(1f, 0f);
@@ -42,7 +50,11 @@ public class MapFactory {
 	}
 	
 	public static Map createHeaterMap(Stage stage) {
-		Map map = new Map("heater.png", stage);
+		return createHeaterMap(stage, "default.txt");
+	}
+
+	public static Map createHeaterMap(Stage stage, String waveFilePath) {
+		Map map = new Map("heater.png", stage, waveFilePath);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		directions[0][8] = new Pair<>(1f, 0f);

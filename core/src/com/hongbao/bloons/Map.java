@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class Map {
+public class Map implements WaveEventListener {
 
 	public static final String BACKGROUND_MAPS_FOLDER = "img/maps/";
 	public static final int TILE_LENGTH = 50;
@@ -48,8 +48,13 @@ public class Map {
 	private boolean hoveringOverUpgrade;
 
 	public Map(String backgroundImage, Stage stage) {
+		this(backgroundImage, stage, "default.txt");
+	}
+
+	public Map(String backgroundImage, Stage stage, String waveFilePath) {
 		this.backgroundImage = backgroundImage;
-		this.bloonManager = new BloonManager(stage, this);
+		this.bloonManager = new BloonManager(stage, this, waveFilePath);
+		this.bloonManager.addWaveEventListener(this);
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;
@@ -355,6 +360,18 @@ public class Map {
 		onStageGirls.remove(selectedGirl);
 		selectedGirl.remove();
 		setSelectedGirl(null);
+	}
+
+	@Override
+	public void onLevelStarted(int level) {
+		MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
+		if (musicPlayer != null) {
+			if (level == 1) {
+				musicPlayer.playStageMusic();
+			} else if (level == 40) {
+				musicPlayer.playFinalBossMusic();
+			}
+		}
 	}
 	
 }
