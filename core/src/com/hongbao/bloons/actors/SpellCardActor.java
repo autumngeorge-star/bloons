@@ -1,13 +1,13 @@
 package com.hongbao.bloons.actors;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonManager;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.SpellCard;
+import com.hongbao.bloons.helpers.TextureCache;
 import com.hongbao.bloons.helpers.ZIndex;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class SpellCardActor extends RenderableActor {
 	
 	public SpellCardActor(SpellCard spellCard, float x, float y) {
 		this.spellCard = spellCard;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(spellCard.getImageFileName())));
+		textureRegion = TextureCache.getTextureRegion(spellCard.getImageFileName());
 		rotationAngle = 0;
 		
 		setZIndex(ZIndex.SPELL_CARD_Z_INDEX);
