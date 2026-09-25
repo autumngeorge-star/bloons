@@ -23,6 +23,7 @@ import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.helpers.DisposableRegistry;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class Map {
 	public static final int TILE_LENGTH = 50;
 	public static final int TILE_HEIGHT = 50;
 
+	private DisposableRegistry disposableRegistry;
 	private String backgroundImage;
 	private BloonManager bloonManager;
 	private Pair<Float, Float>[][] directions;
@@ -48,6 +50,14 @@ public class Map {
 	private boolean hoveringOverUpgrade;
 
 	public Map(String backgroundImage, Stage stage) {
+		this(backgroundImage, stage, new DisposableRegistry());
+	}
+
+	public Map(String backgroundImage, Stage stage, DisposableRegistry disposableRegistry) {
+		if (disposableRegistry == null) {
+			disposableRegistry = new DisposableRegistry();
+		}
+		this.disposableRegistry = disposableRegistry;
 		this.backgroundImage = backgroundImage;
 		this.bloonManager = new BloonManager(stage, this);
 		onStageGirls = new HashSet<>();
@@ -55,9 +65,10 @@ public class Map {
 		this.stage = stage;
 		hoveringOverUpgrade = false;
 
-		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
+		Skin skin = disposableRegistry.register(new Skin(Gdx.files.internal("uiskins/uiskin.json")));
 
-		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
+		Texture detailsTexture = disposableRegistry.register(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")));
+		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(detailsTexture)));
 		infoBackground.setPosition(1504, 4);
 		this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
@@ -355,6 +366,14 @@ public class Map {
 		onStageGirls.remove(selectedGirl);
 		selectedGirl.remove();
 		setSelectedGirl(null);
+	}
+
+	public DisposableRegistry getDisposableRegistry() {
+		return disposableRegistry;
+	}
+
+	public void setDisposableRegistry(DisposableRegistry disposableRegistry) {
+		this.disposableRegistry = disposableRegistry;
 	}
 	
 }
