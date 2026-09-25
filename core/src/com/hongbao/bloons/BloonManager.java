@@ -26,27 +26,47 @@ public class BloonManager {
 	private BloonQueue bloonQueue;
 	
 	public BloonManager(Stage stage, Map map) {
+		this(stage, map, new FileWaveLoader("default.txt"));
+	}
+
+	public BloonManager(Stage stage, Map map, WaveLoader waveLoader) {
+		this(stage, map, waveLoader != null ? waveLoader.load() : new FileWaveLoader("default.txt").load());
+	}
+
+	public BloonManager(Stage stage, Map map, BloonQueue bloonQueue) {
 		this.stage = stage;
 		this.map = map;
-		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
-		bloonQueue = BloonFactory.createBloonQueue();
+		this.onstageBloons = new HashSet<>();
+		if (Gdx.audio != null && Gdx.files != null) {
+			this.popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		}
+		this.bloonQueue = bloonQueue;
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			LevelMetadata metadata = bloonQueue.getCurrentLevelMetadata();
+			if (metadata != null && metadata.getMusicTrack() != null && !metadata.getMusicTrack().isEmpty()) {
+				if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+					MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
+					if (musicPlayer != null) {
+						musicPlayer.playMusic(metadata.getMusicTrack());
+					}
+				}
 			}
 		}
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean instructionsEmpty = true;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			BloonsTouhouDefense game = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+			if (game.instructions != null) {
+				instructionsEmpty = game.instructions.isEmpty();
+			}
+		}
+		return instructionsEmpty && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 
 	public int getLevel() {
@@ -117,7 +137,9 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);

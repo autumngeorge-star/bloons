@@ -431,7 +431,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			}
 		});
 		
-		map = MapFactory.createHeaterMap(stage);
+		WaveLoader waveLoader = HELLA_BLOONS ? new FileWaveLoader("hella_bloons.txt") : new FileWaveLoader("default.txt");
+		map = MapFactory.createHeaterMap(stage, waveLoader);
 		
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
 		ImageButton backgroundMap = new ImageButton(drawable);

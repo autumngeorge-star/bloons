@@ -1,7 +1,9 @@
 package com.hongbao.bloons.factories;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.hongbao.bloons.FileWaveLoader;
 import com.hongbao.bloons.Map;
+import com.hongbao.bloons.WaveLoader;
 import com.hongbao.bloons.helpers.Pair;
 
 
@@ -10,7 +12,11 @@ public class MapFactory {
 	public static final float ROOT_2_OVER_2 = 0.7071f;
 	
 	public static Map createBasicMap(Stage stage) {
-		Map map = new Map("basic_map.png", stage);
+		return createBasicMap(stage, new FileWaveLoader("default.txt"));
+	}
+
+	public static Map createBasicMap(Stage stage, WaveLoader waveLoader) {
+		Map map = new Map("basic_map.png", stage, waveLoader);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		for (int x = 0; x < 32; x++) {
@@ -22,7 +28,11 @@ public class MapFactory {
 	}
 	
 	public static Map createMapWithTurn(Stage stage) {
-		Map map = new Map("map_with_turn.png", stage);
+		return createMapWithTurn(stage, new FileWaveLoader("default.txt"));
+	}
+
+	public static Map createMapWithTurn(Stage stage, WaveLoader waveLoader) {
+		Map map = new Map("map_with_turn.png", stage, waveLoader);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		directions[0][8] = new Pair<>(1f, 0f);
 		directions[1][8] = new Pair<>(1f, 0f);
@@ -42,7 +52,11 @@ public class MapFactory {
 	}
 	
 	public static Map createHeaterMap(Stage stage) {
-		Map map = new Map("heater.png", stage);
+		return createHeaterMap(stage, new FileWaveLoader("default.txt"));
+	}
+
+	public static Map createHeaterMap(Stage stage, WaveLoader waveLoader) {
+		Map map = new Map("heater.png", stage, waveLoader);
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		directions[0][8] = new Pair<>(1f, 0f);

@@ -48,8 +48,12 @@ public class Map {
 	private boolean hoveringOverUpgrade;
 
 	public Map(String backgroundImage, Stage stage) {
+		this(backgroundImage, stage, new FileWaveLoader("default.txt"));
+	}
+
+	public Map(String backgroundImage, Stage stage, WaveLoader waveLoader) {
 		this.backgroundImage = backgroundImage;
-		this.bloonManager = new BloonManager(stage, this);
+		this.bloonManager = new BloonManager(stage, this, waveLoader != null ? waveLoader : new FileWaveLoader("default.txt"));
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;
