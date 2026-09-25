@@ -286,6 +286,15 @@ public class BloonFactory {
 	}
 	
 	public static BloonQueue createBloonQueue() {
+		if (Gdx.files == null) {
+			List<List<Bloon>> bloonLevels = new ArrayList<>();
+			List<List<Long>> intervalLevels = new ArrayList<>();
+			for (int i = 0; i <= 50; i++) {
+				bloonLevels.add(new ArrayList<>());
+				intervalLevels.add(new ArrayList<>());
+			}
+			return new BloonQueue(bloonLevels, intervalLevels);
+		}
 		if (HELLA_BLOONS) {
 			return createBloonQueueFromFile("hella_bloons.txt");
 		} else {

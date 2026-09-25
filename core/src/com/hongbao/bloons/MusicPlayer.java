@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 
 
-public class MusicPlayer {
+public class MusicPlayer implements AudioController {
 	
 	private Music backgroundMusic;
 	
@@ -26,36 +26,43 @@ public class MusicPlayer {
 		}
 	}
 
+	@Override
 	public void playTitleMusic() {
 		playMusic("music/title.mp3");
 	}
 
+	@Override
 	public void playStageMusic() {
 		playMusic("music/demystify_feast.mp3");
 	}
 
+	@Override
 	public void playFinalBossMusic() {
 		playMusic("music/night_falls.mp3");
 	}
 	
+	@Override
 	public void pause() {
 		if (backgroundMusic != null) {
 			backgroundMusic.pause();
 		}
 	}
 	
+	@Override
 	public void resume() {
 		if (backgroundMusic != null) {
 			backgroundMusic.play();
 		}
 	}
 	
+	@Override
 	public void stopMusic() {
 		if (backgroundMusic != null) {
 			backgroundMusic.stop();
 		}
 	}
 
+	@Override
 	public void toggleMusic() {
 		if (backgroundMusic != null) {
 			if (backgroundMusic.isPlaying()) {

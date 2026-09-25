@@ -431,7 +431,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			}
 		});
 		
-		map = MapFactory.createHeaterMap(stage);
+		map = MapFactory.createHeaterMap(stage, musicPlayer);
 		
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
 		ImageButton backgroundMap = new ImageButton(drawable);

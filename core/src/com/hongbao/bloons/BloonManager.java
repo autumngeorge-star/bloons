@@ -24,29 +24,40 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private AudioController audioController;
 	
-	public BloonManager(Stage stage, Map map) {
+	public BloonManager(Stage stage, Map map, AudioController audioController) {
 		this.stage = stage;
 		this.map = map;
+		this.audioController = audioController;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		popSound = Gdx.audio != null ? Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3")) : null;
 		bloonQueue = BloonFactory.createBloonQueue();
+	}
+
+	public BloonManager(Stage stage, Map map) {
+		this(stage, map, null);
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			if (audioController != null) {
+				if (getLevel() == 1) {
+					audioController.playStageMusic();
+				} else if (getLevel() == 40) {
+					audioController.playFinalBossMusic();
+				}
 			}
 		}
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean instructionsEmpty = true;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			instructionsEmpty = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).instructions.isEmpty();
+		}
+		return instructionsEmpty && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 
 	public int getLevel() {
@@ -96,12 +107,15 @@ public class BloonManager {
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
-		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+		Player player = (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense)
+				? ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getPlayer() : null;
 		
 		if (bloonActor.getBloon().willPopBloon(damage)) {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
-			player.earnMoney(result.getCashGenerated());
+			if (player != null) {
+				player.earnMoney(result.getCashGenerated());
+			}
 			
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
@@ -117,7 +131,9 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
