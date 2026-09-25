@@ -186,67 +186,79 @@ public class BloonFactory {
 		return new Bloon(Bloon.Color.ZOMG, 4918, false, false);
 	}
 	
-	public static Bloon createBloonOfType(String type, int health) {
-		// In the case of bullets that do more than 1 damage, we could (for example) pop a parent bloon so hard that the resulting bloons end up damaged.
-		Bloon createdBloon = createBloonOfType(type);
-		createdBloon.setHealth(health);
-		return createdBloon;
-	}
-	
-	public static Bloon createBloonOfType(String type) {
-		// todo george at some point add all the variations of bloons too :(
+	private static String extractBaseType(String type) {
+		if (type == null) {
+			return "";
+		}
 		if (type.endsWith("\r")) {
 			type = type.substring(0, type.length() - 1);
 		}
-		if ("red".equals(type)) {
-			return createRedBloon();
+		return type.replace("_camo", "").replace("_regrowth", "").replace("_regen", "").trim();
+	}
+
+	public static Bloon.Color getColorFromType(String baseType) {
+		for (Bloon.Color c : Bloon.Color.values()) {
+			if (c.getValue().equalsIgnoreCase(baseType)) {
+				return c;
+			}
 		}
-		if ("red_camo".equals(type)) {
-			return createRedCamoBloon();
+		throw new RuntimeException("Unexpected bloon type: " + baseType);
+	}
+
+	public static int getDefaultHealth(Bloon.Color color) {
+		switch (color) {
+			case RED: return 1;
+			case BLUE: return 2;
+			case GREEN: return 3;
+			case YELLOW: return 4;
+			case PINK: return 5;
+			case BLACK: return 6;
+			case LEAD: return 7;
+			case ZEBRA: return 7;
+			case RAINBOW: return 8;
+			case CERAMIC: return 18;
+			case MOAB: return 218;
+			case BFB: return 918;
+			case ZOMG: return 4918;
+			default: throw new IllegalArgumentException("Unknown bloon color: " + color);
 		}
-		if ("red_regen".equals(type)) {
-			return createRedRegenBloon();
+	}
+
+	public static Bloon createBloonOfType(String type, int health, boolean camo, boolean regen) {
+		if (type == null) {
+			throw new IllegalArgumentException("Type cannot be null");
 		}
-		if ("red_camo_regen".equals(type)) {
-			return createRedCamoRegenBloon();
+		if (type.endsWith("\r")) {
+			type = type.substring(0, type.length() - 1);
 		}
-		if ("blue".equals(type)) {
-			return createBlueBloon();
+		boolean isCamo = camo || type.contains("_camo");
+		boolean isRegen = regen || type.contains("_regen") || type.contains("_regrowth");
+		String baseType = extractBaseType(type);
+		Bloon.Color color = getColorFromType(baseType);
+		return new Bloon(color, health, isCamo, isRegen);
+	}
+
+	public static Bloon createBloonOfType(String type, boolean camo, boolean regen) {
+		if (type == null) {
+			throw new IllegalArgumentException("Type cannot be null");
 		}
-		if ("green".equals(type)) {
-			return createGreenBloon();
+		if (type.endsWith("\r")) {
+			type = type.substring(0, type.length() - 1);
 		}
-		if ("yellow".equals(type)) {
-			return createYellowBloon();
-		}
-		if ("pink".equals(type)) {
-			return createPinkBloon();
-		}
-		if ("black".equals(type)) {
-			return createBlackBloon();
-		}
-		if ("lead".equals(type)) {
-			return createLeadBloon();
-		}
-		if ("zebra".equals(type)) {
-			return createZebraBloon();
-		}
-		if ("rainbow".equals(type)) {
-			return createRainbowBloon();
-		}
-		if ("ceramic".equals(type)) {
-			return createCeramicBloon();
-		}
-		if ("moab".equals(type)) {
-			return createMOAB();
-		}
-		if ("bfb".equals(type)) {
-			return createBFB();
-		}
-		if ("zomg".equals(type)) {
-			return createZOMG();
-		}
-		throw new RuntimeException("Unexpected bloon type: " +type);
+		boolean isCamo = camo || type.contains("_camo");
+		boolean isRegen = regen || type.contains("_regen") || type.contains("_regrowth");
+		String baseType = extractBaseType(type);
+		Bloon.Color color = getColorFromType(baseType);
+		int defaultHealth = getDefaultHealth(color);
+		return new Bloon(color, defaultHealth, isCamo, isRegen);
+	}
+
+	public static Bloon createBloonOfType(String type, int health) {
+		return createBloonOfType(type, health, false, false);
+	}
+
+	public static Bloon createBloonOfType(String type) {
+		return createBloonOfType(type, false, false);
 	}
 	
 	public static Bloon createRandomBloon() {

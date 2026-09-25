@@ -57,7 +57,7 @@ public class BloonPoppedResult {
 			int bloonsToBeCreated = COLOR_TO_RATIO.get(poppedColor) / COLOR_TO_RATIO.get(originalColor);
 			
 			for (int x = 0; x < bloonsToBeCreated; x++) {
-				Bloon bloonOfType = BloonFactory.createBloonOfType(poppedColor.getValue(), newBloonHealth);
+				Bloon bloonOfType = BloonFactory.createBloonOfType(poppedColor.getValue(), newBloonHealth, bloon.isCamo(), bloon.isRegen());
 				bloonOfType.setDistanceTravelled(bloon.getDistanceTravelled());
 				bloonsGenerated.add(bloonOfType);
 			}
