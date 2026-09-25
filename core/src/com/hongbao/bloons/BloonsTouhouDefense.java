@@ -25,6 +25,9 @@ import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.events.AudioControlEvent;
+import com.hongbao.bloons.events.AudioToggleEvent;
+import com.hongbao.bloons.events.GameEventManager;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
@@ -72,7 +75,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMap();
 		createMenu();
 		createInstructions();
-		musicPlayer.playTitleMusic();
+		GameEventManager.getInstance().publish(AudioControlEvent.PLAY_TITLE);
 	}
 
 	private void createInstructions() {
@@ -521,7 +524,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					updateInstructions();
 				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.V)) {
-				musicPlayer.toggleMusic();
+				GameEventManager.getInstance().publish(AudioToggleEvent.INSTANCE);
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
@@ -562,13 +565,13 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void pause() {
 		paused = true;
-		musicPlayer.pause();
+		GameEventManager.getInstance().publish(AudioControlEvent.PAUSE);
 	}
 
 	@Override
 	public void resume() {
 		paused = false;
-		musicPlayer.resume();
+		GameEventManager.getInstance().publish(AudioControlEvent.RESUME);
 	}
 
 	@Override
