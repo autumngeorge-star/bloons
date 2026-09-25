@@ -2,7 +2,10 @@ package com.hongbao.bloons.factories;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.hongbao.bloons.BloonQueue;
+import com.hongbao.bloons.WaveMetadata;
 import com.hongbao.bloons.entities.Bloon;
 
 import java.util.ArrayList;
@@ -289,22 +292,250 @@ public class BloonFactory {
 		if (HELLA_BLOONS) {
 			return createBloonQueueFromFile("hella_bloons.txt");
 		} else {
-			return createBloonQueueFromFile("default.txt");
+			return createBloonQueueFromFile("default.json");
 		}
 	}
 	
+	private static FileHandle resolveFileHandle(String fileName) {
+		FileHandle file = null;
+		if (Gdx.files != null) {
+			file = Gdx.files.internal("bloon_queues/" + fileName);
+			if (file.exists()) return file;
+		}
+		file = new FileHandle("assets/bloon_queues/" + fileName);
+		if (file.exists()) return file;
+		file = new FileHandle("core/assets/bloon_queues/" + fileName);
+		if (file.exists()) return file;
+		return Gdx.files != null ? Gdx.files.internal("bloon_queues/" + fileName) : new FileHandle("assets/bloon_queues/" + fileName);
+	}
+
 	public static BloonQueue createBloonQueueFromFile(String fileName) {
-		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
-		String fileContents = file.readString();
+		FileHandle file = resolveFileHandle(fileName);
+
+		if (fileName.endsWith(".json")) {
+			if (file.exists()) {
+				return parseJsonWaveConfig(file.readString(), fileName);
+			} else {
+				String txtFileName = fileName.substring(0, fileName.lastIndexOf('.')) + ".txt";
+				FileHandle txtFile = resolveFileHandle(txtFileName);
+				if (txtFile.exists()) {
+					if (Gdx.app != null) {
+						Gdx.app.log("BloonFactory", "JSON wave configuration file '" + fileName + "' not found. Falling back to legacy file '" + txtFileName + "'");
+					}
+					return parseLegacyTxtWaveConfig(txtFile.readString(), txtFileName);
+				} else {
+					throw new RuntimeException("Wave configuration file not found: " + fileName);
+				}
+			}
+		} else if (fileName.endsWith(".txt")) {
+			if (file.exists()) {
+				return parseLegacyTxtWaveConfig(file.readString(), fileName);
+			} else {
+				throw new RuntimeException("Wave configuration file not found: " + fileName);
+			}
+		} else {
+			if (file.exists()) {
+				String contents = file.readString().trim();
+				if (contents.startsWith("{") || contents.startsWith("[")) {
+					return parseJsonWaveConfig(contents, fileName);
+				} else {
+					return parseLegacyTxtWaveConfig(contents, fileName);
+				}
+			} else {
+				throw new RuntimeException("Wave configuration file not found: " + fileName);
+			}
+		}
+	}
+
+	public static BloonQueue parseJsonWaveConfig(FileHandle file) {
+		return parseJsonWaveConfig(file.readString(), file.name());
+	}
+
+	public static BloonQueue parseJsonWaveConfig(String jsonString, String fileName) {
+		JsonValue root;
+		try {
+			JsonReader reader = new JsonReader();
+			root = reader.parse(jsonString);
+		} catch (Exception e) {
+			String msg = "JSON syntax error in wave configuration file '" + fileName + "': " + e.getMessage();
+			if (Gdx.app != null) {
+				Gdx.app.error("BloonFactory", msg, e);
+			} else {
+				System.err.println("BloonFactory error: " + msg);
+			}
+			throw new RuntimeException(msg, e);
+		}
+
+		if (root == null) {
+			String msg = "JSON wave configuration root is null in '" + fileName + "'";
+			if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+			throw new IllegalArgumentException(msg);
+		}
+
+		JsonValue wavesArray = null;
+		if (root.isArray()) {
+			wavesArray = root;
+		} else if (root.isObject()) {
+			if (root.has("waves")) {
+				wavesArray = root.get("waves");
+			} else if (root.has("levels")) {
+				wavesArray = root.get("levels");
+			} else {
+				String msg = "JSON Wave parsing error: Missing required property 'waves' in root configuration of '" + fileName + "'";
+				if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+				throw new IllegalArgumentException(msg);
+			}
+		} else {
+			String msg = "JSON Wave parsing error: Invalid root JSON structure in '" + fileName + "'. Expected object or array.";
+			if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+			throw new IllegalArgumentException(msg);
+		}
+
+		List<List<Bloon>> bloonLevels = new ArrayList<>();
+		List<List<Long>> intervalLevels = new ArrayList<>();
+		List<WaveMetadata> metadataLevels = new ArrayList<>();
+
+		int waveIndex = 0;
+		for (JsonValue waveObj = wavesArray.child; waveObj != null; waveObj = waveObj.next, waveIndex++) {
+			if (!waveObj.isObject()) {
+				String msg = "JSON Wave parsing error: Wave element at index " + waveIndex + " in '" + fileName + "' must be an object.";
+				if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+				throw new IllegalArgumentException(msg);
+			}
+
+			String title = waveObj.getString("title", "Level " + waveIndex);
+			String musicTrack = waveObj.getString("musicTrack", waveObj.getString("musicCue", waveObj.getString("music", null)));
+
+			JsonValue spawnsArray = waveObj.get("spawns");
+			if (spawnsArray == null) spawnsArray = waveObj.get("spawnGroups");
+			if (spawnsArray == null) spawnsArray = waveObj.get("groups");
+
+			if (spawnsArray == null) {
+				String msg = "JSON Wave parsing error: Missing required property 'spawns' in wave at index " + waveIndex + " of '" + fileName + "'";
+				if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+				throw new IllegalArgumentException(msg);
+			}
+
+			if (!spawnsArray.isArray()) {
+				String msg = "JSON Wave parsing error: Property 'spawns' in wave at index " + waveIndex + " of '" + fileName + "' must be an array.";
+				if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+				throw new IllegalArgumentException(msg);
+			}
+
+			List<Bloon> bloons = new ArrayList<>();
+			List<Long> intervals = new ArrayList<>();
+			long timer = 0;
+
+			int spawnIndex = 0;
+			for (JsonValue spawnObj = spawnsArray.child; spawnObj != null; spawnObj = spawnObj.next, spawnIndex++) {
+				if (!spawnObj.isObject()) {
+					String msg = "JSON Wave parsing error: Spawn group at index " + spawnIndex + " in wave " + waveIndex + " of '" + fileName + "' must be an object.";
+					if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+					throw new IllegalArgumentException(msg);
+				}
+
+				if (!spawnObj.has("count") && !spawnObj.has("amount")) {
+					String msg = "JSON Wave parsing error: Missing required property 'count' in spawn group at index " + spawnIndex + " of wave " + waveIndex + " in '" + fileName + "'";
+					if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+					throw new IllegalArgumentException(msg);
+				}
+
+				if (!spawnObj.has("delay")) {
+					String msg = "JSON Wave parsing error: Missing required property 'delay' in spawn group at index " + spawnIndex + " of wave " + waveIndex + " in '" + fileName + "'";
+					if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+					throw new IllegalArgumentException(msg);
+				}
+
+				if (!spawnObj.has("types") && !spawnObj.has("type") && !spawnObj.has("bloonTypes") && !spawnObj.has("bloons")) {
+					String msg = "JSON Wave parsing error: Missing required property 'types' in spawn group at index " + spawnIndex + " of wave " + waveIndex + " in '" + fileName + "'";
+					if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+					throw new IllegalArgumentException(msg);
+				}
+
+				int amount = spawnObj.has("count") ? spawnObj.getInt("count") : spawnObj.getInt("amount");
+				if (amount <= 0) {
+					String msg = "JSON Wave parsing error: Property 'count' must be greater than 0 in spawn group at index " + spawnIndex + " of wave " + waveIndex + " in '" + fileName + "'";
+					if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+					throw new IllegalArgumentException(msg);
+				}
+
+				long delay = spawnObj.getLong("delay");
+				if (delay < 0) {
+					String msg = "JSON Wave parsing error: Property 'delay' cannot be negative in spawn group at index " + spawnIndex + " of wave " + waveIndex + " in '" + fileName + "'";
+					if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+					throw new IllegalArgumentException(msg);
+				}
+
+				JsonValue typesValue = spawnObj.get("types");
+				if (typesValue == null) typesValue = spawnObj.get("type");
+				if (typesValue == null) typesValue = spawnObj.get("bloonTypes");
+				if (typesValue == null) typesValue = spawnObj.get("bloons");
+
+				List<String> typesList = new ArrayList<>();
+				if (typesValue.isArray()) {
+					for (JsonValue item = typesValue.child; item != null; item = item.next) {
+						typesList.add(item.asString());
+					}
+				} else if (typesValue.isString()) {
+					String[] parts = typesValue.asString().split(",");
+					for (String part : parts) {
+						typesList.add(part.trim());
+					}
+				}
+
+				if (typesList.isEmpty()) {
+					String msg = "JSON Wave parsing error: Property 'types' cannot be empty in spawn group at index " + spawnIndex + " of wave " + waveIndex + " in '" + fileName + "'";
+					if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+					throw new IllegalArgumentException(msg);
+				}
+
+				for (String type : typesList) {
+					try {
+						createBloonOfType(type);
+					} catch (Exception e) {
+						String msg = "JSON Wave parsing error: Unknown bloon type '" + type + "' in spawn group at index " + spawnIndex + " of wave " + waveIndex + " in '" + fileName + "'";
+						if (Gdx.app != null) Gdx.app.error("BloonFactory", msg);
+						throw new IllegalArgumentException(msg, e);
+					}
+				}
+
+				for (int x = 0; x < amount; x++) {
+					for (String type : typesList) {
+						Bloon bloon = createBloonOfType(type);
+						bloons.add(bloon);
+						intervals.add(timer);
+						timer += delay;
+					}
+				}
+			}
+
+			bloonLevels.add(bloons);
+			intervalLevels.add(intervals);
+			metadataLevels.add(new WaveMetadata(title, musicTrack));
+		}
+
+		return new BloonQueue(bloonLevels, intervalLevels, metadataLevels);
+	}
+
+	public static BloonQueue parseLegacyTxtWaveConfig(String fileContents, String fileName) {
+		if (Gdx.app != null) {
+			Gdx.app.log("BloonFactory", "DEPRECATION WARNING: Loading legacy text wave configuration file '" + fileName + "'. Please upgrade to JSON format.");
+		} else {
+			System.out.println("BloonFactory warning: DEPRECATION WARNING: Loading legacy text wave configuration file '" + fileName + "'. Please upgrade to JSON format.");
+		}
+
 		String[] lines = fileContents.split("\n");
 		long timer = 0;
 
 		List<List<Bloon>> bloonLevels = new ArrayList<>();
 		List<List<Long>> intervalLevels = new ArrayList<>();
+		List<WaveMetadata> metadataLevels = new ArrayList<>();
 
 		List<Bloon> bloons = new ArrayList<>();
 		List<Long> intervals = new ArrayList<>();
-		
+
+		int waveIndex = 0;
+
 		for (String line : lines) {
 			if (line.startsWith("//")) {
 				// do nothing
@@ -314,7 +545,7 @@ public class BloonFactory {
 					int amount = Integer.parseInt(parts[0]);
 					long delay = Long.parseLong(parts[1]);
 					String bloonTypes = parts[2];
-					
+
 					for (int x = 0; x < amount; x++) {
 						String[] types = bloonTypes.split(",");
 						for (String type : types) {
@@ -330,15 +561,26 @@ public class BloonFactory {
 			} else if (line.contains("END")) {
 				bloonLevels.add(bloons);
 				intervalLevels.add(intervals);
+
+				String title = "Level " + waveIndex;
+				String music = null;
+				if (waveIndex == 1) {
+					music = "stage";
+				} else if (waveIndex == 40) {
+					music = "final_boss";
+				}
+				metadataLevels.add(new WaveMetadata(title, music));
+
 				bloons = new ArrayList<>();
 				intervals = new ArrayList<>();
 				timer = 0;
+				waveIndex++;
 			} else {
 				System.out.println("BloonFactory.createBloonQueue(wtf1) { " + line + " }");
 			}
 		}
-			
-		return new BloonQueue(bloonLevels, intervalLevels);
+
+		return new BloonQueue(bloonLevels, intervalLevels, metadataLevels);
 	}
 	
 }

@@ -181,7 +181,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					titleActor.setText("YOU WIN!");
 					titleActor.setColor(Color.GOLD);
 				} else {
-					titleActor.setText("Bloons Touhou Defense\nLevel " + (map.getBloonManager().getLevel()));
+					titleActor.setText("Bloons Touhou Defense\n" + (map.getBloonManager().getCurrentLevelTitle()));
 					titleActor.setColor(Color.WHITE);
 				}
 			}

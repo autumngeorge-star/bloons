@@ -13,13 +13,19 @@ public class BloonQueue {
 	
 	private List<List<Bloon>> bloons;
 	private List<List<Long>> intervals;
+	private List<WaveMetadata> metadataList;
 	private int currentLevel;
 	private int currentIndex;
 	private int clock;
 	
 	public BloonQueue(List<List<Bloon>> bloons, List<List<Long>> intervals) {
+		this(bloons, intervals, null);
+	}
+
+	public BloonQueue(List<List<Bloon>> bloons, List<List<Long>> intervals, List<WaveMetadata> metadataList) {
 		this.bloons = bloons;
 		this.intervals = intervals;
+		this.metadataList = metadataList;
 		currentLevel = 0;
 		currentIndex = 0;
 		clock = 0;
@@ -41,6 +47,29 @@ public class BloonQueue {
 
 	public int getLevel() {
 		return currentLevel;
+	}
+
+	public WaveMetadata getCurrentWaveMetadata() {
+		if (metadataList != null && currentLevel >= 0 && currentLevel < metadataList.size()) {
+			return metadataList.get(currentLevel);
+		}
+		return null;
+	}
+
+	public String getCurrentTitle() {
+		WaveMetadata metadata = getCurrentWaveMetadata();
+		if (metadata != null && metadata.getTitle() != null && !metadata.getTitle().trim().isEmpty()) {
+			return metadata.getTitle();
+		}
+		return "Level " + currentLevel;
+	}
+
+	public String getCurrentMusicTrack() {
+		WaveMetadata metadata = getCurrentWaveMetadata();
+		if (metadata != null) {
+			return metadata.getMusicTrack();
+		}
+		return null;
 	}
 
 	public void nextLevel() {
