@@ -7,6 +7,7 @@ import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.entities.Bloon;
+import com.hongbao.bloons.entities.StatusEffect;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
@@ -77,6 +78,11 @@ public class BloonManager {
 			if (distance < collisionDistance) {
 				if (!bulletActor.hasDamagedBloon(bloonActor)) {
 					bulletActor.damageBloon(bloonActor);
+					if (bulletActor.getBullet().hasStatusEffects()) {
+						for (StatusEffect effect : bulletActor.getBullet().getStatusEffects()) {
+							bloonActor.getBloon().addStatusEffect(effect.copy());
+						}
+					}
 					bloonsToBePopped.add(bloonActor);
 					bulletActor.decrementPierce();
 					

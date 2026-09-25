@@ -2,7 +2,9 @@ package com.hongbao.bloons.entities;
 
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.hongbao.bloons.entities.Bloon.Color.BFB;
@@ -93,6 +95,7 @@ public class Bloon {
 	private int distanceTravelled;
 	private boolean camo;
 	private boolean regen;
+	private List<StatusEffect> activeStatusEffects = new ArrayList<>();
 
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
@@ -101,6 +104,77 @@ public class Bloon {
 		this.camo = camo;
 		this.regen = regen;
 		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
+	}
+
+	public void addStatusEffect(StatusEffect effect) {
+		if (effect != null) {
+			activeStatusEffects.add(effect);
+		}
+	}
+
+	public void removeStatusEffect(StatusEffect effect) {
+		activeStatusEffects.remove(effect);
+	}
+
+	public void clearStatusEffects() {
+		activeStatusEffects.clear();
+	}
+
+	public List<StatusEffect> getStatusEffects() {
+		return activeStatusEffects;
+	}
+
+	public boolean isFrozen() {
+		if (activeStatusEffects == null || activeStatusEffects.isEmpty()) {
+			return false;
+		}
+		for (int i = 0; i < activeStatusEffects.size(); i++) {
+			if (activeStatusEffects.get(i).isFreeze()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public float getEffectiveSpeed() {
+		if (activeStatusEffects == null || activeStatusEffects.isEmpty()) {
+			return speed;
+		}
+		float multiplier = 1.0f;
+		for (int i = 0; i < activeStatusEffects.size(); i++) {
+			StatusEffect effect = activeStatusEffects.get(i);
+			if (effect.isFreeze()) {
+				return 0f;
+			}
+			multiplier *= effect.getSpeedModifier();
+		}
+		return speed * multiplier;
+	}
+
+	public int updateStatusEffects(float delta) {
+		if (activeStatusEffects == null || activeStatusEffects.isEmpty()) {
+			return 0;
+		}
+		int totalPeriodicDamage = 0;
+		for (int i = activeStatusEffects.size() - 1; i >= 0; i--) {
+			StatusEffect effect = activeStatusEffects.get(i);
+			totalPeriodicDamage += effect.update(delta);
+			if (effect.isExpired()) {
+				activeStatusEffects.remove(i);
+			}
+		}
+		return totalPeriodicDamage;
+	}
+
+	public void inheritStatusEffects(Bloon parent) {
+		if (parent != null && parent.activeStatusEffects != null) {
+			for (int i = 0; i < parent.activeStatusEffects.size(); i++) {
+				StatusEffect effect = parent.activeStatusEffects.get(i);
+				if (!effect.isExpired()) {
+					this.addStatusEffect(effect.copy());
+				}
+			}
+		}
 	}
 
 	public Color getColor() {
@@ -127,8 +201,12 @@ public class Bloon {
 		this.health = health;
 	}
 	
-	public int getSpeed() {
+	public int getBaseSpeed() {
 		return speed;
+	}
+
+	public int getSpeed() {
+		return Math.round(getEffectiveSpeed());
 	}
 	
 	public void setSpeed(int speed) {
@@ -144,7 +222,7 @@ public class Bloon {
 	}
 	
 	public void incrementDistanceTravelled() {
-		distanceTravelled += speed;
+		distanceTravelled += getSpeed();
 	}
 	
 	public boolean isCamo() {
