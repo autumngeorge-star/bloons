@@ -27,23 +27,29 @@ public class BulletActor extends RenderableActor {
 	private String spellCardOverride; // todo could be an enum
 	
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
+		this(bullet, x, y, dx, dy, true);
+	}
+
+	public BulletActor(Bullet bullet, float x, float y, float dx, float dy, boolean loadTexture) {
 		this.bullet = bullet;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		if (loadTexture) {
+			textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+			collisionRadius = textureRegion.getTexture().getWidth() / 2f;
+			setBounds(
+			 x - textureRegion.getTexture().getWidth() / 2f,
+			 y - textureRegion.getTexture().getHeight() / 2f,
+			 textureRegion.getTexture().getWidth(),
+			 textureRegion.getTexture().getHeight()
+			);
+		}
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
 		this.dy = dy;
 		calculateRotationAngle();
-		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
 		target = null; // this'll get automatically set as the bullet moves
 		
 		setZIndex(ZIndex.BULLET_Z_INDEX);
-		setBounds(
-		 x - textureRegion.getTexture().getWidth() / 2f,
-		 y - textureRegion.getTexture().getHeight() / 2f,
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight()
-		);
 		
 		damagedBloons = new HashSet<>(bullet.getPierce());
 	}
@@ -144,7 +150,15 @@ public class BulletActor extends RenderableActor {
 		bloonManager.checkCollision(this);
 	}
 	
-	private void setDirectionIfApplicable(BloonManager bloonManager) {
+	public float getDx() {
+		return dx;
+	}
+
+	public float getDy() {
+		return dy;
+	}
+
+	void setDirectionIfApplicable(BloonManager bloonManager) {
 		if (spellCardOverride != null) {
 			Pair<Float, Float> overrideDirection = null;
 			if (spellCardOverride.equals("Reimu")) {
@@ -183,7 +197,15 @@ public class BulletActor extends RenderableActor {
 	// spell card directional overrides
 	// they return null if they no longer override the direction of the bullet
 	
-	private Pair<Float, Float> reimuSpellCardOverride() {
+	public int getFrames() {
+		return frames;
+	}
+
+	public void setFrames(int frames) {
+		this.frames = frames;
+	}
+
+	Pair<Float, Float> reimuSpellCardOverride() {
 		if (frames > 200) {
 			// Beyond 200 frames, use the default bullet behavior (homing)
 			return null;
@@ -199,9 +221,12 @@ public class BulletActor extends RenderableActor {
 		}
 	}
 
-	private Pair<Float, Float> yuyukoSpellCardOverride() {
-		// Alternate between turning left and right
-		if (frames % 150 < 75) {
+	Pair<Float, Float> yuyukoSpellCardOverride() {
+		if (frames > 150) {
+			// Beyond 150 frames, use the default bullet behavior (homing)
+			return null;
+		} else if (frames % 150 < 75) {
+			// Alternate between turning left and right
 			double currentAngle = Math.atan2(dy, dx);
 			double desiredAngle = currentAngle - (2 * Math.PI / 300);
 
