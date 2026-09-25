@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -23,11 +24,13 @@ import com.badlogic.gdx.utils.Align;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.actors.RenderableTextButton;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.ui.LevelSelectDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +56,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	
 	@Override
 	public void create() {
+		LevelSaveService.getInstance().load();
 		Gdx.graphics.setWindowedMode(1800, 900);
 		paused = false;
 		tripleSpeed = false;
@@ -403,6 +407,22 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		yuyukoCost.setFontScale(1.5f,1.5f);
 		yuyukoCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
 		stage.addActor(new RenderableLabel(yuyukoCost, ZIndex.MENU_ITEM_Z_INDEX));
+
+		TextButton levelSelectButton = new TextButton("Level Select", skin);
+		levelSelectButton.setPosition(1530, 90);
+		levelSelectButton.setSize(240, 50);
+		levelSelectButton.getLabel().setFontScale(1.2f);
+		levelSelectButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (instructions.isEmpty()) {
+					LevelSelectDialog dialog = new LevelSelectDialog(skin, map.getBloonManager(), BloonsTouhouDefense.this);
+					dialog.show(stage);
+					paused = true;
+				}
+			}
+		});
+		stage.addActor(new RenderableTextButton(levelSelectButton, ZIndex.MENU_ITEM_Z_INDEX));
 	}
 	
 	private RunnableAction createNewCostLabelAction() {
@@ -458,8 +478,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void render() {
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		if (!paused) {
-			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 			if (tripleSpeed) {
 				for (int x = 0; x < 9; x++) {
 					stage.act(Gdx.graphics.getDeltaTime());
