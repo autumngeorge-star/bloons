@@ -111,8 +111,12 @@ public class Girl {
 		return level;
 	}
 
+	public float getBulletLifetimeSeconds() {
+		return getRange() / (12f * bulletSpeed.get(level));
+	}
+
 	public Bullet createBullet() {
-		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
+		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getBulletLifetimeSeconds(), isHoming(), bulletFileName);
 	}
 	
 	public SpellCard createSpellCard() {
