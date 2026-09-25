@@ -23,8 +23,10 @@ import com.badlogic.gdx.utils.Align;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.audio.SoundEffectManager;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.events.GameEventBus;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
@@ -47,6 +49,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Player player;
 	private Map map;
 	private MusicPlayer musicPlayer;
+	private SoundEffectManager soundEffectManager;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
 	
@@ -60,6 +63,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
 		musicPlayer = new MusicPlayer();
+		soundEffectManager = new SoundEffectManager();
+		soundEffectManager.subscribe(GameEventBus.getInstance());
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -450,6 +455,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
 	}
+
+	public SoundEffectManager getSoundEffectManager() {
+		return soundEffectManager;
+	}
 	
 	@Override
 	public void resize(int width, int height) {
@@ -573,6 +582,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		if (soundEffectManager != null) {
+			soundEffectManager.dispose();
+		}
 		stage.dispose();
 	}
 
