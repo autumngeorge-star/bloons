@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.hongbao.bloons.BloonTextureCache;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
@@ -25,9 +26,9 @@ public class BloonActor extends RenderableActor {
 	private Bloon bloon;
 	private float collisionRadius;
 	
-	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
+	public BloonActor(Bloon bloon, TextureRegion textureRegion, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+		this.textureRegion = textureRegion;
 
 		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
 		
@@ -35,12 +36,16 @@ public class BloonActor extends RenderableActor {
 		setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
 		
 		if (parent != null) {
-			parentBloonIds = new HashSet(parent.getParentBloonIds());
+			parentBloonIds = new HashSet<>(parent.getParentBloonIds());
 			parentBloonIds.add(parent.getBloonId());
 		} else {
 			parentBloonIds = new HashSet<>();
 		}
 		bloonId = RANDOM.nextLong();
+	}
+
+	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
+		this(bloon, BloonTextureCache.getInstance().getTextureRegion(bloon.getImageFileName()), x, y, parent);
 	}
 
 	public Bloon getBloon() {
@@ -85,14 +90,12 @@ public class BloonActor extends RenderableActor {
 	// Please avoid calling this method directly, instead use the BloonManager pop()
 	public BloonPoppedResult pop(int damage) {
 		BloonPoppedResult bloonPoppedResult = bloon.pop(damage);
-		textureRegion.getTexture().dispose();
 		remove();
 		return bloonPoppedResult;
 	}
 	
 	public void release() {
 		((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
-		textureRegion.getTexture().dispose();
 		remove();
 	}
 	
