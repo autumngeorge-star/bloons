@@ -258,6 +258,18 @@ public class Map {
 		return true;
 	}
 	
+	public Set<GirlActor> getOnStageGirls() {
+		return onStageGirls;
+	}
+
+	public void clearGirls() {
+		setSelectedGirl(null);
+		for (GirlActor girlActor : new HashSet<>(onStageGirls)) {
+			girlActor.remove();
+		}
+		onStageGirls.clear();
+	}
+
 	public void placeGirl(GirlActor girlActor) {
 		girlActor.setActive(true);
 		onStageGirls.add(girlActor);

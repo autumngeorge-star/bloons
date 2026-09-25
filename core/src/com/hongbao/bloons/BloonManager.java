@@ -53,6 +53,18 @@ public class BloonManager {
 		return bloonQueue.getLevel();
 	}
 
+	public void setLevel(int level) {
+		clearBloons();
+		bloonQueue.setLevel(level);
+	}
+
+	public void clearBloons() {
+		for (BloonActor actor : new HashSet<>(onstageBloons)) {
+			actor.remove();
+		}
+		onstageBloons.clear();
+	}
+
 	public boolean hasWonGame() {
 		return !bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}

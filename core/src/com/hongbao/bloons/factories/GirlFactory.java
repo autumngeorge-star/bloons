@@ -144,4 +144,30 @@ public class GirlFactory {
 		);
 	}
 
+	public static Girl createGirlByName(String name) {
+		if (name == null) {
+			throw new IllegalArgumentException("Girl name cannot be null");
+		}
+		switch (name.trim().toLowerCase()) {
+			case "reimu":
+				return createReimu();
+			case "yukari":
+				return createYukari();
+			case "marisa":
+				return createMarisa();
+			case "alice":
+				return createAlice();
+			case "sakuya":
+				return createSakuya();
+			case "remilia":
+				return createRemilia();
+			case "youmu":
+				return createYoumu();
+			case "yuyuko":
+				return createYuyuko();
+			default:
+				throw new IllegalArgumentException("Unknown girl name: " + name);
+		}
+	}
+
 }

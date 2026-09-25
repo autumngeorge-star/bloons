@@ -29,6 +29,13 @@ import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
 
+import com.hongbao.bloons.dto.GirlPlacementData;
+import com.hongbao.bloons.dto.MapStateData;
+import com.hongbao.bloons.dto.PlayerStateData;
+import com.hongbao.bloons.dto.SaveProfile;
+import com.hongbao.bloons.repository.LocalFileSaveGameRepository;
+import com.hongbao.bloons.repository.SaveGameRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +56,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private SaveGameRepository saveGameRepository;
+	private String currentSlot = "slot_1";
 	
 	
 	@Override
@@ -62,6 +71,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
+		saveGameRepository = new LocalFileSaveGameRepository();
 
 		final RunnableAction bloonCreationAction = new RunnableAction();
 		bloonCreationAction.setRunnable(() -> map.getBloonManager().createBloons());
@@ -526,6 +536,22 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
 				autoContinue = !autoContinue;
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
+				saveGame("slot_1");
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
+				saveGame("slot_2");
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
+				saveGame("slot_3");
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
+				loadGame("slot_1");
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.F6)) {
+				loadGame("slot_2");
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.F7)) {
+				loadGame("slot_3");
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+				saveGame(currentSlot);
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+				loadGame(currentSlot);
 			}
 			
 			if (girl != null) {
@@ -563,6 +589,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public void pause() {
 		paused = true;
 		musicPlayer.pause();
+		saveGame(currentSlot);
 	}
 
 	@Override
@@ -573,7 +600,119 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		saveGame(currentSlot);
 		stage.dispose();
+	}
+
+	public void saveGame(String slotId) {
+		if (slotId == null || slotId.isEmpty()) {
+			slotId = "slot_1";
+		}
+		this.currentSlot = slotId;
+
+		PlayerStateData playerData = new PlayerStateData(player.getMoney(), player.getHealth());
+
+		List<GirlPlacementData> girlPlacements = new ArrayList<>();
+		if (map != null && map.getOnStageGirls() != null) {
+			for (GirlActor girlActor : map.getOnStageGirls()) {
+				if (girlActor != null && girlActor.getGirl() != null) {
+					girlPlacements.add(new GirlPlacementData(
+							girlActor.getGirl().getName(),
+							girlActor.getCenterX(),
+							girlActor.getCenterY(),
+							girlActor.getGirl().getLevel()
+					));
+				}
+			}
+		}
+
+		int level = map != null ? map.getBloonManager().getLevel() : 0;
+		MapStateData mapData = new MapStateData(level, autoContinue, tripleSpeed, girlPlacements);
+
+		SaveProfile profile = new SaveProfile(slotId, playerData, mapData);
+		if (saveGameRepository != null) {
+			saveGameRepository.save(slotId, profile);
+		}
+	}
+
+	public boolean loadGame(String slotId) {
+		if (slotId == null || slotId.isEmpty()) {
+			slotId = "slot_1";
+		}
+		this.currentSlot = slotId;
+
+		try {
+			if (saveGameRepository == null) {
+				return false;
+			}
+			SaveProfile profile = saveGameRepository.load(slotId);
+			if (profile == null) {
+				return false;
+			}
+
+			restoreProfile(profile);
+			return true;
+		} catch (Exception e) {
+			if (Gdx.app != null) {
+				Gdx.app.error("BloonsTouhouDefense", "Failed to load save profile for slot " + slotId, e);
+			}
+			return false;
+		}
+	}
+
+	public void restoreProfile(SaveProfile profile) {
+		if (profile == null) {
+			return;
+		}
+
+		PlayerStateData playerData = profile.getPlayerData();
+		if (playerData != null && player != null) {
+			player.setMoney(playerData.getMoney());
+			player.setHealth(playerData.getHealth());
+		}
+
+		MapStateData mapData = profile.getMapData();
+		if (mapData != null && map != null) {
+			this.autoContinue = mapData.isAutoContinue();
+			this.tripleSpeed = mapData.isTripleSpeed();
+
+			map.clearGirls();
+			map.getBloonManager().setLevel(mapData.getLevel());
+
+			if (mapData.getGirls() != null) {
+				for (GirlPlacementData placement : mapData.getGirls()) {
+					try {
+						Girl girl = GirlFactory.createGirlByName(placement.getName());
+						for (int i = 0; i < placement.getLevel(); i++) {
+							girl.upgrade();
+						}
+						GirlActor girlActor = new GirlActor(girl, placement.getX(), placement.getY());
+						map.placeGirl(girlActor);
+					} catch (Exception e) {
+						if (Gdx.app != null) {
+							Gdx.app.error("BloonsTouhouDefense", "Could not restore girl " + placement.getName(), e);
+						}
+					}
+				}
+			}
+			map.setSelectedGirl(null);
+		}
+	}
+
+	public SaveGameRepository getSaveGameRepository() {
+		return saveGameRepository;
+	}
+
+	public void setSaveGameRepository(SaveGameRepository saveGameRepository) {
+		this.saveGameRepository = saveGameRepository;
+	}
+
+	public String getCurrentSlot() {
+		return currentSlot;
+	}
+
+	public void setCurrentSlot(String currentSlot) {
+		this.currentSlot = currentSlot;
 	}
 
 }
