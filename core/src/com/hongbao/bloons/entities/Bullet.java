@@ -9,6 +9,8 @@ public class Bullet {
 	private int pierce;
 	private float maxRange; // Because of how actions are evaluated, this is an approximation. But that's fine.
 	private float distanceTraveled;
+	private float maxLifetime;
+	private float elapsedTime;
 	private boolean homing;
 	private String imageFileName;
 
@@ -24,16 +26,24 @@ public class Bullet {
 		damage = 2;
 		pierce = 2;
 		maxRange = 500;
+		maxLifetime = Float.MAX_VALUE;
+		elapsedTime = 0;
 		distanceTraveled = 0;
 		homing = false;
 		imageFileName = IMAGE_FOLDER + "red_spell_card.png";
 	}
 	
 	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName) {
+		this(speed, damage, pierce, maxRange, Float.MAX_VALUE, homing, imageFileName);
+	}
+
+	public Bullet(float speed, int damage, int pierce, float maxRange, float maxLifetime, boolean homing, String imageFileName) {
 		this.speed = speed;
 		this.damage = damage;
 		this.pierce = pierce;
 		this.maxRange = maxRange;
+		this.maxLifetime = maxLifetime;
+		this.elapsedTime = 0;
 		this.imageFileName = IMAGE_FOLDER + imageFileName;
 		distanceTraveled = 0;
 		this.homing = homing;
@@ -125,5 +135,37 @@ public class Bullet {
 	
 	public void setInitialDYOverride(float initialDYOverride) {
 		this.initialDYOverride = initialDYOverride;
+	}
+
+	public float getMaxLifetime() {
+		return maxLifetime;
+	}
+
+	public void setMaxLifetime(float maxLifetime) {
+		this.maxLifetime = maxLifetime;
+	}
+
+	public float getMaxLifetimeDuration() {
+		return maxLifetime;
+	}
+
+	public void setMaxLifetimeDuration(float maxLifetimeDuration) {
+		this.maxLifetime = maxLifetimeDuration;
+	}
+
+	public float getElapsedTime() {
+		return elapsedTime;
+	}
+
+	public void setElapsedTime(float elapsedTime) {
+		this.elapsedTime = elapsedTime;
+	}
+
+	public void incrementElapsedTime(float delta) {
+		this.elapsedTime += delta;
+	}
+
+	public boolean isLifetimeExpired() {
+		return elapsedTime >= maxLifetime;
 	}
 }
