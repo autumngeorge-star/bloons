@@ -20,6 +20,8 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.actors.SpellCardActor;
+import com.hongbao.bloons.actors.SpellCardButton;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -45,6 +47,7 @@ public class Map {
 	private RenderableLabel rightDataActor;
 	private RenderableLabel upgradeActor;
 	private RenderableLabel sellActor;
+	private SpellCardButton spellCardButton;
 	private boolean hoveringOverUpgrade;
 
 	public Map(String backgroundImage, Stage stage) {
@@ -118,7 +121,7 @@ public class Map {
 		rightDataActor = new RenderableLabel(rightDataBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
 		Label upgradeBackground = new Label("UPGRADE", skin);
-		upgradeBackground.setBounds(1504, 4, 144, 50);
+		upgradeBackground.setBounds(1504, 4, 94, 50);
 		upgradeBackground.setAlignment(Align.center);
 		upgradeBackground.setColor(Color.BLUE);
 		upgradeBackground.addListener(new ClickListener() {
@@ -158,7 +161,7 @@ public class Map {
 		upgradeActor = new RenderableLabel(upgradeBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
 		Label sellBackground = new Label("SELL", skin);
-		sellBackground.setBounds(1652, 4, 144, 50);
+		sellBackground.setBounds(1602, 4, 94, 50);
 		sellBackground.setAlignment(Align.center);
 		sellBackground.setColor(Color.RED);
 		sellBackground.addListener(new ClickListener() {
@@ -178,6 +181,9 @@ public class Map {
         });
         sellBackground.addAction(Actions.repeat(RepeatAction.FOREVER, sellLabelAction));
 		sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
+
+		spellCardButton = new SpellCardButton(this, skin);
+		spellCardButton.getActor().setBounds(1700, 4, 96, 50);
 	}
 
 	public void setDirections(Pair<Float, Float>[][] directions) {
@@ -272,9 +278,16 @@ public class Map {
 		});
 	}
 	
+	public Set<GirlActor> getOnStageGirls() {
+		return onStageGirls;
+	}
+
 	public void placeSpellCard() {
-		if (selectedGirl != null) {
-			stage.addActor(selectedGirl.createSpellCardActor());
+		if (selectedGirl != null && selectedGirl.isActive()) {
+			SpellCardActor spellCardActor = selectedGirl.createSpellCardActor();
+			if (spellCardActor != null) {
+				stage.addActor(spellCardActor);
+			}
 		}
 	}
 	
@@ -315,6 +328,7 @@ public class Map {
 		stage.addActor(rightDataActor);
 		stage.addActor(upgradeActor);
 		stage.addActor(sellActor);
+		stage.addActor(spellCardButton);
 	}
 
 	public void hideGirlDetailsModule() {
@@ -323,6 +337,7 @@ public class Map {
 		rightDataActor.remove();
 		upgradeActor.remove();
 		sellActor.remove();
+		spellCardButton.remove();
 	}
 
 	public void upgradeSelectedGirl() {
