@@ -5,9 +5,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonsTouhouDefense;
+import com.hongbao.bloons.SoundEventListener;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class GirlActor extends RenderableActor {
@@ -18,21 +22,27 @@ public class GirlActor extends RenderableActor {
 	private float rotationAngle;
 	private float collisionRadius;
 	private boolean active;
+	private final List<SoundEventListener> soundEventListeners = new ArrayList<>();
 	
 	public GirlActor(Girl girl, float x, float y) {
 		this.girl = girl;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(girl.getImageFileName())));
+		if (Gdx.files != null && Gdx.graphics != null && Gdx.gl != null) {
+			textureRegion = new TextureRegion(new Texture(Gdx.files.internal(girl.getImageFileName())));
+			collisionRadius = textureRegion.getTexture().getWidth() / 2f;
+			setBounds(
+			 x - textureRegion.getTexture().getWidth() / 2f,
+			 y - textureRegion.getTexture().getHeight() / 2f,
+			 textureRegion.getTexture().getWidth(),
+			 textureRegion.getTexture().getHeight()
+			);
+		} else {
+			collisionRadius = 25f;
+			setBounds(x - 25f, y - 25f, 50f, 50f);
+		}
 		rotationAngle = 0;
-		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
 		active = false;
 		
 		setZIndex(ZIndex.GIRL_Z_INDEX);
-		setBounds(
-		 x - textureRegion.getTexture().getWidth() / 2f,
-		 y - textureRegion.getTexture().getHeight() / 2f,
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight()
-		);
 	}
 	
 	public Girl getGirl() {
@@ -75,7 +85,9 @@ public class GirlActor extends RenderableActor {
 		lookAtBloon(target);
 		
 		Bullet bullet = girl.createBullet();
-		return new BulletActor(bullet, getCenterX(), getCenterY(), dx, dy);
+		BulletActor bulletActor = new BulletActor(bullet, getCenterX(), getCenterY(), dx, dy);
+		notifyBulletFired(bulletActor);
+		return bulletActor;
 	}
 	
 	public void lookAtBloon(BloonActor target) {
@@ -88,7 +100,12 @@ public class GirlActor extends RenderableActor {
 	public SpellCardActor createSpellCardActor() {
 		if (true) { // todo Girl should have a method that checks the cooldown or something
 			// maybe some direction based on the girl's direction
-			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
+			SpellCardActor spellCardActor = new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
+			for (SoundEventListener listener : getSoundEventListeners()) {
+				spellCardActor.addSoundEventListener(listener);
+			}
+			notifySpellActivated(spellCardActor);
+			return spellCardActor;
 		}
 		return null;
 	}
@@ -121,6 +138,32 @@ public class GirlActor extends RenderableActor {
 				((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager().lookAtBloon(this);
 				girl.decrementCooldown();
 			}
+		}
+	}
+
+	public void addSoundEventListener(SoundEventListener listener) {
+		if (listener != null && !soundEventListeners.contains(listener)) {
+			soundEventListeners.add(listener);
+		}
+	}
+
+	public void removeSoundEventListener(SoundEventListener listener) {
+		soundEventListeners.remove(listener);
+	}
+
+	public List<SoundEventListener> getSoundEventListeners() {
+		return soundEventListeners;
+	}
+
+	private void notifyBulletFired(BulletActor bulletActor) {
+		for (SoundEventListener listener : new ArrayList<>(getSoundEventListeners())) {
+			listener.onBulletFired(bulletActor);
+		}
+	}
+
+	private void notifySpellActivated(SpellCardActor spellCardActor) {
+		for (SoundEventListener listener : new ArrayList<>(getSoundEventListeners())) {
+			listener.onSpellActivated(spellCardActor);
 		}
 	}
 	
