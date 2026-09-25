@@ -1,7 +1,7 @@
 package com.hongbao.bloons.entities;
 
+import java.util.Collections;
 import java.util.List;
-
 
 public class Girl {
 	
@@ -9,88 +9,114 @@ public class Girl {
 	public static final int NO_UPGRADES_AVAILABLE = -1;
 	
 	private String name;
-	private List<Integer> attackDelay;
+	private UpgradeNode rootNode;
+	private UpgradeNode currentNode;
 	private int cooldown;
-	private List<Float> bulletSpeed;
-	private List<Integer> damage;
-	private List<Integer> pierce;
-	private List<Float> range;
-	private List<Float> visualRange;
-	private List<Boolean> homing;
 	private String imageFileName;
 	private String bulletFileName;
 	private int cost;
-	private List<Integer> upgradeCost;
-	private int level;
 	private int totalInvestment;
 	
-	
-	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+	public Girl(String name, UpgradeNode rootNode, String imageFileName, String bulletFileName, int cost) {
 		this.name = name;
-		this.attackDelay = attackDelay;
-		this.cooldown = attackDelay.get(0);
-		this.bulletSpeed = bulletSpeed;
-		this.damage = damage;
-		this.pierce = pierce;
-		this.range = range;
-		this.visualRange = visualRange;
-		this.homing = homing;
-		this.imageFileName = IMAGE_FOLDER + imageFileName;
+		this.rootNode = rootNode;
+		this.currentNode = rootNode;
+		this.imageFileName = imageFileName.startsWith(IMAGE_FOLDER) ? imageFileName : IMAGE_FOLDER + imageFileName;
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
-		this.upgradeCost = upgradeCost;
-		level = 0;
-		totalInvestment = cost;
+		this.totalInvestment = cost;
+		this.cooldown = rootNode.getStats().getAttackDelay();
+	}
+
+	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+		this(name, createLinearGraph(attackDelay, bulletSpeed, damage, pierce, range, visualRange, homing, upgradeCost), imageFileName, bulletFileName, cost);
+	}
+
+	public static UpgradeNode createLinearGraph(List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, List<Integer> upgradeCost) {
+		int n = attackDelay.size();
+		UpgradeNode[] nodes = new UpgradeNode[n];
+		for (int i = n - 1; i >= 0; i--) {
+			GirlTier tier = new GirlTier(
+				attackDelay.get(i),
+				bulletSpeed.get(i),
+				damage.get(i),
+				pierce.get(i),
+				range.get(i),
+				visualRange.get(i),
+				homing.get(i)
+			);
+			int costToThisNode = (i == 0) ? 0 : upgradeCost.get(i - 1);
+			String title = (i == 0) ? "Base" : "Tier " + (i + 1);
+			List<UpgradeNode> children = (i < n - 1) ? Collections.singletonList(nodes[i + 1]) : Collections.emptyList();
+			nodes[i] = new UpgradeNode(title, costToThisNode, tier, children, i);
+		}
+		return nodes[0];
 	}
 
 	public String getName() {
 		return name;
 	}
-	
-	public int getAttackDelay() {
-		return attackDelay.get(level);
+
+	public UpgradeNode getCurrentNode() {
+		return currentNode;
 	}
-	
+
+	public UpgradeNode getRootNode() {
+		return rootNode;
+	}
+
+	public List<UpgradeNode> getAvailableUpgrades() {
+		return currentNode.getChildren();
+	}
+
+	public int getAttackDelay() {
+		return currentNode.getStats().getAttackDelay();
+	}
+
 	public int getCooldown() {
 		return cooldown;
 	}
-	
+
 	public void decrementCooldown() {
 		cooldown--;
 	}
-	
+
 	public void resetCooldown() {
-		cooldown = attackDelay.get(level);
+		cooldown = currentNode.getStats().getAttackDelay();
 	}
-	
+
 	public int getDamage() {
-		return damage.get(level);
+		return currentNode.getStats().getDamage();
 	}
-	
+
 	public int getPierce() {
-		return pierce.get(level);
+		return currentNode.getStats().getPierce();
 	}
-	
+
 	public float getRange() {
-		return range.get(level);
+		return currentNode.getStats().getRange();
 	}
-	
+
 	public float getVisualRange() {
-		return visualRange.get(level);
+		return currentNode.getStats().getVisualRange();
 	}
 
 	public boolean isHoming() {
-		return homing.get(level);
+		return currentNode.getStats().isHoming();
+	}
+
+	public float getBulletSpeed() {
+		return currentNode.getStats().getBulletSpeed();
 	}
 
 	public String getImageFileName() {
 		return imageFileName;
 	}
-	
+
 	public int getCost() {
 		return cost;
 	}
-	
+
 	public String getUpgradeCostString() {
 		if (getUpgradeCost() == NO_UPGRADES_AVAILABLE) {
 			return "N/A";
@@ -98,23 +124,27 @@ public class Girl {
 			return "$" + getUpgradeCost();
 		}
 	}
-	
+
 	public int getUpgradeCost() {
-		return upgradeCost.get(level);
+		List<UpgradeNode> available = getAvailableUpgrades();
+		if (available.isEmpty()) {
+			return NO_UPGRADES_AVAILABLE;
+		}
+		return available.get(0).getUpgradeCost();
 	}
-	
+
 	public int getSellPrice() {
 		return totalInvestment / 2;
 	}
-	
+
 	public int getLevel() {
-		return level;
+		return currentNode.getLevel();
 	}
 
 	public Bullet createBullet() {
-		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
+		return new Bullet(currentNode.getStats().getBulletSpeed(), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
 	}
-	
+
 	public SpellCard createSpellCard() {
 		if (name.equals("Reimu")) {
 			return SpellCard.createReimuSpellCard();
@@ -124,42 +154,59 @@ public class Girl {
 		}
 		return null;
 	}
-	
+
 	public int upgrade() {
-		int upgradeCost = getUpgradeCost();
-		level++;
+		List<UpgradeNode> available = getAvailableUpgrades();
+		if (!available.isEmpty()) {
+			return upgrade(available.get(0));
+		}
+		return 0;
+	}
+
+	public int upgrade(UpgradeNode targetNode) {
+		int upgradeCost = targetNode.getUpgradeCost();
+		currentNode = targetNode;
 		totalInvestment += upgradeCost;
+		resetCooldown();
 		return upgradeCost;
 	}
-	
+
 	public boolean canUpgrade(int currentCash) {
-		if (getUpgradeCost() == NO_UPGRADES_AVAILABLE) {
+		if (getAvailableUpgrades().isEmpty()) {
 			return false;
 		}
-		return currentCash >= getUpgradeCost();
+		for (UpgradeNode option : getAvailableUpgrades()) {
+			if (currentCash >= option.getUpgradeCost()) {
+				return true;
+			}
+		}
+		return false;
 	}
-	
+
+	public boolean canUpgrade(UpgradeNode targetNode, int currentCash) {
+		if (targetNode == null) {
+			return false;
+		}
+		return currentCash >= targetNode.getUpgradeCost();
+	}
+
 	public Girl getUpgradedStats() {
-		if (getUpgradeCost() != NO_UPGRADES_AVAILABLE) {
-			Girl upgradedGirl = new Girl(
-			 name,
-			 attackDelay,
-			 bulletSpeed,
-			 damage,
-			 pierce,
-			 range,
-			 visualRange,
-			 homing,
-			 imageFileName,
-			 bulletFileName,
-			 cost,
-			 upgradeCost
-			);
-			upgradedGirl.level = level + 1;
+		List<UpgradeNode> available = getAvailableUpgrades();
+		if (!available.isEmpty()) {
+			return getUpgradedStats(available.get(0));
+		}
+		return null;
+	}
+
+	public Girl getUpgradedStats(UpgradeNode targetNode) {
+		if (targetNode != null) {
+			Girl upgradedGirl = new Girl(name, rootNode, imageFileName, bulletFileName, cost);
+			upgradedGirl.currentNode = targetNode;
+			upgradedGirl.totalInvestment = this.totalInvestment + targetNode.getUpgradeCost();
 			return upgradedGirl;
 		} else {
 			return null;
 		}
 	}
-	
+
 }
