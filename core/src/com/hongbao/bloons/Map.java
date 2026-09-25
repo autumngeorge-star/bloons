@@ -21,6 +21,7 @@ import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
 
@@ -258,6 +259,32 @@ public class Map {
 		return true;
 	}
 	
+	public Set<GirlActor> getOnStageGirls() {
+		return onStageGirls;
+	}
+
+	public void clearOnStageGirls() {
+		for (GirlActor girlActor : new HashSet<>(onStageGirls)) {
+			girlActor.remove();
+		}
+		onStageGirls.clear();
+		setSelectedGirl(null);
+	}
+
+	public void restoreGirl(String name, int level, float centerX, float centerY, float rotation) {
+		Girl girl = GirlFactory.createByName(name);
+		if (girl == null) {
+			return;
+		}
+		for (int i = 0; i < level; i++) {
+			girl.upgrade();
+		}
+		GirlActor girlActor = new GirlActor(girl, centerX, centerY);
+		girlActor.setRotationAngle(rotation);
+		placeGirl(girlActor);
+		setSelectedGirl(null);
+	}
+
 	public void placeGirl(GirlActor girlActor) {
 		girlActor.setActive(true);
 		onStageGirls.add(girlActor);
