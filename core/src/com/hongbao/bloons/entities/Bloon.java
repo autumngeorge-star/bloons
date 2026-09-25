@@ -147,6 +147,10 @@ public class Bloon {
 		distanceTravelled += speed;
 	}
 	
+	public void incrementDistanceTravelled(int speedAmount) {
+		distanceTravelled += speedAmount;
+	}
+	
 	public boolean isCamo() {
 		return camo;
 	}

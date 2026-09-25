@@ -11,6 +11,8 @@ import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
 
+import com.hongbao.bloons.helpers.BloonStatusEffect;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,8 +31,12 @@ public class BloonManager {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
-		bloonQueue = BloonFactory.createBloonQueue();
+		if (Gdx.audio != null && Gdx.files != null) {
+			popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		}
+		if (Gdx.files != null) {
+			bloonQueue = BloonFactory.createBloonQueue();
+		}
 	}
 
 	public void nextLevel() {
@@ -96,12 +102,17 @@ public class BloonManager {
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
-		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+		Player player = null;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() != null) {
+			player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+		}
 		
 		if (bloonActor.getBloon().willPopBloon(damage)) {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
-			player.earnMoney(result.getCashGenerated());
+			if (player != null) {
+				player.earnMoney(result.getCashGenerated());
+			}
 			
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
@@ -109,19 +120,45 @@ public class BloonManager {
 				if (previousBloonActor == null) {
 					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
 				} else {
-					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
+					Pair<Float, Float> direction = map != null ? map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY()) : new Pair<>(0f, 0f);
 					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
 				}
-				stage.addActor(generatedBloonActor);
+				if (stage != null) {
+					stage.addActor(generatedBloonActor);
+				}
 				onstageBloons.add(generatedBloonActor);
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
-			player.earnMoney(damage);
+			if (player != null) {
+				player.earnMoney(damage);
+			}
 			// todo play some other sound I guess
+		}
+	}
+
+	public void applyStatusEffect(BloonActor bloonActor, BloonStatusEffect statusEffect) {
+		if (bloonActor != null && statusEffect != null) {
+			bloonActor.addStatusEffect(statusEffect);
+		}
+	}
+
+	public Set<BloonActor> getOnstageBloons() {
+		return onstageBloons;
+	}
+
+	public void updateBloonStatuses(float delta) {
+		if (onstageBloons != null) {
+			for (BloonActor actor : onstageBloons) {
+				if (actor != null) {
+					actor.updateStatusEffects(delta);
+				}
+			}
 		}
 	}
 	
