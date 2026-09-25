@@ -24,6 +24,7 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private LevelProgressionManager levelProgressionManager;
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
@@ -31,11 +32,42 @@ public class BloonManager {
 		onstageBloons = new HashSet<>();
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
+		levelProgressionManager = new LevelProgressionManager(bloonQueue.getTotalLevels());
+	}
+
+	public LevelProgressionManager getLevelProgressionManager() {
+		return levelProgressionManager;
+	}
+
+	public boolean selectLevel(int level) {
+		if (levelProgressionManager.selectLevel(level)) {
+			bloonQueue.setLevel(levelProgressionManager.getCurrentLevel());
+			return true;
+		}
+		return false;
+	}
+
+	public boolean incrementLevel() {
+		if (levelProgressionManager.incrementLevel()) {
+			bloonQueue.setLevel(levelProgressionManager.getCurrentLevel());
+			return true;
+		}
+		return false;
+	}
+
+	public boolean decrementLevel() {
+		if (levelProgressionManager.decrementLevel()) {
+			bloonQueue.setLevel(levelProgressionManager.getCurrentLevel());
+			return true;
+		}
+		return false;
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
+			levelProgressionManager.markStageCleared(bloonQueue.getLevel());
 			bloonQueue.nextLevel();
+			levelProgressionManager.selectLevel(bloonQueue.getLevel());
 			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
 			if (map.getBloonManager().getLevel() == 1) {
 				musicPlayer.playStageMusic();
@@ -46,7 +78,11 @@ public class BloonManager {
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean canGo = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		if (canGo) {
+			levelProgressionManager.markStageCleared(bloonQueue.getLevel());
+		}
+		return canGo;
 	}
 
 	public int getLevel() {
