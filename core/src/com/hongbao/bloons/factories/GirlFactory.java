@@ -9,6 +9,32 @@ import static com.hongbao.bloons.entities.Girl.NO_UPGRADES_AVAILABLE;
 
 public class GirlFactory {
 
+	public static Girl createByName(String name) {
+		if (name == null) {
+			return null;
+		}
+		switch (name.trim().toLowerCase()) {
+			case "reimu":
+				return createReimu();
+			case "yukari":
+				return createYukari();
+			case "marisa":
+				return createMarisa();
+			case "alice":
+				return createAlice();
+			case "sakuya":
+				return createSakuya();
+			case "remilia":
+				return createRemilia();
+			case "youmu":
+				return createYoumu();
+			case "yuyuko":
+				return createYuyuko();
+			default:
+				return null;
+		}
+	}
+
 	public static Girl createReimu() {
 		return new Girl(
 				"Reimu",

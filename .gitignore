@@ -108,6 +108,9 @@ gradle-app.setting
 /ios/build/
 /ios-moe/build/
 
+## Save Files
+save.json
+
 ## OS Specific
 .DS_Store
 Thumbs.db

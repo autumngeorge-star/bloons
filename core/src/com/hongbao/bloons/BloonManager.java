@@ -36,6 +36,7 @@ public class BloonManager {
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
+			SaveManager.markDirty();
 			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
 			if (map.getBloonManager().getLevel() == 1) {
 				musicPlayer.playStageMusic();
@@ -51,6 +52,10 @@ public class BloonManager {
 
 	public int getLevel() {
 		return bloonQueue.getLevel();
+	}
+
+	public void setLevel(int level) {
+		bloonQueue.setLevel(level);
 	}
 
 	public boolean hasWonGame() {

@@ -221,6 +221,18 @@ public class Map {
 		}
 	}
 
+	public Set<GirlActor> getOnStageGirls() {
+		return onStageGirls;
+	}
+
+	public void clearOnStageGirls() {
+		for (GirlActor girl : onStageGirls) {
+			girl.remove();
+		}
+		onStageGirls.clear();
+		setSelectedGirl(null);
+	}
+
 	public BloonManager getBloonManager() {
 		return bloonManager;
 	}
@@ -270,6 +282,7 @@ public class Map {
 				event.setStage(null); // a somewhat hacky way of communicating to the stage that this event has already handled.
 			}
 		});
+		SaveManager.markDirty();
 	}
 	
 	public void placeSpellCard() {
@@ -338,6 +351,7 @@ public class Map {
 			int cost = selectedGirl.getGirl().upgrade();
 			player.spendMoney(cost);
 			showGirlDetailsModule();
+			SaveManager.markDirty();
 		}
 	}
 
@@ -355,6 +369,7 @@ public class Map {
 		onStageGirls.remove(selectedGirl);
 		selectedGirl.remove();
 		setSelectedGirl(null);
+		SaveManager.markDirty();
 	}
 	
 }

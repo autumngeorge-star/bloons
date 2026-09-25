@@ -21,9 +21,15 @@ public class Player {
 	public int getMoney() {
 		return money;
 	}
+
+	public void setMoney(int money) {
+		this.money = money;
+		SaveManager.markDirty();
+	}
 	
 	public void earnMoney(int money) {
 		this.money += money;
+		SaveManager.markDirty();
 	}
 	
 	public boolean spendMoney(int money) {
@@ -31,6 +37,7 @@ public class Player {
 			return false;
 		} else {
 			this.money -= money;
+			SaveManager.markDirty();
 			return true;
 		}
 	}
@@ -38,12 +45,18 @@ public class Player {
 	public int getHealth() {
 		return health;
 	}
+
+	public void setHealth(int health) {
+		this.health = health;
+		SaveManager.markDirty();
+	}
 	
 	public void decreaseHealth(int health) {
 		this.health -= health;
 		if (this.health < 0) {
 			this.health = 0;
 		}
+		SaveManager.markDirty();
 	}
 	
 	public boolean canPurchaseGirl(Girl girl) {
