@@ -24,6 +24,8 @@ public abstract class RenderableActor extends Actor {
 	private int zIndex;
 	private Actor actor; // This is kind of stupid, but I want this thing to be able to accommodate many superclasses of actors. If I think of a better way to do things I'll change it.
 	public TextureRegion textureRegion;
+	protected float centerOffsetX;
+	protected float centerOffsetY;
 	
 	public int getZIndex() {
 		return zIndex;
@@ -48,14 +50,22 @@ public abstract class RenderableActor extends Actor {
 	
 	public void setTextureRegion(TextureRegion textureRegion) {
 		this.textureRegion = textureRegion;
+		updateCenterOffsets();
+	}
+	
+	public void updateCenterOffsets() {
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			centerOffsetX = textureRegion.getTexture().getWidth() / 2f;
+			centerOffsetY = textureRegion.getTexture().getHeight() / 2f;
+		}
 	}
 	
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() / 2f;
+		return getX() + centerOffsetX;
 	}
 	
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() / 2f;
+		return getY() + centerOffsetY;
 	}
 	
 	@Override
