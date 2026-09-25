@@ -98,6 +98,7 @@ nb-configuration.xml
 
 ## Gradle
 
+deps.jar
 .gradle/
 gradle-app.setting
 /build/
