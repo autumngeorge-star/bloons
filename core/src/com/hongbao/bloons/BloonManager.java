@@ -3,6 +3,7 @@ package com.hongbao.bloons;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Disposable;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
@@ -15,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class BloonManager {
+public class BloonManager implements Disposable {
 	
 	private Stage stage;
 	private Map map;
@@ -208,6 +209,13 @@ public class BloonManager {
 		}
 		
 		return bloonActor;
+	}
+
+	@Override
+	public void dispose() {
+		if (popSound != null) {
+			popSound.dispose();
+		}
 	}
 	
 }
