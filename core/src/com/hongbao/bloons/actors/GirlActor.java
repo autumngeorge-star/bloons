@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonsTouhouDefense;
+import com.hongbao.bloons.components.AbilityCooldownManager;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.entities.SpellCard;
 import com.hongbao.bloons.helpers.ZIndex;
 
 
@@ -18,9 +20,11 @@ public class GirlActor extends RenderableActor {
 	private float rotationAngle;
 	private float collisionRadius;
 	private boolean active;
+	private AbilityCooldownManager abilityCooldownManager;
 	
 	public GirlActor(Girl girl, float x, float y) {
 		this.girl = girl;
+		this.abilityCooldownManager = new AbilityCooldownManager(girl.getAbilityCooldown());
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(girl.getImageFileName())));
 		rotationAngle = 0;
 		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
@@ -41,6 +45,15 @@ public class GirlActor extends RenderableActor {
 	
 	public void setGirl(Girl girl) {
 		this.girl = girl;
+		if (abilityCooldownManager == null) {
+			abilityCooldownManager = new AbilityCooldownManager(girl.getAbilityCooldown());
+		} else {
+			abilityCooldownManager.setCooldownDuration(girl.getAbilityCooldown());
+		}
+	}
+
+	public AbilityCooldownManager getAbilityCooldownManager() {
+		return abilityCooldownManager;
 	}
 	
 	public float getRotationAngle() {
@@ -86,9 +99,11 @@ public class GirlActor extends RenderableActor {
 	}
 	
 	public SpellCardActor createSpellCardActor() {
-		if (true) { // todo Girl should have a method that checks the cooldown or something
-			// maybe some direction based on the girl's direction
-			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
+		if (abilityCooldownManager != null && abilityCooldownManager.isReady()) {
+			SpellCard spellCard = girl.createSpellCard();
+			if (spellCard != null && abilityCooldownManager.trigger()) {
+				return new SpellCardActor(spellCard, getCenterX(), getCenterY());
+			}
 		}
 		return null;
 	}
@@ -112,6 +127,9 @@ public class GirlActor extends RenderableActor {
 	@Override
 	public void act(float delta) {
 		if (active) {
+			if (abilityCooldownManager != null) {
+				abilityCooldownManager.update(delta);
+			}
 			if (girl.getCooldown() == 0) {
 				boolean attacked = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager().attackBloonIfInRange(this);
 				if (attacked) {

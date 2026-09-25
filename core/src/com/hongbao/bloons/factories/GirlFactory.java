@@ -22,7 +22,8 @@ public class GirlFactory {
 				"reimu.png",
 				"red_spell_card.png",
 				325,
-				Arrays.asList(200, 280, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(200, 280, NO_UPGRADES_AVAILABLE),
+				15.0f
 		);
 	}
 
@@ -140,7 +141,8 @@ public class GirlFactory {
 				"yuyuko.png",
 				"pink_butterfly.png",
 				2000,
-				Arrays.asList(500, 1500, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(500, 1500, NO_UPGRADES_AVAILABLE),
+				20.0f
 		);
 	}
 

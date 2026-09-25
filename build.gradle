@@ -3,6 +3,7 @@ buildscript {
 
     repositories {
         mavenLocal()
+        maven { url 'https://repo.huaweicloud.com/repository/maven/' }
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
@@ -29,6 +30,7 @@ allprojects {
 
     repositories {
         mavenLocal()
+        maven { url 'https://repo.huaweicloud.com/repository/maven/' }
         mavenCentral()
         jcenter()
         google()
