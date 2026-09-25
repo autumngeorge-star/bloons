@@ -231,11 +231,11 @@ public class Map {
 		// It's colliding with the bloon path
 		// It's colliding with another girl
 
-		float x = girlActor.getCenterX() + TILE_LENGTH; // x is always offset by one tile because we have that extra tile on the left
+		float x = girlActor.getCenterX();
 		float y = girlActor.getCenterY();
 		float r = girlActor.getCollisionRadius();
 
-		if (y < 0 || y > 900 || x < 0 || x > 1550) {
+		if (y < 0 || y > 900 || x < 0 || x > 1500) {
 			return false;
 		}
 		
@@ -278,8 +278,8 @@ public class Map {
 		}
 	}
 	
-	private static float getCenterXOfTile(int tile) {
-		return tile * TILE_LENGTH + (TILE_LENGTH / 2f);
+	public static float getCenterXOfTile(int tile) {
+		return (tile - 1) * TILE_LENGTH + (TILE_LENGTH / 2f);
 	}
 	
 	private static float getCenterYOfTile(int tile) {
