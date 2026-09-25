@@ -7,6 +7,7 @@ import java.util.Map;
 
 import static com.hongbao.bloons.entities.Bloon.Color.BFB;
 import static com.hongbao.bloons.entities.Bloon.Color.BLACK;
+import static com.hongbao.bloons.entities.Bloon.Color.WHITE;
 import static com.hongbao.bloons.entities.Bloon.Color.BLUE;
 import static com.hongbao.bloons.entities.Bloon.Color.CERAMIC;
 import static com.hongbao.bloons.entities.Bloon.Color.GREEN;
@@ -30,6 +31,7 @@ public class Bloon {
 		YELLOW("yellow"),
 		PINK("pink"),
 		BLACK("black"),
+		WHITE("white"),
 		LEAD("lead"),
 		ZEBRA("zebra"),
 		RAINBOW("rainbow"),
@@ -75,6 +77,7 @@ public class Bloon {
 			put(YELLOW, 8);
 			put(PINK, 9);
 			put(BLACK, 7);
+			put(WHITE, 7);
 			put(LEAD, 5);
 			put(ZEBRA, 7);
 			put(RAINBOW, 8);

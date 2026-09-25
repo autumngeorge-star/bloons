@@ -5,9 +5,9 @@ import com.badlogic.gdx.audio.Music;
 
 
 public class MusicPlayer {
-	
+
 	private Music backgroundMusic;
-	
+
 	public MusicPlayer() {
 		backgroundMusic = null;
 	}
@@ -26,30 +26,44 @@ public class MusicPlayer {
 		}
 	}
 
+	public void playMusicTrack(String trackName) {
+		if (trackName == null || trackName.trim().isEmpty()) {
+			return;
+		}
+		String fileName = trackName.trim();
+		if (!fileName.startsWith("music/")) {
+			fileName = "music/" + fileName;
+		}
+		if (!fileName.endsWith(".mp3")) {
+			fileName = fileName + ".mp3";
+		}
+		playMusic(fileName);
+	}
+
 	public void playTitleMusic() {
-		playMusic("music/title.mp3");
+		playMusicTrack("title");
 	}
 
 	public void playStageMusic() {
-		playMusic("music/demystify_feast.mp3");
+		playMusicTrack("demystify_feast");
 	}
 
 	public void playFinalBossMusic() {
-		playMusic("music/night_falls.mp3");
+		playMusicTrack("night_falls");
 	}
-	
+
 	public void pause() {
 		if (backgroundMusic != null) {
 			backgroundMusic.pause();
 		}
 	}
-	
+
 	public void resume() {
 		if (backgroundMusic != null) {
 			backgroundMusic.play();
 		}
 	}
-	
+
 	public void stopMusic() {
 		if (backgroundMusic != null) {
 			backgroundMusic.stop();
