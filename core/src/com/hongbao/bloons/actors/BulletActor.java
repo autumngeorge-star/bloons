@@ -17,6 +17,8 @@ import java.util.Set;
 public class BulletActor extends RenderableActor {
 	
 	private Bullet bullet;
+	private float startX;
+	private float startY;
 	private float dx; // This should be a unit vector
 	private float dy;
 	private float rotationAngle;
@@ -44,10 +46,20 @@ public class BulletActor extends RenderableActor {
 		 textureRegion.getTexture().getWidth(),
 		 textureRegion.getTexture().getHeight()
 		);
+		this.startX = getX();
+		this.startY = getY();
 		
 		damagedBloons = new HashSet<>(bullet.getPierce());
 	}
 	
+	public float getStartX() {
+		return startX;
+	}
+
+	public float getStartY() {
+		return startY;
+	}
+
 	public Bullet getBullet() {
 		return bullet;
 	}
@@ -125,23 +137,32 @@ public class BulletActor extends RenderableActor {
 	@Override
 	public void act(float delta) {
 		frames++;
-		BloonManager bloonManager = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager();
+		BloonManager bloonManager = null;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+			if (app.getMap() != null) {
+				bloonManager = app.getMap().getBloonManager();
+			}
+		}
 		
-		setDirectionIfApplicable(bloonManager);
+		if (bloonManager != null) {
+			setDirectionIfApplicable(bloonManager);
+		}
 		
 		setX(getX() + dx * bullet.getSpeed() / 5);
 		setY(getY() + dy * bullet.getSpeed() / 5);
 		
-		if (getY() < 0 || getY() > 900 || getX() < 0 || getX() > 1500) {
+		if (getY() < 0 || getY() > 900 || getX() < 0 || getX() > 1500 || frames > 2000) {
 			remove();
 		}
 		
-		bullet.incrementDistanceTraveled();
-		if (bullet.getDistanceTraveled() >= bullet.getMaxRange()) {
+		if (Math.hypot(getX() - startX, getY() - startY) >= bullet.getMaxRange()) {
 			remove();
 		}
 		
-		bloonManager.checkCollision(this);
+		if (bloonManager != null) {
+			bloonManager.checkCollision(this);
+		}
 	}
 	
 	private void setDirectionIfApplicable(BloonManager bloonManager) {
