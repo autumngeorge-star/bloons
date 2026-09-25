@@ -1,6 +1,7 @@
 package com.hongbao.bloons.actors;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -20,7 +21,17 @@ public class SpellCardActor extends RenderableActor {
 	
 	public SpellCardActor(SpellCard spellCard, float x, float y) {
 		this.spellCard = spellCard;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(spellCard.getImageFileName())));
+		AssetManager am = null;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			am = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getAssetManager();
+		}
+		Texture texture;
+		if (am != null && am.isLoaded(spellCard.getImageFileName(), Texture.class)) {
+			texture = am.get(spellCard.getImageFileName(), Texture.class);
+		} else {
+			texture = new Texture(Gdx.files.internal(spellCard.getImageFileName()));
+		}
+		textureRegion = new TextureRegion(texture);
 		rotationAngle = 0;
 		
 		setZIndex(ZIndex.SPELL_CARD_Z_INDEX);

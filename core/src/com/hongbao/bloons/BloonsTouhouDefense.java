@@ -3,6 +3,9 @@ package com.hongbao.bloons;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -43,6 +46,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public boolean tripleSpeed;
 	public boolean autoContinue;
 
+	private AssetManager assetManager;
 	private Stage stage;
 	private Player player;
 	private Map map;
@@ -50,16 +54,102 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
 	
+	public AssetManager getAssetManager() {
+		return assetManager;
+	}
+
+	private void loadAssets() {
+		// Skin
+		assetManager.load("uiskins/uiskin.json", Skin.class);
+
+		// Music & Sound
+		assetManager.load("music/title.mp3", Music.class);
+		assetManager.load("music/demystify_feast.mp3", Music.class);
+		assetManager.load("music/night_falls.mp3", Music.class);
+		assetManager.load("music/pop.mp3", Sound.class);
+
+		// Instructions
+		assetManager.load("img/instructions/title.png", Texture.class);
+		assetManager.load("img/instructions/objective.png", Texture.class);
+		assetManager.load("img/instructions/bloons.png", Texture.class);
+		assetManager.load("img/instructions/blimps.png", Texture.class);
+		assetManager.load("img/instructions/girls.png", Texture.class);
+		assetManager.load("img/instructions/shortcuts.png", Texture.class);
+
+		// UI
+		assetManager.load("img/ui/header.png", Texture.class);
+		assetManager.load("img/ui/girl_details_template.png", Texture.class);
+		assetManager.load("img/ui/reimu_box.png", Texture.class);
+		assetManager.load("img/ui/yukari_box.png", Texture.class);
+		assetManager.load("img/ui/marisa_box.png", Texture.class);
+		assetManager.load("img/ui/alice_box.png", Texture.class);
+		assetManager.load("img/ui/sakuya_box.png", Texture.class);
+		assetManager.load("img/ui/remilia_box.png", Texture.class);
+		assetManager.load("img/ui/youmu_box.png", Texture.class);
+		assetManager.load("img/ui/yuyuko_box.png", Texture.class);
+
+		// Maps
+		assetManager.load("img/maps/basic_map.png", Texture.class);
+		assetManager.load("img/maps/map_with_turn.png", Texture.class);
+		assetManager.load("img/maps/heater.png", Texture.class);
+
+		// Characters
+		assetManager.load("img/characters/reimu.png", Texture.class);
+		assetManager.load("img/characters/yukari.png", Texture.class);
+		assetManager.load("img/characters/marisa.png", Texture.class);
+		assetManager.load("img/characters/alice.png", Texture.class);
+		assetManager.load("img/characters/sakuya.png", Texture.class);
+		assetManager.load("img/characters/remilia.png", Texture.class);
+		assetManager.load("img/characters/youmu.png", Texture.class);
+		assetManager.load("img/characters/yuyuko.png", Texture.class);
+
+		// Projectiles
+		assetManager.load("img/projectiles/red_spell_card.png", Texture.class);
+		assetManager.load("img/projectiles/purple_energy.png", Texture.class);
+		assetManager.load("img/projectiles/blue_magic_missile.png", Texture.class);
+		assetManager.load("img/projectiles/magic_spike.png", Texture.class);
+		assetManager.load("img/projectiles/blue_knives.png", Texture.class);
+		assetManager.load("img/projectiles/bat.png", Texture.class);
+		assetManager.load("img/projectiles/sword_slash.png", Texture.class);
+		assetManager.load("img/projectiles/pink_butterfly.png", Texture.class);
+
+		// SpellCards
+		assetManager.load("img/spellcards/reimu_spell.png", Texture.class);
+		assetManager.load("img/spellcards/yuyuko_fan.png", Texture.class);
+
+		// Bloons
+		String[] bloonImages = {
+			"black_bloon.png", "black_camo_bloon.png", "black_camo_regrowth_bloon.png", "black_regrowth_bloon.png",
+			"blue_bloon.png", "blue_camo_bloon.png", "blue_camo_regrowth_bloon.png", "blue_regrowth_bloon.png",
+			"green_bloon.png", "green_camo_bloon.png", "green_camo_regrowth_bloon.png", "green_regrowth_bloon.png",
+			"yellow_bloon.png", "yellow_camo_bloon.png", "yellow_camo_regrowth_bloon.png", "yellow_regrowth_bloon.png",
+			"pink_bloon.png", "pink_camo_bloon.png", "pink_camo_regrowth_bloon.png", "pink_regrowth_bloon.png",
+			"white_bloon.png", "white_camo_bloon.png", "white_camo_regrowth_bloon.png", "white_regrowth_bloon.png",
+			"lead_bloon.png", "lead_camo_bloon.png", "lead_camo_regrowth_bloon.png", "lead_regrowth_bloon.png",
+			"zebra_bloon.png", "zebra_camo_bloon.png", "zebra_camo_regrowth_bloon.png", "zebra_regrowth_bloon.png",
+			"rainbow_bloon.png", "rainbow_camo_bloon.png", "rainbow_camo_regrowth_bloon.png", "rainbow_regrowth_bloon.png",
+			"ceramic_bloon.png", "ceramic_camo_bloon.png", "ceramic_camo_regrowth_bloon.png", "ceramic_regrowth_bloon.png",
+			"red_bloon.png", "red_camo_bloon.png", "red_camo_regrowth_bloon.png", "red_regrowth_bloon.png",
+			"moab_bloon.png", "bfb_bloon.png", "zomg_bloon.png"
+		};
+		for (String img : bloonImages) {
+			assetManager.load("img/bloons/" + img, Texture.class);
+		}
+	}
 	
 	@Override
 	public void create() {
 		Gdx.graphics.setWindowedMode(1800, 900);
+		assetManager = new AssetManager();
+		loadAssets();
+		assetManager.finishLoading();
+
 		paused = false;
 		tripleSpeed = false;
 		autoContinue = false;
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
-		musicPlayer = new MusicPlayer();
+		musicPlayer = new MusicPlayer(assetManager);
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -76,7 +166,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	}
 
 	private void createInstructions() {
-		ImageButton instructions1 = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/instructions/title.png")))));
+		ImageButton instructions1 = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/instructions/title.png", Texture.class))));
 		instructions1.setPosition(376, 300);
 		instructions1.addListener(new ClickListener() {
 			@Override
@@ -84,7 +174,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				updateInstructions();
 			}
 		});
-		ImageButton instructions2 = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/instructions/objective.png")))));
+		ImageButton instructions2 = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/instructions/objective.png", Texture.class))));
 		instructions2.setPosition(376, 300);
 		instructions2.addListener(new ClickListener() {
 			@Override
@@ -92,7 +182,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				updateInstructions();
 			}
 		});
-		ImageButton instructions3 = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/instructions/bloons.png")))));
+		ImageButton instructions3 = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/instructions/bloons.png", Texture.class))));
 		instructions3.setPosition(376, 300);
 		instructions3.addListener(new ClickListener() {
 			@Override
@@ -100,7 +190,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				updateInstructions();
 			}
 		});
-		ImageButton instructions4 = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/instructions/blimps.png")))));
+		ImageButton instructions4 = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/instructions/blimps.png", Texture.class))));
 		instructions4.setPosition(376, 300);
 		instructions4.addListener(new ClickListener() {
 			@Override
@@ -108,7 +198,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				updateInstructions();
 			}
 		});
-		ImageButton instructions5 = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/instructions/girls.png")))));
+		ImageButton instructions5 = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/instructions/girls.png", Texture.class))));
 		instructions5.setPosition(376, 300);
 		instructions5.addListener(new ClickListener() {
 			@Override
@@ -116,7 +206,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				updateInstructions();
 			}
 		});
-		ImageButton instructions6 = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/instructions/shortcuts.png")))));
+		ImageButton instructions6 = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/instructions/shortcuts.png", Texture.class))));
 		instructions6.setPosition(376, 300);
 		instructions6.addListener(new ClickListener() {
 			@Override
@@ -145,9 +235,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	}
 	
 	private void createMenu() {
-		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
+		Skin skin = assetManager.get("uiskins/uiskin.json", Skin.class);
 
-		ImageButton background = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/header.png")))));
+		ImageButton background = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/ui/header.png", Texture.class))));
 		background.setPosition(1500, 0);
 		stage.addActor(new RenderableImageButton(background, ZIndex.MENU_Z_INDEX));
 
@@ -212,7 +302,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		healthLabel.addAction(Actions.repeat(RepeatAction.FOREVER, healthLabelAction));
 		stage.addActor(new RenderableLabel(healthLabel, ZIndex.MENU_ITEM_Z_INDEX));
 		
-		ImageButton purchaseReimu = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/reimu_box.png")))));
+		ImageButton purchaseReimu = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/ui/reimu_box.png", Texture.class))));
 		purchaseReimu.setPosition(1504, 676);
 		purchaseReimu.addCaptureListener(new ClickListener() {
 			@Override
@@ -236,7 +326,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		reimuCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
 		stage.addActor(new RenderableLabel(reimuCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
-		ImageButton purchaseYukari = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/yukari_box.png")))));
+		ImageButton purchaseYukari = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/ui/yukari_box.png", Texture.class))));
 		purchaseYukari.setPosition(1504, 604);
 		purchaseYukari.addListener(new ClickListener() {
 			@Override
@@ -260,7 +350,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		yukariCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
 		stage.addActor(new RenderableLabel(yukariCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
-		ImageButton purchaseMarisa = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/marisa_box.png")))));
+		ImageButton purchaseMarisa = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/ui/marisa_box.png", Texture.class))));
 		purchaseMarisa.setPosition(1504, 532);
 		purchaseMarisa.addListener(new ClickListener() {
 			@Override
@@ -284,7 +374,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		marisaCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
 		stage.addActor(new RenderableLabel(marisaCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
-		ImageButton purchaseAlice = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/alice_box.png")))));
+		ImageButton purchaseAlice = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/ui/alice_box.png", Texture.class))));
 		purchaseAlice.setPosition(1504, 460);
 		purchaseAlice.addListener(new ClickListener() {
 			@Override
@@ -308,7 +398,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		aliceCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
 		stage.addActor(new RenderableLabel(aliceCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
-		ImageButton purchaseSakuya = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/sakuya_box.png")))));
+		ImageButton purchaseSakuya = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/ui/sakuya_box.png", Texture.class))));
 		purchaseSakuya.setPosition(1504, 388);
 		purchaseSakuya.addListener(new ClickListener() {
 			@Override
@@ -332,7 +422,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		sakuyaCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
 		stage.addActor(new RenderableLabel(sakuyaCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
-		ImageButton purchaseRemilia = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/remilia_box.png")))));
+		ImageButton purchaseRemilia = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/ui/remilia_box.png", Texture.class))));
 		purchaseRemilia.setPosition(1504, 316);
 		purchaseRemilia.addListener(new ClickListener() {
 			@Override
@@ -356,7 +446,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		remiliaCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
 		stage.addActor(new RenderableLabel(remiliaCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
-		ImageButton purchaseYoumu = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/youmu_box.png")))));
+		ImageButton purchaseYoumu = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/ui/youmu_box.png", Texture.class))));
 		purchaseYoumu.setPosition(1504, 244);
 		purchaseYoumu.addListener(new ClickListener() {
 			@Override
@@ -380,7 +470,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		youmuCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
 		stage.addActor(new RenderableLabel(youmuCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
-		ImageButton purchaseYuyuko = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/yuyuko_box.png")))));
+		ImageButton purchaseYuyuko = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetManager.get("img/ui/yuyuko_box.png", Texture.class))));
 		purchaseYuyuko.setPosition(1504, 172);
 		purchaseYuyuko.addListener(new ClickListener() {
 			@Override
@@ -433,7 +523,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		
 		map = MapFactory.createHeaterMap(stage);
 		
-		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
+		Drawable drawable = new TextureRegionDrawable(new TextureRegion(assetManager.get(map.getBackgroundImageFilePath(), Texture.class)));
 		ImageButton backgroundMap = new ImageButton(drawable);
 		backgroundMap.setPosition(0, 0);
 		stage.addActor(backgroundMap);
@@ -574,6 +664,12 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void dispose() {
 		stage.dispose();
+		if (shapeRenderer != null) {
+			shapeRenderer.dispose();
+		}
+		if (assetManager != null) {
+			assetManager.dispose();
+		}
 	}
 
 }
