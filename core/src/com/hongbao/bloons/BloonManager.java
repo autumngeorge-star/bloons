@@ -107,10 +107,20 @@ public class BloonManager {
 			for (Bloon bloon : result.getBloonsGenerated()) {
 				BloonActor generatedBloonActor;
 				if (previousBloonActor == null) {
-					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
+					generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
 				} else {
 					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
-					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
+					if (direction.getFirst() == 0f && direction.getSecond() == 0f) {
+						direction = map.getDirection(bloonActor.getCenterX(), bloonActor.getCenterY());
+					}
+					if (direction.getFirst() == 0f && direction.getSecond() == 0f) {
+						direction = new Pair<>(1f, 0f);
+					}
+					float spacing = Math.max(16f, previousBloonActor.getCollisionRadius() * 1.0f);
+					float nextX = previousBloonActor.getCenterX() - direction.getFirst() * spacing;
+					float nextY = previousBloonActor.getCenterY() - direction.getSecond() * spacing;
+					generatedBloonActor = new BloonActor(bloon, nextX, nextY, bloonActor);
+					bloon.setDistanceTravelled((int)(previousBloonActor.getBloon().getDistanceTravelled() - spacing));
 				}
 				stage.addActor(generatedBloonActor);
 				onstageBloons.add(generatedBloonActor);
