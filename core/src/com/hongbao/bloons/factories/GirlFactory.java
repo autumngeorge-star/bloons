@@ -144,4 +144,19 @@ public class GirlFactory {
 		);
 	}
 
+	public static Girl createGirlByName(String name) {
+		if (name == null) return null;
+		switch (name) {
+			case "Reimu": return createReimu();
+			case "Yukari": return createYukari();
+			case "Marisa": return createMarisa();
+			case "Alice": return createAlice();
+			case "Sakuya": return createSakuya();
+			case "Remilia": return createRemilia();
+			case "Youmu": return createYoumu();
+			case "Yuyuko": return createYuyuko();
+			default: return null;
+		}
+	}
+
 }
