@@ -9,8 +9,12 @@ import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.statuseffects.StatusEffect;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -96,16 +100,34 @@ public class BloonActor extends RenderableActor {
 		remove();
 	}
 	
-	public void move(Pair<Float, Float> direction) {
-		setX(getX() + direction.getFirst() * bloon.getSpeed() / 5);
-		setY(getY() + direction.getSecond() * bloon.getSpeed() / 5);
+	public void applyStatusEffect(StatusEffect effect) {
+		if (bloon != null) {
+			bloon.addStatusEffect(effect);
+		}
+	}
+
+	public List<StatusEffect> getStatusEffects() {
+		return bloon != null ? bloon.getStatusEffects() : Collections.emptyList();
+	}
+
+	public void move(Pair<Float, Float> direction, float delta) {
+		float effectiveSpeed = bloon != null ? bloon.getEffectiveSpeed() : 0f;
+		float distance = effectiveSpeed * 12f * delta;
+		setX(getX() + direction.getFirst() * distance);
+		setY(getY() + direction.getSecond() * distance);
 		
-		bloon.incrementDistanceTravelled();
+		if (bloon != null) {
+			bloon.incrementDistanceTravelled(distance);
+		}
 
 		if (getCenterX() > 1500) {
 			release();
 			((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager().removeBloonFromStage(this);
 		}
+	}
+
+	public void move(Pair<Float, Float> direction) {
+		move(direction, 1f / 60f);
 	}
 
 	@Override
@@ -133,11 +155,46 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public void act(float delta) {
-		BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
-		Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
-		if (direction.getFirst() < 0) {
-			System.out.println(direction.getFirst());
+		if (bloon != null) {
+			List<StatusEffect> effects = bloon.getStatusEffects();
+			if (!effects.isEmpty()) {
+				int totalDamageToApply = 0;
+				List<StatusEffect> expiredEffects = new ArrayList<>();
+
+				for (StatusEffect effect : effects) {
+					int ticks = effect.update(delta);
+					if (ticks > 0) {
+						totalDamageToApply += ticks * effect.getDamage();
+					}
+					if (effect.isExpired()) {
+						expiredEffects.add(effect);
+					}
+				}
+
+				for (StatusEffect expired : expiredEffects) {
+					bloon.removeStatusEffect(expired);
+				}
+
+				if (totalDamageToApply > 0) {
+					BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+					if (app != null && app.getMap() != null && app.getMap().getBloonManager() != null) {
+						app.getMap().getBloonManager().popBloon(this, totalDamageToApply);
+					}
+				}
+			}
 		}
-		move(direction);
+
+		if (getStage() == null || bloon == null || bloon.getHealth() <= 0) {
+			return;
+		}
+
+		BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+		if (app != null && app.getMap() != null) {
+			Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
+			if (direction.getFirst() < 0) {
+				System.out.println(direction.getFirst());
+			}
+			move(direction, delta);
+		}
 	}
 }
