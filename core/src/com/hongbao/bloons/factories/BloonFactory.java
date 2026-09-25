@@ -3,6 +3,7 @@ package com.hongbao.bloons.factories;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.hongbao.bloons.BloonQueue;
+import com.hongbao.bloons.SpawnEntry;
 import com.hongbao.bloons.entities.Bloon;
 
 import java.util.ArrayList;
@@ -297,14 +298,11 @@ public class BloonFactory {
 		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
 		String fileContents = file.readString();
 		String[] lines = fileContents.split("\n");
-		long timer = 0;
+		float timer = 0f;
 
-		List<List<Bloon>> bloonLevels = new ArrayList<>();
-		List<List<Long>> intervalLevels = new ArrayList<>();
+		List<List<SpawnEntry>> spawnLevels = new ArrayList<>();
+		List<SpawnEntry> spawnEntries = new ArrayList<>();
 
-		List<Bloon> bloons = new ArrayList<>();
-		List<Long> intervals = new ArrayList<>();
-		
 		for (String line : lines) {
 			if (line.startsWith("//")) {
 				// do nothing
@@ -312,33 +310,35 @@ public class BloonFactory {
 				String[] parts = line.split(" ");
 				if (parts.length == 3) {
 					int amount = Integer.parseInt(parts[0]);
-					long delay = Long.parseLong(parts[1]);
+					long delayInFrames = Long.parseLong(parts[1]);
 					String bloonTypes = parts[2];
-					
+					float delayInSeconds = delayInFrames / 60.0f;
+
 					for (int x = 0; x < amount; x++) {
 						String[] types = bloonTypes.split(",");
 						for (String type : types) {
 							Bloon bloon = createBloonOfType(type);
-							bloons.add(bloon);
-							intervals.add(timer);
-							timer += delay;
+							spawnEntries.add(new SpawnEntry(bloon, timer));
+							timer += delayInSeconds;
 						}
 					}
 				} else {
 					System.out.println("BloonFactory.createBloonQueue(wtf2) { " + line + " }");
 				}
 			} else if (line.contains("END")) {
-				bloonLevels.add(bloons);
-				intervalLevels.add(intervals);
-				bloons = new ArrayList<>();
-				intervals = new ArrayList<>();
-				timer = 0;
+				spawnLevels.add(spawnEntries);
+				spawnEntries = new ArrayList<>();
+				timer = 0f;
 			} else {
 				System.out.println("BloonFactory.createBloonQueue(wtf1) { " + line + " }");
 			}
 		}
-			
-		return new BloonQueue(bloonLevels, intervalLevels);
+
+		if (!spawnEntries.isEmpty()) {
+			spawnLevels.add(spawnEntries);
+		}
+
+		return new BloonQueue(spawnLevels);
 	}
 	
 }

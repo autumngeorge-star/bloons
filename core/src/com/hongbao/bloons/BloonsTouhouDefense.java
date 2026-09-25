@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -63,9 +64,14 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
-		final RunnableAction bloonCreationAction = new RunnableAction();
-		bloonCreationAction.setRunnable(() -> map.getBloonManager().createBloons());
-		stage.addAction(Actions.repeat(RepeatAction.FOREVER, bloonCreationAction));
+		final Action bloonCreationAction = new Action() {
+			@Override
+			public boolean act(float delta) {
+				map.getBloonManager().createBloons(delta);
+				return false;
+			}
+		};
+		stage.addAction(bloonCreationAction);
 
 		Gdx.input.setInputProcessor(stage);
 		
