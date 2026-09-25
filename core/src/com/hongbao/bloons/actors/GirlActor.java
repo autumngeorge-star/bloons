@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.entities.SpellCard;
 import com.hongbao.bloons.helpers.ZIndex;
 
 
@@ -86,9 +87,12 @@ public class GirlActor extends RenderableActor {
 	}
 	
 	public SpellCardActor createSpellCardActor() {
-		if (true) { // todo Girl should have a method that checks the cooldown or something
-			// maybe some direction based on the girl's direction
-			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
+		if (girl != null && girl.canActivateSpellCard()) {
+			SpellCard spellCard = girl.createSpellCard();
+			if (spellCard != null) {
+				girl.triggerSpellCardCooldown();
+				return new SpellCardActor(spellCard, getCenterX(), getCenterY());
+			}
 		}
 		return null;
 	}
@@ -112,6 +116,7 @@ public class GirlActor extends RenderableActor {
 	@Override
 	public void act(float delta) {
 		if (active) {
+			girl.decrementSpellCardCooldown();
 			if (girl.getCooldown() == 0) {
 				boolean attacked = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager().attackBloonIfInRange(this);
 				if (attacked) {

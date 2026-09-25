@@ -22,7 +22,8 @@ public class GirlFactory {
 				"reimu.png",
 				"red_spell_card.png",
 				325,
-				Arrays.asList(200, 280, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(200, 280, NO_UPGRADES_AVAILABLE),
+				1800
 		);
 	}
 
@@ -38,7 +39,8 @@ public class GirlFactory {
 				"yukari.png",
 				"purple_energy.png",
 				2500,
-				Arrays.asList(2500, 4500, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(2500, 4500, NO_UPGRADES_AVAILABLE),
+				1800
 		);
 	}
 
@@ -55,7 +57,8 @@ public class GirlFactory {
 				"marisa.png",
 				"blue_magic_missile.png",
 				200,
-				Arrays.asList(140, 220, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(140, 220, NO_UPGRADES_AVAILABLE),
+				1800
 		);
 	}
 
@@ -72,7 +75,8 @@ public class GirlFactory {
 				"alice.png",
 				"magic_spike.png",
 				450,
-				Arrays.asList(150, 600, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(150, 600, NO_UPGRADES_AVAILABLE),
+				1800
 		);
 	}
 
@@ -89,7 +93,8 @@ public class GirlFactory {
 				"sakuya.png",
 				"blue_knives.png",
 				500,
-				Arrays.asList(300, 350, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(300, 350, NO_UPGRADES_AVAILABLE),
+				1800
 		);
 	}
 
@@ -106,7 +111,8 @@ public class GirlFactory {
 				"remilia.png",
 				"bat.png",
 				2500,
-				Arrays.asList(4000, 5000, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(4000, 5000, NO_UPGRADES_AVAILABLE),
+				1800
 		);
 	}
 
@@ -123,7 +129,8 @@ public class GirlFactory {
 				"youmu.png",
 				"sword_slash.png",
 				600,
-				Arrays.asList(400, 800, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(400, 800, NO_UPGRADES_AVAILABLE),
+				1800
 		);
 	}
 
@@ -140,7 +147,8 @@ public class GirlFactory {
 				"yuyuko.png",
 				"pink_butterfly.png",
 				2000,
-				Arrays.asList(500, 1500, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(500, 1500, NO_UPGRADES_AVAILABLE),
+				2400
 		);
 	}
 
