@@ -18,6 +18,7 @@ import static com.hongbao.bloons.entities.Bloon.Color.MOAB;
 import static com.hongbao.bloons.entities.Bloon.Color.PINK;
 import static com.hongbao.bloons.entities.Bloon.Color.RAINBOW;
 import static com.hongbao.bloons.entities.Bloon.Color.RED;
+import static com.hongbao.bloons.entities.Bloon.Color.WHITE;
 import static com.hongbao.bloons.entities.Bloon.Color.YELLOW;
 import static com.hongbao.bloons.entities.Bloon.Color.ZEBRA;
 import static com.hongbao.bloons.entities.Bloon.Color.ZOMG;
@@ -35,6 +36,7 @@ public class BloonPoppedResult {
 			put(ZEBRA, 256);
 			put(LEAD, 256);
 			put(BLACK, 512);
+			put(WHITE, 512);
 			put(PINK, 1024);
 			put(YELLOW, 1024);
 			put(GREEN, 1024);

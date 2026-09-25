@@ -1,0 +1,27 @@
+{
+  "title": "Hella Bloons Queue",
+  "music": "music/demystify_feast.mp3",
+  "cashBonus": 100,
+  "waves": [
+    {
+      "title": "Preparation",
+      "music": "",
+      "cashBonus": 0,
+      "spawns": []
+    },
+    {
+      "title": "Hella Wave 1",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 10000,
+          "delay": 15,
+          "types": [
+            "ceramic"
+          ]
+        }
+      ]
+    }
+  ]
+}

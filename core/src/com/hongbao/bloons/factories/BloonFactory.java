@@ -2,11 +2,16 @@ package com.hongbao.bloons.factories;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.hongbao.bloons.BloonQueue;
+import com.hongbao.bloons.WaveMetadata;
 import com.hongbao.bloons.entities.Bloon;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static com.hongbao.bloons.BloonsTouhouDefense.HELLA_BLOONS;
@@ -109,6 +114,22 @@ public class BloonFactory {
 	public static Bloon createBlackCamoRegenBloon() {
 		return new Bloon(Bloon.Color.BLACK, 6, true, true);
 	}
+
+	public static Bloon createWhiteBloon() {
+		return new Bloon(Bloon.Color.WHITE, 6, false, false);
+	}
+
+	public static Bloon createWhiteCamoBloon() {
+		return new Bloon(Bloon.Color.WHITE, 6, true, false);
+	}
+
+	public static Bloon createWhiteRegenBloon() {
+		return new Bloon(Bloon.Color.WHITE, 6, false, true);
+	}
+
+	public static Bloon createWhiteCamoRegenBloon() {
+		return new Bloon(Bloon.Color.WHITE, 6, true, true);
+	}
 	
 	public static Bloon createLeadBloon() {
 		return new Bloon(Bloon.Color.LEAD, 7, false, false);
@@ -185,74 +206,71 @@ public class BloonFactory {
 	public static Bloon createZOMG() {
 		return new Bloon(Bloon.Color.ZOMG, 4918, false, false);
 	}
-	
+
+	private static final Map<String, Bloon.Color> BLOON_TYPE_LOOKUP = new HashMap<String, Bloon.Color>() {
+		{
+			for (Bloon.Color color : Bloon.Color.values()) {
+				put(color.getValue().toLowerCase(), color);
+			}
+		}
+	};
+
 	public static Bloon createBloonOfType(String type, int health) {
-		// In the case of bullets that do more than 1 damage, we could (for example) pop a parent bloon so hard that the resulting bloons end up damaged.
 		Bloon createdBloon = createBloonOfType(type);
 		createdBloon.setHealth(health);
 		return createdBloon;
 	}
-	
+
 	public static Bloon createBloonOfType(String type) {
-		// todo george at some point add all the variations of bloons too :(
+		if (type == null) {
+			throw new IllegalArgumentException("Bloon type cannot be null");
+		}
+		type = type.trim();
 		if (type.endsWith("\r")) {
 			type = type.substring(0, type.length() - 1);
 		}
-		if ("red".equals(type)) {
-			return createRedBloon();
+
+		boolean camo = type.contains("_camo");
+		boolean regen = type.contains("_regen") || type.contains("_regrowth");
+
+		String baseType = type.toLowerCase()
+				.replace("_camo", "")
+				.replace("_regen", "")
+				.replace("_regrowth", "");
+
+		Bloon.Color color = BLOON_TYPE_LOOKUP.get(baseType);
+		if (color == null) {
+			throw new IllegalArgumentException("Unrecognized bloon type: '" + type + "' (color: '" + baseType + "')");
 		}
-		if ("red_camo".equals(type)) {
-			return createRedCamoBloon();
-		}
-		if ("red_regen".equals(type)) {
-			return createRedRegenBloon();
-		}
-		if ("red_camo_regen".equals(type)) {
-			return createRedCamoRegenBloon();
-		}
-		if ("blue".equals(type)) {
-			return createBlueBloon();
-		}
-		if ("green".equals(type)) {
-			return createGreenBloon();
-		}
-		if ("yellow".equals(type)) {
-			return createYellowBloon();
-		}
-		if ("pink".equals(type)) {
-			return createPinkBloon();
-		}
-		if ("black".equals(type)) {
-			return createBlackBloon();
-		}
-		if ("lead".equals(type)) {
-			return createLeadBloon();
-		}
-		if ("zebra".equals(type)) {
-			return createZebraBloon();
-		}
-		if ("rainbow".equals(type)) {
-			return createRainbowBloon();
-		}
-		if ("ceramic".equals(type)) {
-			return createCeramicBloon();
-		}
-		if ("moab".equals(type)) {
-			return createMOAB();
-		}
-		if ("bfb".equals(type)) {
-			return createBFB();
-		}
-		if ("zomg".equals(type)) {
-			return createZOMG();
-		}
-		throw new RuntimeException("Unexpected bloon type: " +type);
+
+		int health = getDefaultHealthForColor(color);
+		return new Bloon(color, health, camo, regen);
 	}
-	
+
+	private static int getDefaultHealthForColor(Bloon.Color color) {
+		switch (color) {
+			case RED: return 1;
+			case BLUE: return 2;
+			case GREEN: return 3;
+			case YELLOW: return 4;
+			case PINK: return 5;
+			case BLACK: return 6;
+			case WHITE: return 6;
+			case LEAD: return 7;
+			case ZEBRA: return 7;
+			case RAINBOW: return 8;
+			case CERAMIC: return 18;
+			case MOAB: return 218;
+			case BFB: return 918;
+			case ZOMG: return 4918;
+			default: throw new IllegalArgumentException("Unknown bloon color: " + color);
+		}
+	}
+
 	public static Bloon createRandomBloon() {
 		Random r = new Random();
 		
-		int index = r.nextInt(10);
+		int index = r.nextInt(11);
 		if (index == 0) {
 			return createRedBloon();
 		}
@@ -272,12 +290,15 @@ public class BloonFactory {
 			return createBlackBloon();
 		}
 		else if (index == 6) {
-			return createLeadBloon();
+			return createWhiteBloon();
 		}
 		else if (index == 7) {
-			return createZebraBloon();
+			return createLeadBloon();
 		}
 		else if (index == 8) {
+			return createZebraBloon();
+		}
+		else if (index == 9) {
 			return createRainbowBloon();
 		}
 		else {
@@ -287,58 +308,137 @@ public class BloonFactory {
 	
 	public static BloonQueue createBloonQueue() {
 		if (HELLA_BLOONS) {
-			return createBloonQueueFromFile("hella_bloons.txt");
+			return createBloonQueueFromFile("hella_bloons.json");
 		} else {
-			return createBloonQueueFromFile("default.txt");
+			return createBloonQueueFromFile("default.json");
 		}
 	}
 	
 	public static BloonQueue createBloonQueueFromFile(String fileName) {
 		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
-		String fileContents = file.readString();
-		String[] lines = fileContents.split("\n");
-		long timer = 0;
+		if (!file.exists()) {
+			Gdx.app.error("BloonFactory", "Bloon queue file not found: bloon_queues/" + fileName);
+			return new BloonQueue(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+		}
 
 		List<List<Bloon>> bloonLevels = new ArrayList<>();
 		List<List<Long>> intervalLevels = new ArrayList<>();
+		List<WaveMetadata> waveMetadatas = new ArrayList<>();
 
-		List<Bloon> bloons = new ArrayList<>();
-		List<Long> intervals = new ArrayList<>();
-		
-		for (String line : lines) {
-			if (line.startsWith("//")) {
-				// do nothing
-			} else if (line.contains(" ")) {
-				String[] parts = line.split(" ");
-				if (parts.length == 3) {
-					int amount = Integer.parseInt(parts[0]);
-					long delay = Long.parseLong(parts[1]);
-					String bloonTypes = parts[2];
-					
-					for (int x = 0; x < amount; x++) {
-						String[] types = bloonTypes.split(",");
-						for (String type : types) {
-							Bloon bloon = createBloonOfType(type);
-							bloons.add(bloon);
-							intervals.add(timer);
-							timer += delay;
+		try {
+			JsonReader reader = new JsonReader();
+			JsonValue root = reader.parse(file);
+
+			if (root == null) {
+				Gdx.app.error("BloonFactory", "Failed to parse JSON root in file: " + fileName);
+				return new BloonQueue(bloonLevels, intervalLevels, waveMetadatas);
+			}
+
+			String fileTitle = getOptString(root, "title", "Default Wave Set");
+			String fileMusic = getOptString(root, "music", "music/demystify_feast.mp3");
+			int fileCashBonus = getOptInt(root, "cashBonus", 100);
+
+			JsonValue wavesArray = root.get("waves");
+			if (wavesArray == null || !wavesArray.isArray()) {
+				Gdx.app.error("BloonFactory", "Missing or invalid 'waves' array field in file: " + fileName);
+				return new BloonQueue(bloonLevels, intervalLevels, waveMetadatas);
+			}
+
+			int waveIdx = 0;
+			for (JsonValue waveVal = wavesArray.child; waveVal != null; waveVal = waveVal.next, waveIdx++) {
+				String title = getOptString(waveVal, "title", waveIdx == 0 ? "Initial Preparation" : "Level " + waveIdx);
+				String music = getOptString(waveVal, "music", waveIdx == 0 ? "" : fileMusic);
+				int cashBonus = getOptInt(waveVal, "cashBonus", waveIdx == 0 ? 0 : fileCashBonus);
+
+				WaveMetadata waveMeta = new WaveMetadata(title, music, cashBonus);
+				waveMetadatas.add(waveMeta);
+
+				List<Bloon> bloons = new ArrayList<>();
+				List<Long> intervals = new ArrayList<>();
+				long timer = 0;
+
+				JsonValue spawnsArray = waveVal.get("spawns");
+				if (spawnsArray != null && spawnsArray.isArray()) {
+					int spawnIdx = 0;
+					for (JsonValue spawnVal = spawnsArray.child; spawnVal != null; spawnVal = spawnVal.next, spawnIdx++) {
+						try {
+							if (!spawnVal.has("count") || !spawnVal.get("count").isNumber()) {
+								Gdx.app.error("BloonFactory", "Invalid or missing 'count' field at wave " + waveIdx + ", spawn " + spawnIdx + " in file " + fileName);
+								continue;
+							}
+							if (!spawnVal.has("delay") || !spawnVal.get("delay").isNumber()) {
+								Gdx.app.error("BloonFactory", "Invalid or missing 'delay' field at wave " + waveIdx + ", spawn " + spawnIdx + " in file " + fileName);
+								continue;
+							}
+
+							int amount = spawnVal.getInt("count");
+							long delay = spawnVal.getLong("delay");
+
+							List<String> types = parseTypesField(spawnVal, fileName, waveIdx, spawnIdx);
+
+							for (int x = 0; x < amount; x++) {
+								for (String type : types) {
+									Bloon bloon = createBloonOfType(type);
+									bloons.add(bloon);
+									intervals.add(timer);
+									timer += delay;
+								}
+							}
+						} catch (Exception e) {
+							Gdx.app.error("BloonFactory", "Error processing spawn entry at wave " + waveIdx + ", spawn " + spawnIdx + " in file " + fileName + ": " + e.getMessage());
 						}
 					}
-				} else {
-					System.out.println("BloonFactory.createBloonQueue(wtf2) { " + line + " }");
 				}
-			} else if (line.contains("END")) {
+
 				bloonLevels.add(bloons);
 				intervalLevels.add(intervals);
-				bloons = new ArrayList<>();
-				intervals = new ArrayList<>();
-				timer = 0;
-			} else {
-				System.out.println("BloonFactory.createBloonQueue(wtf1) { " + line + " }");
 			}
+		} catch (Exception e) {
+			Gdx.app.error("BloonFactory", "Error parsing wave definition file: " + fileName + ", exception: " + e.getMessage());
 		}
-			
-		return new BloonQueue(bloonLevels, intervalLevels);
+
+		return new BloonQueue(bloonLevels, intervalLevels, waveMetadatas);
+	}
+
+	private static List<String> parseTypesField(JsonValue spawnVal, String fileName, int waveIdx, int spawnIdx) {
+		List<String> types = new ArrayList<>();
+		JsonValue typesVal = spawnVal.get("types");
+		if (typesVal == null) {
+			typesVal = spawnVal.get("type");
+		}
+
+		if (typesVal == null) {
+			Gdx.app.error("BloonFactory", "Missing 'types' field at wave " + waveIdx + ", spawn " + spawnIdx + " in file " + fileName);
+			return types;
+		}
+
+		if (typesVal.isArray()) {
+			for (JsonValue t = typesVal.child; t != null; t = t.next) {
+				types.add(t.asString());
+			}
+		} else if (typesVal.isString()) {
+			String[] split = typesVal.asString().split(",");
+			for (String s : split) {
+				types.add(s.trim());
+			}
+		} else {
+			Gdx.app.error("BloonFactory", "Invalid type for 'types' field at wave " + waveIdx + ", spawn " + spawnIdx + " in file " + fileName);
+		}
+		return types;
+	}
+
+	private static String getOptString(JsonValue json, String name, String defaultVal) {
+		if (json != null && json.has(name) && json.get(name).isString()) {
+			return json.getString(name);
+		}
+		return defaultVal;
+	}
+
+	private static int getOptInt(JsonValue json, String name, int defaultVal) {
+		if (json != null && json.has(name) && json.get(name).isNumber()) {
+			return json.getInt(name);
+		}
+		return defaultVal;
 	}
 	
 }

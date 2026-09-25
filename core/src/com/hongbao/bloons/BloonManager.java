@@ -35,12 +35,28 @@ public class BloonManager {
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
+			WaveMetadata completedWaveMeta = bloonQueue.getCurrentWaveMetadata();
+			if (completedWaveMeta != null && bloonQueue.getLevel() > 0) {
+				int bonus = completedWaveMeta.getCashBonus();
+				if (bonus > 0) {
+					Player player = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getPlayer();
+					if (player != null) {
+						player.earnMoney(bonus);
+					}
+				}
+			}
+
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+
+			WaveMetadata currentWaveMeta = bloonQueue.getCurrentWaveMetadata();
+			if (currentWaveMeta != null) {
+				String musicTrack = currentWaveMeta.getMusic();
+				if (musicTrack != null && !musicTrack.trim().isEmpty()) {
+					MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
+					if (musicPlayer != null) {
+						musicPlayer.playMusic(musicTrack);
+					}
+				}
 			}
 		}
 	}
