@@ -103,6 +103,18 @@ public class Bloon {
 		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
 	}
 
+	public Bloon(Bloon parent, Color color, int health) {
+		this(color, health, parent != null && parent.isCamo(), parent != null && parent.isRegen());
+	}
+
+	public void copyModifiersFrom(Bloon parent) {
+		if (parent != null) {
+			this.camo = parent.isCamo();
+			this.regen = parent.isRegen();
+			this.imageFileName = createImageFileName(this.color.getValue(), this.camo, this.regen);
+		}
+	}
+
 	public Color getColor() {
 		return color;
 	}

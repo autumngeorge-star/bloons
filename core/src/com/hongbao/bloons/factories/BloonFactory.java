@@ -185,68 +185,108 @@ public class BloonFactory {
 	public static Bloon createZOMG() {
 		return new Bloon(Bloon.Color.ZOMG, 4918, false, false);
 	}
-	
+
+	public static Bloon createChildFromParent(Bloon parent, Bloon.Color childColor, int health) {
+		if (parent == null) {
+			return new Bloon(childColor, health, false, false);
+		}
+		return new Bloon(parent, childColor, health);
+	}
+
+	public static Bloon createChildFromParent(Bloon parent, Bloon.Color childColor) {
+		return createChildFromParent(parent, childColor, getDefaultHealthForColor(childColor));
+	}
+
+	public static int getDefaultHealthForColor(Bloon.Color color) {
+		switch (color) {
+			case RED: return 1;
+			case BLUE: return 2;
+			case GREEN: return 3;
+			case YELLOW: return 4;
+			case PINK: return 5;
+			case BLACK: return 6;
+			case LEAD: return 7;
+			case ZEBRA: return 7;
+			case RAINBOW: return 8;
+			case CERAMIC: return 18;
+			case MOAB: return 218;
+			case BFB: return 918;
+			case ZOMG: return 4918;
+			default: return 1;
+		}
+	}
+
 	public static Bloon createBloonOfType(String type, int health) {
 		// In the case of bullets that do more than 1 damage, we could (for example) pop a parent bloon so hard that the resulting bloons end up damaged.
 		Bloon createdBloon = createBloonOfType(type);
 		createdBloon.setHealth(health);
 		return createdBloon;
 	}
-	
+
 	public static Bloon createBloonOfType(String type) {
-		// todo george at some point add all the variations of bloons too :(
+		if (type == null) {
+			throw new RuntimeException("Unexpected bloon type: null");
+		}
+		type = type.trim();
 		if (type.endsWith("\r")) {
-			type = type.substring(0, type.length() - 1);
+			type = type.substring(0, type.length() - 1).trim();
 		}
-		if ("red".equals(type)) {
-			return createRedBloon();
+
+		boolean camo = type.contains("_camo");
+		boolean regen = type.contains("_regen") || type.contains("_regrowth");
+
+		String baseType = type.toLowerCase()
+				.replace("_camo", "")
+				.replace("_regen", "")
+				.replace("_regrowth", "");
+
+		Bloon.Color color;
+		int health;
+
+		if ("red".equals(baseType)) {
+			color = Bloon.Color.RED;
+			health = 1;
+		} else if ("blue".equals(baseType)) {
+			color = Bloon.Color.BLUE;
+			health = 2;
+		} else if ("green".equals(baseType)) {
+			color = Bloon.Color.GREEN;
+			health = 3;
+		} else if ("yellow".equals(baseType)) {
+			color = Bloon.Color.YELLOW;
+			health = 4;
+		} else if ("pink".equals(baseType)) {
+			color = Bloon.Color.PINK;
+			health = 5;
+		} else if ("black".equals(baseType)) {
+			color = Bloon.Color.BLACK;
+			health = 6;
+		} else if ("lead".equals(baseType)) {
+			color = Bloon.Color.LEAD;
+			health = 7;
+		} else if ("zebra".equals(baseType)) {
+			color = Bloon.Color.ZEBRA;
+			health = 7;
+		} else if ("rainbow".equals(baseType)) {
+			color = Bloon.Color.RAINBOW;
+			health = 8;
+		} else if ("ceramic".equals(baseType)) {
+			color = Bloon.Color.CERAMIC;
+			health = 18;
+		} else if ("moab".equals(baseType)) {
+			color = Bloon.Color.MOAB;
+			health = 218;
+		} else if ("bfb".equals(baseType)) {
+			color = Bloon.Color.BFB;
+			health = 918;
+		} else if ("zomg".equals(baseType)) {
+			color = Bloon.Color.ZOMG;
+			health = 4918;
+		} else {
+			throw new RuntimeException("Unexpected bloon type: " + type);
 		}
-		if ("red_camo".equals(type)) {
-			return createRedCamoBloon();
-		}
-		if ("red_regen".equals(type)) {
-			return createRedRegenBloon();
-		}
-		if ("red_camo_regen".equals(type)) {
-			return createRedCamoRegenBloon();
-		}
-		if ("blue".equals(type)) {
-			return createBlueBloon();
-		}
-		if ("green".equals(type)) {
-			return createGreenBloon();
-		}
-		if ("yellow".equals(type)) {
-			return createYellowBloon();
-		}
-		if ("pink".equals(type)) {
-			return createPinkBloon();
-		}
-		if ("black".equals(type)) {
-			return createBlackBloon();
-		}
-		if ("lead".equals(type)) {
-			return createLeadBloon();
-		}
-		if ("zebra".equals(type)) {
-			return createZebraBloon();
-		}
-		if ("rainbow".equals(type)) {
-			return createRainbowBloon();
-		}
-		if ("ceramic".equals(type)) {
-			return createCeramicBloon();
-		}
-		if ("moab".equals(type)) {
-			return createMOAB();
-		}
-		if ("bfb".equals(type)) {
-			return createBFB();
-		}
-		if ("zomg".equals(type)) {
-			return createZOMG();
-		}
-		throw new RuntimeException("Unexpected bloon type: " +type);
+
+		return new Bloon(color, health, camo, regen);
 	}
 	
 	public static Bloon createRandomBloon() {
