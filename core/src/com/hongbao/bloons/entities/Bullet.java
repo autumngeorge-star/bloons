@@ -1,5 +1,7 @@
 package com.hongbao.bloons.entities;
 
+import com.hongbao.bloons.effects.StatusEffectFactory;
+
 public class Bullet {
 	
 	public static final String IMAGE_FOLDER = "img/projectiles/";
@@ -11,6 +13,7 @@ public class Bullet {
 	private float distanceTraveled;
 	private boolean homing;
 	private String imageFileName;
+	private StatusEffectFactory statusEffectFactory;
 
 	private float initialXOffset;
 
@@ -125,5 +128,13 @@ public class Bullet {
 	
 	public void setInitialDYOverride(float initialDYOverride) {
 		this.initialDYOverride = initialDYOverride;
+	}
+
+	public StatusEffectFactory getStatusEffectFactory() {
+		return statusEffectFactory;
+	}
+
+	public void setStatusEffectFactory(StatusEffectFactory statusEffectFactory) {
+		this.statusEffectFactory = statusEffectFactory;
 	}
 }

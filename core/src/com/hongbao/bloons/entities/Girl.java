@@ -1,5 +1,7 @@
 package com.hongbao.bloons.entities;
 
+import com.hongbao.bloons.effects.StatusEffectFactory;
+
 import java.util.List;
 
 
@@ -23,6 +25,7 @@ public class Girl {
 	private List<Integer> upgradeCost;
 	private int level;
 	private int totalInvestment;
+	private StatusEffectFactory statusEffectFactory;
 	
 	
 	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
@@ -112,7 +115,17 @@ public class Girl {
 	}
 
 	public Bullet createBullet() {
-		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
+		Bullet bullet = new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
+		bullet.setStatusEffectFactory(statusEffectFactory);
+		return bullet;
+	}
+
+	public StatusEffectFactory getStatusEffectFactory() {
+		return statusEffectFactory;
+	}
+
+	public void setStatusEffectFactory(StatusEffectFactory statusEffectFactory) {
+		this.statusEffectFactory = statusEffectFactory;
 	}
 	
 	public SpellCard createSpellCard() {
@@ -156,6 +169,7 @@ public class Girl {
 			 upgradeCost
 			);
 			upgradedGirl.level = level + 1;
+			upgradedGirl.statusEffectFactory = statusEffectFactory;
 			return upgradedGirl;
 		} else {
 			return null;

@@ -1,8 +1,12 @@
 package com.hongbao.bloons.entities;
 
+import com.hongbao.bloons.effects.StatusEffectStrategy;
+import com.hongbao.bloons.effects.StatusEffectType;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.hongbao.bloons.entities.Bloon.Color.BFB;
@@ -89,15 +93,18 @@ public class Bloon {
 	private Color color;
 	private String imageFileName;
 	private int health;
+	private int baseSpeed;
 	private int speed;
 	private int distanceTravelled;
 	private boolean camo;
 	private boolean regen;
+	private final List<StatusEffectStrategy> activeStatusEffects = new ArrayList<>();
 
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
 		this.health = health;
-		speed = COLOR_TO_SPEED.get(color);
+		baseSpeed = COLOR_TO_SPEED.get(color);
+		speed = baseSpeed;
 		this.camo = camo;
 		this.regen = regen;
 		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
@@ -219,6 +226,78 @@ public class Bloon {
 	
 	public boolean isBlimp() {
 		return color == MOAB || color == BFB || color == ZOMG;
+	}
+
+	public int getBaseSpeed() {
+		return baseSpeed;
+	}
+
+	public List<StatusEffectStrategy> getActiveStatusEffects() {
+		return new ArrayList<>(activeStatusEffects);
+	}
+
+	public void addStatusEffect(StatusEffectStrategy effect) {
+		if (effect == null) {
+			return;
+		}
+
+		StatusEffectStrategy existing = null;
+		for (StatusEffectStrategy strategy : activeStatusEffects) {
+			if (strategy.getType() == effect.getType()) {
+				existing = strategy;
+				break;
+			}
+		}
+
+		if (existing != null) {
+			existing.refreshDuration(effect.getDuration());
+			existing.addStack();
+		} else {
+			activeStatusEffects.add(effect);
+			effect.onApply(this);
+		}
+		recalculateSpeed();
+	}
+
+	public void update(float delta) {
+		if (activeStatusEffects.isEmpty()) {
+			return;
+		}
+
+		List<StatusEffectStrategy> snapshot = new ArrayList<>(activeStatusEffects);
+		for (StatusEffectStrategy strategy : snapshot) {
+			strategy.onTick(this, delta);
+			if (strategy.isExpired()) {
+				activeStatusEffects.remove(strategy);
+				strategy.onExpire(this);
+			}
+		}
+		recalculateSpeed();
+	}
+
+	public void recalculateSpeed() {
+		boolean frozen = false;
+		float totalSlowIntensity = 0f;
+
+		for (StatusEffectStrategy strategy : activeStatusEffects) {
+			if (strategy.getType() == StatusEffectType.FREEZE) {
+				frozen = true;
+				break;
+			} else if (strategy.getType() == StatusEffectType.SLOW) {
+				totalSlowIntensity += strategy.getIntensity();
+			} else if (strategy.getType() == StatusEffectType.GENERIC && strategy.getIntensity() > 0) {
+				totalSlowIntensity += strategy.getIntensity();
+			}
+		}
+
+		if (frozen) {
+			this.speed = 0;
+		} else if (totalSlowIntensity > 0) {
+			totalSlowIntensity = Math.min(0.85f, totalSlowIntensity);
+			this.speed = Math.max(1, Math.round(baseSpeed * (1f - totalSlowIntensity)));
+		} else {
+			this.speed = baseSpeed;
+		}
 	}
 	
 }
