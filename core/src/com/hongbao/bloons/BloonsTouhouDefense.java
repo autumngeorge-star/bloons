@@ -573,6 +573,12 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		if (musicPlayer != null) {
+			musicPlayer.dispose();
+		}
+		if (map != null && map.getBloonManager() != null) {
+			map.getBloonManager().dispose();
+		}
 		stage.dispose();
 	}
 
