@@ -107,6 +107,10 @@ public class Girl {
 		return totalInvestment / 2;
 	}
 	
+	public int getTotalInvestment() {
+		return totalInvestment;
+	}
+	
 	public int getLevel() {
 		return level;
 	}
