@@ -128,6 +128,11 @@ public class BloonManager {
 	public void addBulletToStage(BulletActor bulletActor) {
 		stage.addActor(bulletActor);
 	}
+
+	public void addBloonToStage(BloonActor bloonActor) {
+		stage.addActor(bloonActor);
+		onstageBloons.add(bloonActor);
+	}
 	
 	public boolean attackBloonIfInRange(GirlActor girlActor) {
 		Set<BloonActor> bloonsInRange = new HashSet<>();

@@ -100,7 +100,7 @@ public class BloonActor extends RenderableActor {
 		setX(getX() + direction.getFirst() * bloon.getSpeed() / 5);
 		setY(getY() + direction.getSecond() * bloon.getSpeed() / 5);
 		
-		bloon.incrementDistanceTravelled();
+		bloon.incrementDistanceTravelled(direction);
 
 		if (getCenterX() > 1500) {
 			release();

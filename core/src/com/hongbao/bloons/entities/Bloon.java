@@ -1,6 +1,7 @@
 package com.hongbao.bloons.entities;
 
 import com.hongbao.bloons.helpers.BloonPoppedResult;
+import com.hongbao.bloons.helpers.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -145,6 +146,18 @@ public class Bloon {
 	
 	public void incrementDistanceTravelled() {
 		distanceTravelled += speed;
+	}
+
+	public void incrementDistanceTravelled(Pair<Float, Float> direction) {
+		if (direction != null && (direction.getFirst() != 0f || direction.getSecond() != 0f)) {
+			incrementDistanceTravelled();
+		}
+	}
+
+	public void incrementDistanceTravelled(float dx, float dy) {
+		if (dx != 0f || dy != 0f) {
+			incrementDistanceTravelled();
+		}
 	}
 	
 	public boolean isCamo() {
