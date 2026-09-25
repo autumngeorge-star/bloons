@@ -61,6 +61,12 @@ public class BloonActor extends RenderableActor {
 		return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
 	}
 	
+	public void setCenter(float x, float y) {
+		float width = textureRegion.getTexture().getWidth() * SCALE;
+		float height = textureRegion.getTexture().getHeight() * SCALE;
+		setBounds(x - width / 2f, y - height / 2f, width, height);
+	}
+	
 	public float getCollisionRadius() {
 		return collisionRadius;
 	}
@@ -91,8 +97,12 @@ public class BloonActor extends RenderableActor {
 	}
 	
 	public void release() {
-		((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
-		textureRegion.getTexture().dispose();
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
+		}
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
 	}
 	
@@ -104,13 +114,15 @@ public class BloonActor extends RenderableActor {
 
 		if (getCenterX() > 1500) {
 			release();
-			((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager().removeBloonFromStage(this);
+			if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+				((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager().removeBloonFromStage(this);
+			}
 		}
 	}
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		if (bloon.isBlimp()) {
+		if (bloon.isBlimp() && Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
 			BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
 			Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
 			float rotationAngle = (float)(Math.atan2(direction.getFirst(), direction.getSecond()) / Math.PI * 180);
@@ -133,11 +145,13 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public void act(float delta) {
-		BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
-		Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
-		if (direction.getFirst() < 0) {
-			System.out.println(direction.getFirst());
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
+			Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
+			if (direction.getFirst() < 0) {
+				System.out.println(direction.getFirst());
+			}
+			move(direction);
 		}
-		move(direction);
 	}
 }

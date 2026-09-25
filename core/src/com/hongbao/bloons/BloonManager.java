@@ -96,31 +96,63 @@ public class BloonManager {
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
-		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+		Player player = null;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			player = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getPlayer();
+		}
 		
 		if (bloonActor.getBloon().willPopBloon(damage)) {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
-			player.earnMoney(result.getCashGenerated());
+			if (player != null) {
+				player.earnMoney(result.getCashGenerated());
+			}
 			
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
 				BloonActor generatedBloonActor;
 				if (previousBloonActor == null) {
-					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
+					generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
+					generatedBloonActor.getBloon().setDistanceTravelled(bloonActor.getBloon().getDistanceTravelled());
 				} else {
-					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
-					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
+					generatedBloonActor = new BloonActor(bloon, 0, 0, bloonActor);
+					float sepDistance = generatedBloonActor.getCollisionRadius() * 1.5f;
+
+					float currX = previousBloonActor.getCenterX();
+					float currY = previousBloonActor.getCenterY();
+					float remainingDistance = sepDistance;
+					float stepSize = 1.0f;
+
+					while (remainingDistance > 1e-4f) {
+						float currentStep = Math.min(stepSize, remainingDistance);
+						Pair<Float, Float> direction = map.getDirection(currX, currY);
+						if (direction == null || (direction.getFirst() == 0f && direction.getSecond() == 0f)) {
+							break;
+						}
+						currX -= direction.getFirst() * currentStep;
+						currY -= direction.getSecond() * currentStep;
+						remainingDistance -= currentStep;
+					}
+
+					generatedBloonActor.setCenter(currX, currY);
+					int prevDistance = previousBloonActor.getBloon().getDistanceTravelled();
+					generatedBloonActor.getBloon().setDistanceTravelled(Math.max(0, prevDistance - Math.round(sepDistance)));
 				}
-				stage.addActor(generatedBloonActor);
+				if (stage != null) {
+					stage.addActor(generatedBloonActor);
+				}
 				onstageBloons.add(generatedBloonActor);
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
-			player.earnMoney(damage);
+			if (player != null) {
+				player.earnMoney(damage);
+			}
 			// todo play some other sound I guess
 		}
 	}
