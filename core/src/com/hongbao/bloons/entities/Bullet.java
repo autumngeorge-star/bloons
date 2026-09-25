@@ -76,7 +76,11 @@ public class Bullet {
 	}
 	
 	public void incrementDistanceTraveled() {
-		distanceTraveled += speed / 5;
+		incrementDistanceTraveled(speed / 5);
+	}
+	
+	public void incrementDistanceTraveled(float distance) {
+		distanceTraveled += distance;
 	}
 	
 	public boolean isHoming() {

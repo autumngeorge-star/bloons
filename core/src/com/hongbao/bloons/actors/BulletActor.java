@@ -16,6 +16,9 @@ import java.util.Set;
 
 public class BulletActor extends RenderableActor {
 	
+	public static final float MIN_TARGET_COLLISION_RADIUS = 9.0f;
+	public static final int MAX_SUB_STEPS = 10;
+	
 	private Bullet bullet;
 	private float dx; // This should be a unit vector
 	private float dy;
@@ -129,19 +132,40 @@ public class BulletActor extends RenderableActor {
 		
 		setDirectionIfApplicable(bloonManager);
 		
-		setX(getX() + dx * bullet.getSpeed() / 5);
-		setY(getY() + dy * bullet.getSpeed() / 5);
-		
-		if (getY() < 0 || getY() > 900 || getX() < 0 || getX() > 1500) {
-			remove();
+		float totalDisplacement = bullet.getSpeed() / 5.0f;
+		float safetyStride = MIN_TARGET_COLLISION_RADIUS;
+		int numSubSteps = (int) Math.ceil(totalDisplacement / safetyStride);
+		if (numSubSteps < 1) {
+			numSubSteps = 1;
+		} else if (numSubSteps > MAX_SUB_STEPS) {
+			numSubSteps = MAX_SUB_STEPS;
 		}
 		
-		bullet.incrementDistanceTraveled();
-		if (bullet.getDistanceTraveled() >= bullet.getMaxRange()) {
-			remove();
-		}
+		float stepDx = (dx * totalDisplacement) / numSubSteps;
+		float stepDy = (dy * totalDisplacement) / numSubSteps;
+		float stepDistance = totalDisplacement / numSubSteps;
 		
-		bloonManager.checkCollision(this);
+		for (int i = 0; i < numSubSteps; i++) {
+			setX(getX() + stepDx);
+			setY(getY() + stepDy);
+			
+			if (getY() < 0 || getY() > 900 || getX() < 0 || getX() > 1500) {
+				remove();
+				break;
+			}
+			
+			bullet.incrementDistanceTraveled(stepDistance);
+			if (bullet.getDistanceTraveled() >= bullet.getMaxRange()) {
+				remove();
+				break;
+			}
+			
+			bloonManager.checkCollision(this);
+			
+			if (bullet.getPierce() <= 0 || getStage() == null) {
+				break;
+			}
+		}
 	}
 	
 	private void setDirectionIfApplicable(BloonManager bloonManager) {
