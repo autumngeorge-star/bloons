@@ -26,6 +26,18 @@ public class BulletActor extends RenderableActor {
 	private Set<Long> damagedBloons;
 	private String spellCardOverride; // todo could be an enum
 	
+	public BulletActor(Bullet bullet, float x, float y, float dx, float dy, float collisionRadius) {
+		this.bullet = bullet;
+		this.dx = dx;
+		this.dy = dy;
+		this.collisionRadius = collisionRadius;
+		calculateRotationAngle();
+		target = null;
+		setZIndex(ZIndex.BULLET_Z_INDEX);
+		setBounds(x - collisionRadius, y - collisionRadius, collisionRadius * 2, collisionRadius * 2);
+		damagedBloons = new HashSet<>(bullet.getPierce());
+	}
+
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
