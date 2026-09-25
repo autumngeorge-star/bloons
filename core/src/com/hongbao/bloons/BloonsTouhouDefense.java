@@ -49,7 +49,11 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private PreferencesManager preferencesManager;
 	
+	public PreferencesManager getPreferencesManager() {
+		return preferencesManager;
+	}
 	
 	@Override
 	public void create() {
@@ -58,7 +62,12 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		tripleSpeed = false;
 		autoContinue = false;
 		stage = new Stage();
-		player = new Player(MONEY, HEALTH);
+		
+		preferencesManager = new PreferencesManager();
+		int initialMoney = preferencesManager.getMoney(MONEY);
+		int initialHealth = preferencesManager.getHealth(HEALTH);
+		player = new Player(initialMoney, initialHealth, preferencesManager);
+		
 		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
@@ -563,6 +572,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public void pause() {
 		paused = true;
 		musicPlayer.pause();
+		if (preferencesManager != null) {
+			preferencesManager.flush();
+		}
 	}
 
 	@Override
@@ -573,6 +585,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		if (preferencesManager != null) {
+			preferencesManager.flush();
+		}
 		stage.dispose();
 	}
 

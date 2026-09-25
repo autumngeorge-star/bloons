@@ -12,16 +12,28 @@ public class MusicPlayer {
 		backgroundMusic = null;
 	}
 
+	private PreferencesManager getPreferencesManager() {
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			return ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getPreferencesManager();
+		}
+		return null;
+	}
+
 	private void playMusic(String fileName) {
-		boolean wasPlaying = true;
+		PreferencesManager prefs = getPreferencesManager();
+		boolean musicEnabled = prefs == null || prefs.isMusicEnabled(true);
+		float volume = prefs != null ? prefs.getMusicVolume(0.5f) : 0.5f;
+
+		boolean wasPlaying = musicEnabled;
 		if (backgroundMusic != null) {
 			wasPlaying = backgroundMusic.isPlaying();
 		}
+
 		stopMusic();
 		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
-		backgroundMusic.setVolume(0.5f);
+		backgroundMusic.setVolume(volume);
 		backgroundMusic.setLooping(true);
-		if (wasPlaying) {
+		if (wasPlaying && musicEnabled) {
 			backgroundMusic.play();
 		}
 	}
@@ -45,7 +57,9 @@ public class MusicPlayer {
 	}
 	
 	public void resume() {
-		if (backgroundMusic != null) {
+		PreferencesManager prefs = getPreferencesManager();
+		boolean musicEnabled = prefs == null || prefs.isMusicEnabled(true);
+		if (backgroundMusic != null && musicEnabled) {
 			backgroundMusic.play();
 		}
 	}
@@ -56,14 +70,41 @@ public class MusicPlayer {
 		}
 	}
 
+	public void setVolume(float volume) {
+		if (backgroundMusic != null) {
+			backgroundMusic.setVolume(volume);
+		}
+		PreferencesManager prefs = getPreferencesManager();
+		if (prefs != null) {
+			prefs.saveMusicVolume(volume);
+			prefs.flush();
+		}
+	}
+
 	public void toggleMusic() {
+		PreferencesManager prefs = getPreferencesManager();
 		if (backgroundMusic != null) {
 			if (backgroundMusic.isPlaying()) {
 				pause();
+				if (prefs != null) {
+					prefs.saveMusicEnabled(false);
+					prefs.flush();
+				}
 			} else {
+				if (prefs != null) {
+					prefs.saveMusicEnabled(true);
+					prefs.flush();
+				}
 				resume();
+			}
+		} else {
+			if (prefs != null) {
+				boolean currentState = prefs.isMusicEnabled(true);
+				prefs.saveMusicEnabled(!currentState);
+				prefs.flush();
 			}
 		}
 	}
 
 }
+
