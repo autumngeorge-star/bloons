@@ -1,5 +1,6 @@
 package com.hongbao.bloons.entities;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -17,6 +18,7 @@ public class Girl {
 	private List<Float> range;
 	private List<Float> visualRange;
 	private List<Boolean> homing;
+	private List<Float> bulletDuration;
 	private String imageFileName;
 	private String bulletFileName;
 	private int cost;
@@ -26,6 +28,10 @@ public class Girl {
 	
 	
 	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+		this(name, attackDelay, bulletSpeed, damage, pierce, range, visualRange, homing, Arrays.asList(0f, 0f, 0f), imageFileName, bulletFileName, cost, upgradeCost);
+	}
+
+	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, List<Float> bulletDuration, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
 		this.name = name;
 		this.attackDelay = attackDelay;
 		this.cooldown = attackDelay.get(0);
@@ -35,6 +41,7 @@ public class Girl {
 		this.range = range;
 		this.visualRange = visualRange;
 		this.homing = homing;
+		this.bulletDuration = bulletDuration;
 		this.imageFileName = IMAGE_FOLDER + imageFileName;
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
@@ -83,6 +90,17 @@ public class Girl {
 		return homing.get(level);
 	}
 
+	public float getBulletDuration() {
+		if (bulletDuration != null && level < bulletDuration.size()) {
+			return bulletDuration.get(level);
+		}
+		return 0f;
+	}
+
+	public List<Float> getBulletDurationList() {
+		return bulletDuration;
+	}
+
 	public String getImageFileName() {
 		return imageFileName;
 	}
@@ -112,9 +130,9 @@ public class Girl {
 	}
 
 	public Bullet createBullet() {
-		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
+		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), getBulletDuration(), isHoming(), bulletFileName);
 	}
-	
+
 	public SpellCard createSpellCard() {
 		if (name.equals("Reimu")) {
 			return SpellCard.createReimuSpellCard();
@@ -150,6 +168,7 @@ public class Girl {
 			 range,
 			 visualRange,
 			 homing,
+			 bulletDuration,
 			 imageFileName,
 			 bulletFileName,
 			 cost,

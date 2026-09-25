@@ -134,11 +134,19 @@ public class BulletActor extends RenderableActor {
 		
 		if (getY() < 0 || getY() > 900 || getX() < 0 || getX() > 1500) {
 			remove();
+			return;
 		}
 		
+		bullet.incrementElapsedDuration();
+		if (bullet.getMaxDuration() > 0 && bullet.getElapsedDuration() >= bullet.getMaxDuration()) {
+			remove();
+			return;
+		}
+
 		bullet.incrementDistanceTraveled();
 		if (bullet.getDistanceTraveled() >= bullet.getMaxRange()) {
 			remove();
+			return;
 		}
 		
 		bloonManager.checkCollision(this);
