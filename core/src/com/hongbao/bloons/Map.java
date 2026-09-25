@@ -34,6 +34,11 @@ public class Map {
 	public static final int TILE_LENGTH = 50;
 	public static final int TILE_HEIGHT = 50;
 
+	public static final float PLAY_AREA_MIN_X = 0f;
+	public static final float PLAY_AREA_MAX_X = 1500f;
+	public static final float PLAY_AREA_MIN_Y = 0f;
+	public static final float PLAY_AREA_MAX_Y = 900f;
+
 	private String backgroundImage;
 	private BloonManager bloonManager;
 	private Pair<Float, Float>[][] directions;
@@ -225,19 +230,26 @@ public class Map {
 		return bloonManager;
 	}
 
+	public static boolean isWithinPlayArea(float centerX, float centerY, float radius) {
+		return (centerX - radius >= PLAY_AREA_MIN_X)
+			&& (centerX + radius <= PLAY_AREA_MAX_X)
+			&& (centerY - radius >= PLAY_AREA_MIN_Y)
+			&& (centerY + radius <= PLAY_AREA_MAX_Y);
+	}
+
 	public boolean canPlaceGirl(GirlActor girlActor) {
 		// You can't place a girl down if it violates any of the following rules:
 		// It's out of bounds
 		// It's colliding with the bloon path
 		// It's colliding with another girl
 
+		if (!isWithinPlayArea(girlActor.getCenterX(), girlActor.getCenterY(), girlActor.getCollisionRadius())) {
+			return false;
+		}
+
 		float x = girlActor.getCenterX() + TILE_LENGTH; // x is always offset by one tile because we have that extra tile on the left
 		float y = girlActor.getCenterY();
 		float r = girlActor.getCollisionRadius();
-
-		if (y < 0 || y > 900 || x < 0 || x > 1550) {
-			return false;
-		}
 		
 		for (int i = 0; i < directions.length; i++) {
 			for (int j = 0; j < directions[i].length; j++) {
