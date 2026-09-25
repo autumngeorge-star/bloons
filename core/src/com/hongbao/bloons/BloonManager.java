@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 
+import com.hongbao.bloons.targeting.TargetingStrategy;
+
 public class BloonManager {
 	
 	private Stage stage;
@@ -29,24 +31,33 @@ public class BloonManager {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		if (Gdx.files != null && Gdx.audio != null) {
+			popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		}
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+				MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
+				if (musicPlayer != null) {
+					if (map.getBloonManager().getLevel() == 1) {
+						musicPlayer.playStageMusic();
+					} else if (map.getBloonManager().getLevel() == 40) {
+						musicPlayer.playFinalBossMusic();
+					}
+				}
 			}
 		}
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		}
+		return bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 
 	public int getLevel() {
@@ -96,12 +107,15 @@ public class BloonManager {
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
-		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+		Player player = (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) ?
+				((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer() : null;
 		
 		if (bloonActor.getBloon().willPopBloon(damage)) {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
-			player.earnMoney(result.getCashGenerated());
+			if (player != null) {
+				player.earnMoney(result.getCashGenerated());
+			}
 			
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
@@ -109,24 +123,32 @@ public class BloonManager {
 				if (previousBloonActor == null) {
 					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
 				} else {
-					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
+					Pair<Float, Float> direction = map != null ? map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY()) : new Pair<>(0f, 0f);
 					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
 				}
-				stage.addActor(generatedBloonActor);
+				if (stage != null) {
+					stage.addActor(generatedBloonActor);
+				}
 				onstageBloons.add(generatedBloonActor);
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
-			player.earnMoney(damage);
+			if (player != null) {
+				player.earnMoney(damage);
+			}
 			// todo play some other sound I guess
 		}
 	}
 	
 	public void addBulletToStage(BulletActor bulletActor) {
-		stage.addActor(bulletActor);
+		if (stage != null) {
+			stage.addActor(bulletActor);
+		}
 	}
 	
 	public boolean attackBloonIfInRange(GirlActor girlActor) {
@@ -140,19 +162,14 @@ public class BloonManager {
 			}
 		}
 		
-		if (bloonsInRange.isEmpty()) {
+		BloonActor target = TargetingStrategy.selectTarget(bloonsInRange);
+		if (target == null) {
 			return false;
 		} else {
-			BloonActor bloonActor = bloonsInRange.iterator().next();
-			
-			for (BloonActor actor : bloonsInRange) {
-				if (actor.getBloon().getDistanceTravelled() > bloonActor.getBloon().getDistanceTravelled()) {
-					bloonActor = actor;
-				}
+			BulletActor bulletActor = girlActor.createBulletActor(target);
+			if (stage != null) {
+				stage.addActor(bulletActor);
 			}
-			
-			BulletActor bulletActor = girlActor.createBulletActor(bloonActor);
-			stage.addActor(bulletActor);
 			return true;
 		}
 	}
@@ -168,16 +185,9 @@ public class BloonManager {
 			}
 		}
 		
-		if (!bloonsInRange.isEmpty()) {
-			BloonActor bloonActor = bloonsInRange.iterator().next();
-			
-			for (BloonActor actor : bloonsInRange) {
-				if (actor.getBloon().getDistanceTravelled() > bloonActor.getBloon().getDistanceTravelled()) {
-					bloonActor = actor;
-				}
-			}
-			
-			girlActor.lookAtBloon(bloonActor);
+		BloonActor target = TargetingStrategy.selectTarget(bloonsInRange);
+		if (target != null) {
+			girlActor.lookAtBloon(target);
 		}
 	}
 	

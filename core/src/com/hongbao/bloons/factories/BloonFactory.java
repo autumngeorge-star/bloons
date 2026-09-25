@@ -5,9 +5,11 @@ import com.badlogic.gdx.files.FileHandle;
 import com.hongbao.bloons.BloonQueue;
 import com.hongbao.bloons.entities.Bloon;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 import static com.hongbao.bloons.BloonsTouhouDefense.HELLA_BLOONS;
 
@@ -294,8 +296,18 @@ public class BloonFactory {
 	}
 	
 	public static BloonQueue createBloonQueueFromFile(String fileName) {
-		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
-		String fileContents = file.readString();
+		String fileContents = "";
+		if (Gdx.files != null) {
+			FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
+			fileContents = file.readString();
+		} else {
+			InputStream is = BloonFactory.class.getClassLoader().getResourceAsStream("bloon_queues/" + fileName);
+			if (is != null) {
+				try (Scanner scanner = new Scanner(is, "UTF-8")) {
+					fileContents = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+				}
+			}
+		}
 		String[] lines = fileContents.split("\n");
 		long timer = 0;
 
