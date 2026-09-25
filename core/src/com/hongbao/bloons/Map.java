@@ -231,30 +231,43 @@ public class Map {
 		// It's colliding with the bloon path
 		// It's colliding with another girl
 
-		float x = girlActor.getCenterX() + TILE_LENGTH; // x is always offset by one tile because we have that extra tile on the left
-		float y = girlActor.getCenterY();
+		float screenX = girlActor.getCenterX();
+		float screenY = girlActor.getCenterY();
 		float r = girlActor.getCollisionRadius();
 
-		if (y < 0 || y > 900 || x < 0 || x > 1550) {
+		if (screenX - r < 0 || screenX + r > 1500 || screenY - r < 0 || screenY + r > 900) {
 			return false;
 		}
-		
+
+		float rSq = r * r;
+
 		for (int i = 0; i < directions.length; i++) {
 			for (int j = 0; j < directions[i].length; j++) {
 				if (directions[i][j] != null && (directions[i][j].getFirst() != 0 || directions[i][j].getSecond() != 0)) {
-					if (Math.abs(x - getCenterXOfTile(i)) < r + (TILE_LENGTH / 2f) && Math.abs(y - getCenterYOfTile(j)) < r + (TILE_HEIGHT / 2f)) {
+					float minX = i * TILE_LENGTH - TILE_LENGTH;
+					float maxX = i * TILE_LENGTH;
+					float minY = j * TILE_HEIGHT;
+					float maxY = (j + 1) * TILE_HEIGHT;
+
+					float closestX = Math.max(minX, Math.min(screenX, maxX));
+					float closestY = Math.max(minY, Math.min(screenY, maxY));
+
+					float dx = screenX - closestX;
+					float dy = screenY - closestY;
+
+					if (dx * dx + dy * dy < rSq) {
 						return false;
 					}
 				}
 			}
 		}
-		
+
 		for (GirlActor stageActor : onStageGirls) {
 			if (distanceBetweenActors(girlActor, stageActor) < r + stageActor.getCollisionRadius()) {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 	
