@@ -20,7 +20,7 @@ import static com.hongbao.bloons.entities.Bloon.Color.ZEBRA;
 import static com.hongbao.bloons.entities.Bloon.Color.ZOMG;
 
 
-public class Bloon {
+public class Bloon implements IBloon {
 
 	public enum Color {
 
@@ -90,7 +90,7 @@ public class Bloon {
 	private String imageFileName;
 	private int health;
 	private int speed;
-	private int distanceTravelled;
+	private PathProgress pathProgress;
 	private boolean camo;
 	private boolean regen;
 
@@ -101,6 +101,7 @@ public class Bloon {
 		this.camo = camo;
 		this.regen = regen;
 		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
+		this.pathProgress = new PathProgress();
 	}
 
 	public Color getColor() {
@@ -135,16 +136,34 @@ public class Bloon {
 		this.speed = speed;
 	}
 	
+	@Override
+	public PathProgress getPathProgress() {
+		return pathProgress;
+	}
+
+	@Override
+	public void setPathProgress(PathProgress pathProgress) {
+		this.pathProgress = pathProgress != null ? pathProgress.clone() : new PathProgress();
+	}
+
+	@Override
 	public int getDistanceTravelled() {
-		return distanceTravelled;
+		return (int) pathProgress.getAccumulatedDistance();
 	}
-	
+
+	@Override
 	public void setDistanceTravelled(int distanceTravelled) {
-		this.distanceTravelled = distanceTravelled;
+		this.pathProgress.setAccumulatedDistance(distanceTravelled);
 	}
-	
+
+	@Override
 	public void incrementDistanceTravelled() {
-		distanceTravelled += speed;
+		this.pathProgress.updateProgress(this.speed, 50.0f);
+	}
+
+	@Override
+	public void updatePathProgress(float displacement, float segmentLength) {
+		this.pathProgress.updateProgress(displacement, segmentLength);
 	}
 	
 	public boolean isCamo() {
