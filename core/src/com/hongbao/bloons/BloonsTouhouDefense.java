@@ -49,11 +49,16 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private GameState gameState;
 	
 	
 	@Override
 	public void create() {
 		Gdx.graphics.setWindowedMode(1800, 900);
+		gameState = SaveManager.loadGameState();
+		gameState.incrementGamesPlayed();
+		SaveManager.saveGameState(gameState);
+
 		paused = false;
 		tripleSpeed = false;
 		autoContinue = false;
@@ -178,10 +183,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				}
 			} else {
 				if (map.getBloonManager().hasWonGame()) {
-					titleActor.setText("YOU WIN!");
+					titleActor.setText("YOU WIN!\nHigh Score: " + (gameState != null ? gameState.getHighScore() : 0));
 					titleActor.setColor(Color.GOLD);
 				} else {
-					titleActor.setText("Bloons Touhou Defense\nLevel " + (map.getBloonManager().getLevel()));
+					titleActor.setText("Bloons Touhou Defense\nLevel " + (map.getBloonManager().getLevel()) + "\nHigh Score: " + (gameState != null ? gameState.getHighScore() : 0));
 					titleActor.setColor(Color.WHITE);
 				}
 			}
@@ -559,10 +564,17 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		}
 	}
 
+	public GameState getGameState() {
+		return gameState;
+	}
+
 	@Override
 	public void pause() {
 		paused = true;
 		musicPlayer.pause();
+		if (gameState != null) {
+			SaveManager.saveGameState(gameState);
+		}
 	}
 
 	@Override
@@ -573,6 +585,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		if (gameState != null) {
+			SaveManager.saveGameState(gameState);
+		}
 		stage.dispose();
 	}
 
