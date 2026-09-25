@@ -25,9 +25,11 @@ import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.events.EventBus;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.registry.WaveRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +59,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		paused = false;
 		tripleSpeed = false;
 		autoContinue = false;
+		WaveRegistry.getInstance().setActiveProfileKey(HELLA_BLOONS ? WaveRegistry.HELLA_BLOONS_KEY : WaveRegistry.DEFAULT_KEY);
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
 		musicPlayer = new MusicPlayer();
@@ -574,6 +577,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void dispose() {
 		stage.dispose();
+		if (musicPlayer != null) {
+			musicPlayer.dispose();
+		}
+		EventBus.getInstance().clear();
 	}
 
 }
