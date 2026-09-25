@@ -1,0 +1,995 @@
+{
+  "name": "Default Waves",
+  "waves": [
+    {
+      "level": 1,
+      "title": "Level 1",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 20,
+          "delay": 30,
+          "types": [
+            "red"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "title": "Level 2",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 35,
+          "delay": 30,
+          "types": [
+            "red"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "title": "Level 3",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 25,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 5,
+          "delay": 30,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "title": "Level 4",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 35,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 18,
+          "delay": 30,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 5,
+      "title": "Level 5",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 5,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 27,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 6,
+      "title": "Level 6",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 7,
+      "title": "Level 7",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 5,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 8,
+      "title": "Level 8",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 14,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 9,
+      "title": "Level 9",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 30,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 10,
+      "title": "Level 10",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 102,
+          "delay": 15,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 11,
+      "title": "Level 11",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 6,
+          "delay": 10,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 12,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 12,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 3,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 12,
+      "title": "Level 12",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 5,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 13,
+      "title": "Level 13",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 50,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 23,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 14,
+      "title": "Level 14",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 49,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 9,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 15,
+      "title": "Level 15",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 12,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 16,
+      "title": "Level 16",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 40,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 8,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 17,
+      "title": "Level 17",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 12,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 18,
+      "title": "Level 18",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 80,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 19,
+      "title": "Level 19",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 20,
+      "title": "Level 20",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 6,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 21,
+      "title": "Level 21",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 40,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "amount": 14,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 22,
+      "title": "Level 22",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 16,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 23,
+      "title": "Level 23",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 7,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 24,
+      "title": "Level 24",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 1,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 25,
+      "title": "Level 25",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 25,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 26,
+      "title": "Level 26",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 23,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 27,
+      "title": "Level 27",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 100,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 60,
+          "delay": 5,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 45,
+          "delay": 5,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 45,
+          "delay": 5,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 28,
+      "title": "Level 28",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 6,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 29,
+      "title": "Level 29",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 50,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "amount": 50,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 30,
+      "title": "Level 30",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 9,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 31,
+      "title": "Level 31",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 16,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 8,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "amount": 2,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 32,
+      "title": "Level 32",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 45,
+          "delay": 15,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 33,
+      "title": "Level 33",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 13,
+          "delay": 50,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 34,
+      "title": "Level 34",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 26,
+          "delay": 20,
+          "types": [
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow",
+            "zebra"
+          ]
+        },
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 35,
+      "title": "Level 35",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 35,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 5,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 25,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "amount": 5,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 36,
+      "title": "Level 36",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "pink",
+            "pink",
+            "pink",
+            "pink",
+            "pink",
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 37,
+      "title": "Level 37",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 57,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 38,
+      "title": "Level 38",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 42,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 17,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "amount": 14,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        },
+        {
+          "amount": 2,
+          "delay": 20,
+          "types": [
+            "ceramic"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 39,
+      "title": "Level 39",
+      "musicTrack": "music/demystify_feast.mp3",
+      "bloons": [
+        {
+          "amount": 20,
+          "delay": 10,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "amount": 18,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        },
+        {
+          "amount": 2,
+          "delay": 20,
+          "types": [
+            "ceramic"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 40,
+      "title": "Level 40",
+      "musicTrack": "music/night_falls.mp3",
+      "bloons": [
+        {
+          "amount": 1,
+          "delay": 1,
+          "types": [
+            "moab"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 41,
+      "title": "Level 41",
+      "musicTrack": "music/night_falls.mp3",
+      "bloons": [
+        {
+          "amount": 1,
+          "delay": 1,
+          "types": [
+            "bfb"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 42,
+      "title": "Level 42",
+      "musicTrack": "music/night_falls.mp3",
+      "bloons": [
+        {
+          "amount": 1,
+          "delay": 1,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 43,
+      "title": "Level 43",
+      "musicTrack": "music/night_falls.mp3",
+      "bloons": [
+        {
+          "amount": 2,
+          "delay": 20,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 44,
+      "title": "Level 44",
+      "musicTrack": "music/night_falls.mp3",
+      "bloons": [
+        {
+          "amount": 3,
+          "delay": 20,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    },
+    {
+      "level": 45,
+      "title": "Level 45",
+      "musicTrack": "music/night_falls.mp3",
+      "bloons": [
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    }
+  ]
+}
