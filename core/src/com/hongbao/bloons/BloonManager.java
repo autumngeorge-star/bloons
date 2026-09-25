@@ -29,7 +29,8 @@ public class BloonManager {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+		popSound = app.getAssetManager().get("music/pop.mp3", Sound.class);
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
 
