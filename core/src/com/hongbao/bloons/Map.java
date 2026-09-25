@@ -20,6 +20,8 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.audio.AudioService;
+import com.hongbao.bloons.audio.NullAudioService;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -40,6 +42,7 @@ public class Map {
 	private Set<GirlActor> onStageGirls;
 	private GirlActor selectedGirl;
 	private Stage stage;
+	private AudioService audioService;
 	private RenderableImageButton infoBackground;
 	private RenderableLabel leftDataActor;
 	private RenderableLabel rightDataActor;
@@ -47,9 +50,10 @@ public class Map {
 	private RenderableLabel sellActor;
 	private boolean hoveringOverUpgrade;
 
-	public Map(String backgroundImage, Stage stage) {
+	public Map(String backgroundImage, Stage stage, AudioService audioService) {
 		this.backgroundImage = backgroundImage;
-		this.bloonManager = new BloonManager(stage, this);
+		this.audioService = audioService != null ? audioService : new NullAudioService();
+		this.bloonManager = new BloonManager(stage, this, this.audioService);
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;
@@ -180,6 +184,10 @@ public class Map {
 		sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
 	}
 
+	public Map(String backgroundImage, Stage stage) {
+		this(backgroundImage, stage, new NullAudioService());
+	}
+
 	public void setDirections(Pair<Float, Float>[][] directions) {
 		this.directions = directions;
 	}
@@ -263,6 +271,7 @@ public class Map {
 		onStageGirls.add(girlActor);
 		stage.addActor(girlActor);
 		selectedGirl = girlActor;
+		audioService.playTowerPlacementSound();
 		girlActor.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -337,6 +346,7 @@ public class Map {
 		if (selectedGirl.getGirl().canUpgrade(player.getMoney())) {
 			int cost = selectedGirl.getGirl().upgrade();
 			player.spendMoney(cost);
+			audioService.playTowerPlacementSound();
 			showGirlDetailsModule();
 		}
 	}
@@ -351,6 +361,7 @@ public class Map {
         GirlActor selectedGirl = getSelectedGirl();
 
 		player.earnMoney(selectedGirl.getGirl().getSellPrice());
+		audioService.playTowerPlacementSound();
 		hideGirlDetailsModule();
 		onStageGirls.remove(selectedGirl);
 		selectedGirl.remove();

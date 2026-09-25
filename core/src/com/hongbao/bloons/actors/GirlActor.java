@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonsTouhouDefense;
+import com.hongbao.bloons.audio.AudioService;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
@@ -15,12 +16,14 @@ public class GirlActor extends RenderableActor {
 	// In hindsight, this was not a good choice of class name.
 	
 	private Girl girl;
+	private AudioService audioService;
 	private float rotationAngle;
 	private float collisionRadius;
 	private boolean active;
-	
-	public GirlActor(Girl girl, float x, float y) {
+
+	public GirlActor(Girl girl, float x, float y, AudioService audioService) {
 		this.girl = girl;
+		this.audioService = audioService;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(girl.getImageFileName())));
 		rotationAngle = 0;
 		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
@@ -33,6 +36,10 @@ public class GirlActor extends RenderableActor {
 		 textureRegion.getTexture().getWidth(),
 		 textureRegion.getTexture().getHeight()
 		);
+	}
+
+	public GirlActor(Girl girl, float x, float y) {
+		this(girl, x, y, null);
 	}
 	
 	public Girl getGirl() {
@@ -88,7 +95,7 @@ public class GirlActor extends RenderableActor {
 	public SpellCardActor createSpellCardActor() {
 		if (true) { // todo Girl should have a method that checks the cooldown or something
 			// maybe some direction based on the girl's direction
-			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
+			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY(), audioService);
 		}
 		return null;
 	}

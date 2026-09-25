@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonManager;
 import com.hongbao.bloons.BloonsTouhouDefense;
+import com.hongbao.bloons.audio.AudioService;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.SpellCard;
 import com.hongbao.bloons.helpers.ZIndex;
@@ -16,10 +17,12 @@ import java.util.List;
 public class SpellCardActor extends RenderableActor {
 	
 	private SpellCard spellCard;
+	private AudioService audioService;
 	private float rotationAngle;
-	
-	public SpellCardActor(SpellCard spellCard, float x, float y) {
+
+	public SpellCardActor(SpellCard spellCard, float x, float y, AudioService audioService) {
 		this.spellCard = spellCard;
+		this.audioService = audioService;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(spellCard.getImageFileName())));
 		rotationAngle = 0;
 		
@@ -30,6 +33,14 @@ public class SpellCardActor extends RenderableActor {
 		 textureRegion.getTexture().getWidth(),
 		 textureRegion.getTexture().getHeight()
 		);
+
+		if (audioService != null) {
+			audioService.playSpellSound();
+		}
+	}
+
+	public SpellCardActor(SpellCard spellCard, float x, float y) {
+		this(spellCard, x, y, null);
 	}
 	
 	public SpellCard getSpellCard() {
