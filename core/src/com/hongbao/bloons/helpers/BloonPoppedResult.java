@@ -47,23 +47,68 @@ public class BloonPoppedResult {
 	private Set<Bloon> bloonsGenerated;
 	
 	public BloonPoppedResult(Bloon bloon, int damage) {
-		bloonsGenerated = new HashSet<>();
-		
-		if (bloon.getHealth() > damage) {
-			Bloon.Color originalColor = bloon.getColor();
-			int newBloonHealth = bloon.getHealth() - damage;
-			Bloon.Color poppedColor = Bloon.getColorFromHealth(newBloonHealth);
-			
-			int bloonsToBeCreated = COLOR_TO_RATIO.get(poppedColor) / COLOR_TO_RATIO.get(originalColor);
-			
-			for (int x = 0; x < bloonsToBeCreated; x++) {
-				Bloon bloonOfType = BloonFactory.createBloonOfType(poppedColor.getValue(), newBloonHealth);
-				bloonOfType.setDistanceTravelled(bloon.getDistanceTravelled());
-				bloonsGenerated.add(bloonOfType);
-			}
+		bloonsGenerated = processPop(bloon, damage, 0);
+		cashGenerated = calculateHealthDifferenceBetweenBloons(bloon, bloonsGenerated);
+	}
+	
+	public static int getShellBaseHealth(Bloon bloon) {
+		int health = bloon.getHealth();
+		if (health > 918) {
+			return 918;
+		} else if (health > 218) {
+			return 218;
+		} else if (health > 18) {
+			return 18;
+		} else if (health > 8) {
+			return 8;
+		} else {
+			return health - 1;
+		}
+	}
+	
+	private static Set<Bloon> processPop(Bloon bloon, int damage, int depth) {
+		Set<Bloon> result = new HashSet<>();
+		if (depth >= 12 || damage <= 0) {
+			result.add(bloon);
+			return result;
 		}
 		
-		cashGenerated = calculateHealthDifferenceBetweenBloons(bloon, bloonsGenerated);
+		int baseThreshold = getShellBaseHealth(bloon);
+		int shellHealth = bloon.getHealth() - baseThreshold;
+		
+		if (damage < shellHealth) {
+			bloon.setHealth(bloon.getHealth() - damage);
+			result.add(bloon);
+			return result;
+		}
+		
+		int overkillDamage = damage - shellHealth;
+		if (baseThreshold == 0) {
+			return result;
+		}
+		
+		Bloon.Color originalColor = bloon.getColor();
+		Bloon.Color poppedColor = Bloon.getColorFromHealth(baseThreshold);
+		int bloonsToBeCreated = COLOR_TO_RATIO.get(poppedColor) / COLOR_TO_RATIO.get(originalColor);
+		
+		Set<Bloon> spawnedChildren = new HashSet<>();
+		for (int x = 0; x < bloonsToBeCreated; x++) {
+			Bloon child = BloonFactory.createBloonOfType(poppedColor.getValue(), baseThreshold);
+			child.setCamo(bloon.isCamo());
+			child.setRegen(bloon.isRegen());
+			child.setDistanceTravelled(bloon.getDistanceTravelled());
+			spawnedChildren.add(child);
+		}
+		
+		if (overkillDamage == 0) {
+			return spawnedChildren;
+		}
+		
+		for (Bloon child : spawnedChildren) {
+			result.addAll(processPop(child, overkillDamage, depth + 1));
+		}
+		
+		return result;
 	}
 	
 	public int getCashGenerated() {
