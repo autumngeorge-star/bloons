@@ -11,12 +11,24 @@ import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
 public class BloonManager {
 	
+	private static class CollisionCandidate {
+		final BloonActor bloonActor;
+		final float t;
+
+		CollisionCandidate(BloonActor bloonActor, float t) {
+			this.bloonActor = bloonActor;
+			this.t = t;
+		}
+	}
+
 	private Stage stage;
 	private Map map;
 	// A dedicated collection of onstage bloons is maintained to (probably) speed up collision checking
@@ -68,30 +80,65 @@ public class BloonManager {
 	}
 	
 	public void checkCollision(final BulletActor bulletActor) {
-		Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
-		
+		float x0 = bulletActor.getPrevCenterX();
+		float y0 = bulletActor.getPrevCenterY();
+		float x1 = bulletActor.getCenterX();
+		float y1 = bulletActor.getCenterY();
+
+		float dx = x1 - x0;
+		float dy = y1 - y0;
+		float lengthSq = dx * dx + dy * dy;
+
+		List<CollisionCandidate> candidates = new ArrayList<>();
+
 		for (BloonActor bloonActor : onstageBloons) {
-			float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
-			float distance = Map.distanceBetweenActors(bulletActor, bloonActor);
-			
-			if (distance < collisionDistance) {
-				if (!bulletActor.hasDamagedBloon(bloonActor)) {
-					bulletActor.damageBloon(bloonActor);
-					bloonsToBePopped.add(bloonActor);
-					bulletActor.decrementPierce();
-					
-					if (bulletActor.getBullet().getPierce() == 0) {
-						// don't bother checking collisions if the bullet is used up.
-						break;
-					}
+			if (bulletActor.hasDamagedBloon(bloonActor)) {
+				continue;
+			}
+
+			float cx = bloonActor.getCenterX();
+			float cy = bloonActor.getCenterY();
+
+			float t;
+			if (lengthSq == 0) {
+				t = 0;
+			} else {
+				t = ((cx - x0) * dx + (cy - y0) * dy) / lengthSq;
+			}
+
+			float tClamped = Math.max(0f, Math.min(1f, t));
+			float nearX = x0 + tClamped * dx;
+			float nearY = y0 + tClamped * dy;
+
+			float distSq = (cx - nearX) * (cx - nearX) + (cy - nearY) * (cy - nearY);
+			float collisionRadius = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
+
+			if (distSq < collisionRadius * collisionRadius) {
+				candidates.add(new CollisionCandidate(bloonActor, t));
+			}
+		}
+
+		candidates.sort((c1, c2) -> Float.compare(c1.t, c2.t));
+
+		List<BloonActor> bloonsToBePopped = new ArrayList<>();
+
+		for (CollisionCandidate candidate : candidates) {
+			BloonActor bloonActor = candidate.bloonActor;
+			if (!bulletActor.hasDamagedBloon(bloonActor)) {
+				bulletActor.damageBloon(bloonActor);
+				bloonsToBePopped.add(bloonActor);
+				bulletActor.decrementPierce();
+
+				if (bulletActor.getBullet().getPierce() == 0) {
+					break;
 				}
 			}
 		}
-		
+
 		if (bulletActor.getBullet().isHoming()) {
 			bulletActor.setTarget(null);
 		}
-		
+
 		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
 	}
 	
