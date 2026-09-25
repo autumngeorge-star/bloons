@@ -24,6 +24,8 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private int lastSavedWave = 0;
+	private boolean victorySaved = false;
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
@@ -31,6 +33,32 @@ public class BloonManager {
 		onstageBloons = new HashSet<>();
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
+	}
+
+	public void checkSaveStatus() {
+		if (Gdx.app == null || !(Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense)) {
+			return;
+		}
+		BloonsTouhouDefense game = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+		SaveProfileManager manager = game.getSaveProfileManager();
+		if (manager == null || map == null) {
+			return;
+		}
+
+		String mapId = map.getMapId();
+		int currentLevel = getLevel();
+
+		if (onstageBloons.isEmpty() && bloonQueue.isEmpty()) {
+			if (currentLevel > lastSavedWave && currentLevel > 0) {
+				manager.recordWaveCompletion(mapId, currentLevel);
+				lastSavedWave = currentLevel;
+			}
+			if (hasWonGame() && !victorySaved) {
+				int score = game.getPlayer() != null ? game.getPlayer().getMoney() : 0;
+				manager.recordMapVictory(mapId, score);
+				victorySaved = true;
+			}
+		}
 	}
 
 	public void nextLevel() {
@@ -46,7 +74,7 @@ public class BloonManager {
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getInstructions().isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 
 	public int getLevel() {
@@ -123,6 +151,7 @@ public class BloonManager {
 			player.earnMoney(damage);
 			// todo play some other sound I guess
 		}
+		checkSaveStatus();
 	}
 	
 	public void addBulletToStage(BulletActor bulletActor) {
@@ -187,6 +216,7 @@ public class BloonManager {
 
 	public void removeBloonFromStage(BloonActor actor) {
 		onstageBloons.remove(actor);
+		checkSaveStatus();
 	}
 	
 	public BloonActor getNewHomingTarget(BulletActor bulletActor) {
