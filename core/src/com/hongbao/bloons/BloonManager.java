@@ -10,8 +10,12 @@ import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.score.ScoreEvent;
+import com.hongbao.bloons.score.ScoreEventListener;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -24,13 +28,34 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private List<ScoreEventListener> scoreEventListeners = new ArrayList<>();
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		if (Gdx.audio != null) {
+			popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		}
 		bloonQueue = BloonFactory.createBloonQueue();
+	}
+
+	public void addScoreEventListener(ScoreEventListener listener) {
+		if (listener != null && !scoreEventListeners.contains(listener)) {
+			scoreEventListeners.add(listener);
+		}
+	}
+
+	public void notifyScoreListeners(ScoreEvent event) {
+		for (ScoreEventListener listener : scoreEventListeners) {
+			listener.onScoreEvent(event);
+		}
+		if (scoreEventListeners.isEmpty() && Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+			if (app.getScoreManager() != null) {
+				app.getScoreManager().onScoreEvent(event);
+			}
+		}
 	}
 
 	public void nextLevel() {
@@ -102,6 +127,7 @@ public class BloonManager {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
 			player.earnMoney(result.getCashGenerated());
+			notifyScoreListeners(new ScoreEvent(ScoreEvent.Type.BLOON_POPPED, result.getCashGenerated(), bloonActor.getBloon(), result.getCashGenerated()));
 			
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
@@ -117,10 +143,13 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
+			notifyScoreListeners(new ScoreEvent(ScoreEvent.Type.BLOON_DAMAGED, damage, bloonActor.getBloon(), damage));
 			// todo play some other sound I guess
 		}
 	}

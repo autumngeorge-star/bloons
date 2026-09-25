@@ -4,3 +4,18 @@ sourceCompatibility = 8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.test.java.srcDirs = [ "test/" ]
+
+dependencies {
+    testImplementation files("../libs.jar")
+}
+
+test {
+    dependsOn compileTestJava
+    doLast {
+        javaexec {
+            main = "com.hongbao.bloons.score.ScoreManagerTest"
+            classpath = sourceSets.test.runtimeClasspath + files("../libs.jar")
+        }
+    }
+}
