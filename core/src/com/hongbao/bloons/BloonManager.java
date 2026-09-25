@@ -29,7 +29,13 @@ public class BloonManager {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		try {
+			if (Gdx.audio != null) {
+				popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+			}
+		} catch (Exception e) {
+			popSound = null;
+		}
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
 
@@ -117,7 +123,12 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				try {
+					popSound.play(0.5f);
+				} catch (Exception ignored) {
+				}
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
