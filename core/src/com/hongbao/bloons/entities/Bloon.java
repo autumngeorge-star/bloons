@@ -1,5 +1,6 @@
 package com.hongbao.bloons.entities;
 
+import com.badlogic.gdx.utils.Pool;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ import static com.hongbao.bloons.entities.Bloon.Color.ZEBRA;
 import static com.hongbao.bloons.entities.Bloon.Color.ZOMG;
 
 
-public class Bloon {
+public class Bloon implements Pool.Poolable {
 
 	public enum Color {
 
@@ -94,13 +95,36 @@ public class Bloon {
 	private boolean camo;
 	private boolean regen;
 
+	public Bloon() {
+	}
+
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
+		init(color, health, camo, regen, 0);
+	}
+
+	public void init(Color color, int health, boolean camo, boolean regen) {
+		init(color, health, camo, regen, 0);
+	}
+
+	public void init(Color color, int health, boolean camo, boolean regen, int distanceTravelled) {
 		this.color = color;
 		this.health = health;
-		speed = COLOR_TO_SPEED.get(color);
+		this.speed = COLOR_TO_SPEED.get(color);
 		this.camo = camo;
 		this.regen = regen;
+		this.distanceTravelled = distanceTravelled;
 		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
+	}
+
+	@Override
+	public void reset() {
+		this.color = null;
+		this.imageFileName = null;
+		this.health = 0;
+		this.speed = 0;
+		this.distanceTravelled = 0;
+		this.camo = false;
+		this.regen = false;
 	}
 
 	public Color getColor() {

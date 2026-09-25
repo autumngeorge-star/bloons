@@ -29,6 +29,7 @@ allprojects {
 
     repositories {
         mavenLocal()
+        maven { url "https://cache-redirector.jetbrains.com/repo1.maven.org/maven2/" }
         mavenCentral()
         jcenter()
         google()
@@ -55,6 +56,18 @@ project(":desktop") {
 project(":core") {
     apply plugin: "java-library"
 
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src']
+            }
+        }
+        test {
+            java {
+                srcDirs = ['test']
+            }
+        }
+    }
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -62,6 +75,6 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
         api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        
+        testImplementation "junit:junit:4.13.2"
     }
 }
