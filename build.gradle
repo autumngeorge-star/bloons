@@ -20,11 +20,6 @@ allprojects {
     version = '1.0'
     ext {
         appName = "bloons-tower-defence"
-        gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.8'
-        box2DLightsVersion = '1.4'
-        ashleyVersion = '1.7.0'
-        aiVersion = '1.8.0'
     }
 
     repositories {
@@ -43,11 +38,11 @@ project(":desktop") {
 
     dependencies {
         implementation project(":core")
-        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        api libs.gdx.backend.lwjgl
+        api variantOf(libs.gdx.platform) { classifier("natives-desktop") }
+        api variantOf(libs.gdx.box2d.platform) { classifier("natives-desktop") }
+        api variantOf(libs.gdx.bullet.platform) { classifier("natives-desktop") }
+        api libs.gdx.tools
         
     }
 }
@@ -57,11 +52,11 @@ project(":core") {
 
 
     dependencies {
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
-        api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-        api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        api libs.gdx
+        api libs.gdx.box2d
+        api libs.gdx.bullet
+        api libs.box2dlights
+        api libs.gdx.ai
         
     }
 }

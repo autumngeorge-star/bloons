@@ -1,0 +1,19 @@
+[versions]
+gdx = "1.9.10"
+robovm = "2.3.8"
+box2dlights = "1.4"
+ashley = "1.7.0"
+ai = "1.8.0"
+
+[libraries]
+gdx = { module = "com.badlogicgames.gdx:gdx", version.ref = "gdx" }
+gdx-backend-lwjgl = { module = "com.badlogicgames.gdx:gdx-backend-lwjgl", version.ref = "gdx" }
+gdx-platform = { module = "com.badlogicgames.gdx:gdx-platform", version.ref = "gdx" }
+gdx-box2d = { module = "com.badlogicgames.gdx:gdx-box2d", version.ref = "gdx" }
+gdx-box2d-platform = { module = "com.badlogicgames.gdx:gdx-box2d-platform", version.ref = "gdx" }
+gdx-bullet = { module = "com.badlogicgames.gdx:gdx-bullet", version.ref = "gdx" }
+gdx-bullet-platform = { module = "com.badlogicgames.gdx:gdx-bullet-platform", version.ref = "gdx" }
+gdx-tools = { module = "com.badlogicgames.gdx:gdx-tools", version.ref = "gdx" }
+gdx-ai = { module = "com.badlogicgames.gdx:gdx-ai", version.ref = "ai" }
+box2dlights = { module = "com.badlogicgames.box2dlights:box2dlights", version.ref = "box2dlights" }
+ashley = { module = "com.badlogicgames.ashley:ashley", version.ref = "ashley" }
