@@ -21,7 +21,13 @@ public class GirlActor extends RenderableActor {
 	
 	public GirlActor(Girl girl, float x, float y) {
 		this.girl = girl;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(girl.getImageFileName())));
+		Texture texture;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			texture = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getTexture(girl.getImageFileName());
+		} else {
+			texture = new Texture(Gdx.files.internal(girl.getImageFileName()));
+		}
+		textureRegion = new TextureRegion(texture);
 		rotationAngle = 0;
 		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
 		active = false;

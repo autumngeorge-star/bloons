@@ -27,7 +27,13 @@ public class BloonActor extends RenderableActor {
 	
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+		Texture texture;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			texture = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getTexture(bloon.getImageFileName());
+		} else {
+			texture = new Texture(Gdx.files.internal(bloon.getImageFileName()));
+		}
+		textureRegion = new TextureRegion(texture);
 
 		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
 		
@@ -85,14 +91,12 @@ public class BloonActor extends RenderableActor {
 	// Please avoid calling this method directly, instead use the BloonManager pop()
 	public BloonPoppedResult pop(int damage) {
 		BloonPoppedResult bloonPoppedResult = bloon.pop(damage);
-		textureRegion.getTexture().dispose();
 		remove();
 		return bloonPoppedResult;
 	}
 	
 	public void release() {
 		((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
-		textureRegion.getTexture().dispose();
 		remove();
 	}
 	
