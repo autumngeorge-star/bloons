@@ -18,7 +18,8 @@ public class MusicPlayer {
 			wasPlaying = backgroundMusic.isPlaying();
 		}
 		stopMusic();
-		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
+		BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+		backgroundMusic = app.getAssetManager().get(fileName, Music.class);
 		backgroundMusic.setVolume(0.5f);
 		backgroundMusic.setLooping(true);
 		if (wasPlaying) {
