@@ -36,11 +36,20 @@ public class BloonManager {
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+			if (app != null && app.getGameState() != null) {
+				GameState gameState = app.getGameState();
+				gameState.incrementLevelsCompleted();
+				gameState.setUnlockedLevel(getLevel());
+				SaveManager.saveGameState(gameState);
+			}
+			MusicPlayer musicPlayer = app != null ? app.getMusicPlayer() : null;
+			if (musicPlayer != null) {
+				if (map.getBloonManager().getLevel() == 1) {
+					musicPlayer.playStageMusic();
+				} else if (map.getBloonManager().getLevel() == 40) {
+					musicPlayer.playFinalBossMusic();
+				}
 			}
 		}
 	}
@@ -97,12 +106,18 @@ public class BloonManager {
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
 		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
-		
+		BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+		GameState gameState = app != null ? app.getGameState() : null;
+
 		if (bloonActor.getBloon().willPopBloon(damage)) {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
 			player.earnMoney(result.getCashGenerated());
-			
+			if (gameState != null) {
+				gameState.addBloonsPopped(1);
+				gameState.addMoneyEarned(result.getCashGenerated());
+			}
+
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
 				BloonActor generatedBloonActor;
@@ -116,11 +131,14 @@ public class BloonManager {
 				onstageBloons.add(generatedBloonActor);
 				previousBloonActor = generatedBloonActor;
 			}
-			
+
 			popSound.play(0.5f);
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
+			if (gameState != null) {
+				gameState.addMoneyEarned(damage);
+			}
 			// todo play some other sound I guess
 		}
 	}
