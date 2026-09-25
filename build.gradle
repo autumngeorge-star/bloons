@@ -1,12 +1,9 @@
 buildscript {
-    
-
     repositories {
         mavenLocal()
+        maven { url "https://maven-central.storage-download.googleapis.com/maven2/" }
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
         google()
     }
     dependencies {
@@ -29,11 +26,9 @@ allprojects {
 
     repositories {
         mavenLocal()
+        maven { url "https://maven-central.storage-download.googleapis.com/maven2/" }
         mavenCentral()
-        jcenter()
         google()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
 }
 
@@ -55,6 +50,18 @@ project(":desktop") {
 project(":core") {
     apply plugin: "java-library"
 
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src']
+            }
+        }
+        test {
+            java {
+                srcDirs = ['test']
+            }
+        }
+    }
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -62,6 +69,10 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
         api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        
+        testImplementation 'junit:junit:4.13.2'
+    }
+
+    test {
+        useJUnit()
     }
 }
