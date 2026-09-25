@@ -7,21 +7,37 @@ import com.badlogic.gdx.audio.Music;
 public class MusicPlayer {
 	
 	private Music backgroundMusic;
+	private PreferenceManager preferenceManager;
+	private boolean musicEnabled = true;
+	private float volume = 0.5f;
 	
 	public MusicPlayer() {
+		this(null);
+	}
+
+	public MusicPlayer(PreferenceManager preferenceManager) {
 		backgroundMusic = null;
+		setPreferenceManager(preferenceManager);
+	}
+
+	public void setPreferenceManager(PreferenceManager preferenceManager) {
+		this.preferenceManager = preferenceManager;
+		if (preferenceManager != null) {
+			this.musicEnabled = preferenceManager.isMusicEnabled();
+			this.volume = preferenceManager.getVolume();
+		}
 	}
 
 	private void playMusic(String fileName) {
-		boolean wasPlaying = true;
+		boolean wasPlaying = musicEnabled;
 		if (backgroundMusic != null) {
-			wasPlaying = backgroundMusic.isPlaying();
+			wasPlaying = wasPlaying && backgroundMusic.isPlaying();
 		}
 		stopMusic();
 		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
-		backgroundMusic.setVolume(0.5f);
+		backgroundMusic.setVolume(volume);
 		backgroundMusic.setLooping(true);
-		if (wasPlaying) {
+		if (wasPlaying && musicEnabled) {
 			backgroundMusic.play();
 		}
 	}
@@ -45,7 +61,7 @@ public class MusicPlayer {
 	}
 	
 	public void resume() {
-		if (backgroundMusic != null) {
+		if (backgroundMusic != null && musicEnabled) {
 			backgroundMusic.play();
 		}
 	}
@@ -57,12 +73,38 @@ public class MusicPlayer {
 	}
 
 	public void toggleMusic() {
+		setMusicEnabled(!musicEnabled);
+	}
+
+	public boolean isMusicEnabled() {
+		return musicEnabled;
+	}
+
+	public void setMusicEnabled(boolean enabled) {
+		this.musicEnabled = enabled;
+		if (preferenceManager != null) {
+			preferenceManager.setMusicEnabled(enabled);
+		}
 		if (backgroundMusic != null) {
-			if (backgroundMusic.isPlaying()) {
-				pause();
+			if (enabled) {
+				backgroundMusic.play();
 			} else {
-				resume();
+				backgroundMusic.pause();
 			}
+		}
+	}
+
+	public float getVolume() {
+		return volume;
+	}
+
+	public void setVolume(float volume) {
+		this.volume = volume;
+		if (preferenceManager != null) {
+			preferenceManager.setVolume(volume);
+		}
+		if (backgroundMusic != null) {
+			backgroundMusic.setVolume(volume);
 		}
 	}
 
