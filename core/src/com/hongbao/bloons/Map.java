@@ -231,13 +231,16 @@ public class Map {
 		// It's colliding with the bloon path
 		// It's colliding with another girl
 
-		float x = girlActor.getCenterX() + TILE_LENGTH; // x is always offset by one tile because we have that extra tile on the left
-		float y = girlActor.getCenterY();
+		float centerX = girlActor.getCenterX();
+		float centerY = girlActor.getCenterY();
 		float r = girlActor.getCollisionRadius();
 
-		if (y < 0 || y > 900 || x < 0 || x > 1550) {
+		if (centerX - r < 0 || centerX + r > 1500 || centerY - r < 0 || centerY + r > 900) {
 			return false;
 		}
+
+		float x = centerX + TILE_LENGTH; // x is always offset by one tile because we have that extra tile on the left
+		float y = centerY;
 		
 		for (int i = 0; i < directions.length; i++) {
 			for (int j = 0; j < directions[i].length; j++) {
