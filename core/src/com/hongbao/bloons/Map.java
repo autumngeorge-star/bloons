@@ -210,15 +210,61 @@ public class Map {
 	}
 
 	public Pair<Float, Float> getDirection(float balloonX, float balloonY) {
-		// Each "direction tile" is 50x50 px, maybe some minor tweaking later
-		// There is an extra tile on the left and right of the screen so we have a smol x offset for that
-		int xTile = (int)(balloonX + TILE_LENGTH) / TILE_LENGTH;
-		int yTile = (int)balloonY / TILE_HEIGHT;
-		if (xTile < directions.length && yTile < directions[xTile].length) {
-			return directions[xTile][yTile];
-		} else {
+		if (directions == null || Float.isNaN(balloonX) || Float.isNaN(balloonY) || Float.isInfinite(balloonX) || Float.isInfinite(balloonY)) {
 			return new Pair<>(0f, 0f);
 		}
+
+		// Each tile is 50x50. World x = -50 maps to gx = 0, x = 0 maps to gx = 1.
+		float gx = (balloonX + TILE_LENGTH) / (float) TILE_LENGTH;
+		float gy = balloonY / (float) TILE_HEIGHT;
+
+		// Map bounds check
+		if (gx < 0f || gx > directions.length || gy < 0f || gy > directions[0].length) {
+			return new Pair<>(0f, 0f);
+		}
+
+		// Tile centers are at (i + 0.5, j + 0.5) in continuous grid coordinates.
+		// Shift coordinates by -0.5 so integer floor yields surrounding tile indices.
+		float u = gx - 0.5f;
+		float v = gy - 0.5f;
+
+		int x0 = (int) Math.floor(u);
+		int y0 = (int) Math.floor(v);
+		int x1 = x0 + 1;
+		int y1 = y0 + 1;
+
+		float tx = u - x0;
+		float ty = v - y0;
+
+		Pair<Float, Float> v00 = getVectorAt(x0, y0);
+		Pair<Float, Float> v10 = getVectorAt(x1, y0);
+		Pair<Float, Float> v01 = getVectorAt(x0, y1);
+		Pair<Float, Float> v11 = getVectorAt(x1, y1);
+
+		float w00 = (1f - tx) * (1f - ty);
+		float w10 = tx * (1f - ty);
+		float w01 = (1f - tx) * ty;
+		float w11 = tx * ty;
+
+		float vx = w00 * v00.getFirst() + w10 * v10.getFirst() + w01 * v01.getFirst() + w11 * v11.getFirst();
+		float vy = w00 * v00.getSecond() + w10 * v10.getSecond() + w01 * v01.getSecond() + w11 * v11.getSecond();
+
+		float len = (float) Math.sqrt(vx * vx + vy * vy);
+		if (len < 1e-6f) {
+			return new Pair<>(0f, 0f);
+		}
+
+		return new Pair<>(vx / len, vy / len);
+	}
+
+	private Pair<Float, Float> getVectorAt(int x, int y) {
+		if (x < 0 || x >= directions.length || directions[x] == null) {
+			return new Pair<>(0f, 0f);
+		}
+		if (y < 0 || y >= directions[x].length || directions[x][y] == null) {
+			return new Pair<>(0f, 0f);
+		}
+		return directions[x][y];
 	}
 
 	public BloonManager getBloonManager() {
