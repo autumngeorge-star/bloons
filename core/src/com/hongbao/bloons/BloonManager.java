@@ -25,6 +25,8 @@ public class BloonManager {
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
 	
+	private boolean levelClearProcessed = false;
+
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
 		this.map = map;
@@ -33,9 +35,42 @@ public class BloonManager {
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
 
+	public BloonQueue getBloonQueue() {
+		return bloonQueue;
+	}
+
+	public void setLevel(int level) {
+		clearOnstageBloons();
+		bloonQueue.setLevel(level);
+		levelClearProcessed = false;
+		MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
+		if (level == 1) {
+			musicPlayer.playStageMusic();
+		} else if (level == 40) {
+			musicPlayer.playFinalBossMusic();
+		}
+	}
+
+	public void clearOnstageBloons() {
+		for (BloonActor bloonActor : new HashSet<>(onstageBloons)) {
+			bloonActor.remove();
+		}
+		onstageBloons.clear();
+	}
+
+	public void checkLevelCompletion() {
+		if (getLevel() >= 1 && bloonQueue.isEmpty() && onstageBloons.isEmpty()) {
+			if (!levelClearProcessed) {
+				levelClearProcessed = true;
+				LevelSaveService.getInstance().unlockLevel(getLevel() + 1);
+			}
+		}
+	}
+
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
+			levelClearProcessed = false;
 			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
 			if (map.getBloonManager().getLevel() == 1) {
 				musicPlayer.playStageMusic();
@@ -46,7 +81,11 @@ public class BloonManager {
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean can = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		if (can) {
+			checkLevelCompletion();
+		}
+		return can;
 	}
 
 	public int getLevel() {
@@ -123,6 +162,7 @@ public class BloonManager {
 			player.earnMoney(damage);
 			// todo play some other sound I guess
 		}
+		checkLevelCompletion();
 	}
 	
 	public void addBulletToStage(BulletActor bulletActor) {
@@ -187,6 +227,7 @@ public class BloonManager {
 
 	public void removeBloonFromStage(BloonActor actor) {
 		onstageBloons.remove(actor);
+		checkLevelCompletion();
 	}
 	
 	public BloonActor getNewHomingTarget(BulletActor bulletActor) {
