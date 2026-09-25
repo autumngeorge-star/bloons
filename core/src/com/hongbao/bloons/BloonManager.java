@@ -11,7 +11,11 @@ import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 
@@ -24,13 +28,45 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private Queue<BloonPopJob> popJobQueue;
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
-		bloonQueue = BloonFactory.createBloonQueue();
+		if (Gdx.files != null) {
+			if (Gdx.audio != null) {
+				popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+			}
+			bloonQueue = BloonFactory.createBloonQueue();
+		}
+		popJobQueue = new LinkedList<>();
+	}
+
+	public Queue<BloonPopJob> getPopJobQueue() {
+		return popJobQueue;
+	}
+
+	public static int getShellHealth(Bloon bloon) {
+		int health = bloon.getHealth();
+		if (health <= 8) {
+			return 1;
+		} else if (health <= 18) {
+			return health - 8;
+		} else if (health <= 218) {
+			return health - 18;
+		} else if (health <= 918) {
+			return health - 218;
+		} else {
+			return health - 918;
+		}
+	}
+
+	private Player getPlayer() {
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			return ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getPlayer();
+		}
+		return null;
 	}
 
 	public void nextLevel() {
@@ -92,36 +128,97 @@ public class BloonManager {
 			bulletActor.setTarget(null);
 		}
 		
-		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
+		for (BloonActor bloonActor : bloonsToBePopped) {
+			enqueuePopJob(bloonActor, bulletActor.getBullet().getDamage());
+		}
+		processPopQueue();
+	}
+
+	public void enqueuePopJob(BloonActor bloonActor, int damage) {
+		if (bloonActor == null || damage <= 0) {
+			return;
+		}
+		popJobQueue.add(new BloonPopJob(bloonActor, damage, bloonActor.getCenterX(), bloonActor.getCenterY()));
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
-		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+		if (bloonActor == null || damage <= 0) {
+			return;
+		}
+		enqueuePopJob(bloonActor, damage);
+		processPopQueue();
+	}
+
+	public void processPopQueue() {
+		List<BloonActor> newlyCreatedActors = new ArrayList<>();
+		int iterations = 0;
 		
-		if (bloonActor.getBloon().willPopBloon(damage)) {
-			onstageBloons.remove(bloonActor);
-			BloonPoppedResult result = bloonActor.pop(damage);
-			player.earnMoney(result.getCashGenerated());
+		while (!popJobQueue.isEmpty() && iterations < 1000) {
+			iterations++;
+			BloonPopJob job = popJobQueue.poll();
+			BloonActor bloonActor = job.getBloonActor();
+			int damage = job.getDamage();
 			
-			BloonActor previousBloonActor = null;
-			for (Bloon bloon : result.getBloonsGenerated()) {
-				BloonActor generatedBloonActor;
-				if (previousBloonActor == null) {
-					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
-				} else {
-					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
-					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
-				}
-				stage.addActor(generatedBloonActor);
-				onstageBloons.add(generatedBloonActor);
-				previousBloonActor = generatedBloonActor;
+			if (bloonActor == null || damage <= 0) {
+				continue;
 			}
 			
-			popSound.play(0.5f);
-		} else {
-			bloonActor.damage(damage);
-			player.earnMoney(damage);
-			// todo play some other sound I guess
+			Bloon bloon = bloonActor.getBloon();
+			int shellHealth = getShellHealth(bloon);
+			Player player = getPlayer();
+			
+			if (damage >= shellHealth) {
+				int damageApplied = shellHealth;
+				int remainingDamage = damage - damageApplied;
+				
+				if (onstageBloons.contains(bloonActor)) {
+					onstageBloons.remove(bloonActor);
+				}
+				
+				BloonPoppedResult result = bloonActor.pop(damageApplied);
+				
+				if (player != null) {
+					player.earnMoney(result.getCashGenerated());
+				}
+				
+				if (popSound != null) {
+					popSound.play(0.5f);
+				}
+				
+				BloonActor previousBloonActor = null;
+				for (Bloon childBloon : result.getBloonsGenerated()) {
+					BloonActor childActor;
+					if (previousBloonActor == null) {
+						childActor = new BloonActor(childBloon, job.getX(), job.getY(), bloonActor);
+					} else {
+						Pair<Float, Float> direction = map != null ? map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY()) : new Pair<>(0f, 0f);
+						childActor = new BloonActor(childBloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
+					}
+					previousBloonActor = childActor;
+					
+					if (remainingDamage > 0) {
+						popJobQueue.add(new BloonPopJob(childActor, remainingDamage, childActor.getCenterX(), childActor.getCenterY()));
+					} else {
+						newlyCreatedActors.add(childActor);
+					}
+				}
+			} else {
+				bloonActor.damage(damage);
+				if (player != null) {
+					player.earnMoney(damage);
+				}
+				
+				if (!onstageBloons.contains(bloonActor) && !newlyCreatedActors.contains(bloonActor)) {
+					newlyCreatedActors.add(bloonActor);
+				}
+			}
+		}
+		
+		for (BloonActor actor : newlyCreatedActors) {
+			if (stage != null) {
+				stage.addActor(actor);
+			}
+			onstageBloons.add(actor);
 		}
 	}
 	
