@@ -24,6 +24,7 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.comparators.SortByZIndex;
+import com.hongbao.bloons.components.SpellCardAbility;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
@@ -540,6 +541,48 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		}
 		stage.draw();
 		
+		// Render visual radial cooldown overlays over towers on spell card cooldown
+		if (map != null && map.getOnStageGirls() != null) {
+			Gdx.gl.glEnable(GL20.GL_BLEND);
+			Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+			for (GirlActor activeGirl : map.getOnStageGirls()) {
+				if (activeGirl != null && activeGirl.isActive()) {
+					SpellCardAbility ability = activeGirl.getSpellCardAbility();
+					if (ability != null && !ability.isReady()) {
+						float remainingRatio = ability.getRemainingCooldownRatio();
+						float degrees = 360f * remainingRatio;
+						float radius = activeGirl.getCollisionRadius() + 6f;
+						float cx = activeGirl.getCenterX();
+						float cy = activeGirl.getCenterY();
+
+						boolean isSelected = (activeGirl == map.getSelectedGirl());
+
+						// Draw semi-transparent radial pie overlay
+						shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+						if (isSelected) {
+							shapeRenderer.setColor(new Color(0.1f, 0.6f, 1.0f, 0.35f));
+						} else {
+							shapeRenderer.setColor(new Color(0.2f, 0.2f, 0.2f, 0.25f));
+						}
+						shapeRenderer.arc(cx, cy, radius, 90f, degrees, 24);
+						shapeRenderer.end();
+
+						// Draw outer outline ring
+						shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+						if (isSelected) {
+							shapeRenderer.setColor(Color.CYAN);
+						} else {
+							shapeRenderer.setColor(new Color(0.8f, 0.8f, 0.8f, 0.6f));
+						}
+						shapeRenderer.arc(cx, cy, radius, 90f, degrees, 24);
+						shapeRenderer.circle(cx, cy, radius, 24);
+						shapeRenderer.end();
+					}
+				}
+			}
+		}
+
 		if (map.getSelectedGirl() != null) {
 			// Draw the range of collision, the range of sight, and range of... well, range
 			if (!map.getSelectedGirl().isActive()) {
