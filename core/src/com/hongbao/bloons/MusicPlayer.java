@@ -26,6 +26,25 @@ public class MusicPlayer {
 		}
 	}
 
+	public void playMusicTrack(String trackOrCue) {
+		if (trackOrCue == null || trackOrCue.trim().isEmpty()) {
+			return;
+		}
+		String cue = trackOrCue.trim();
+		if ("stage".equalsIgnoreCase(cue) || "demystify_feast".equalsIgnoreCase(cue)) {
+			playStageMusic();
+		} else if ("final_boss".equalsIgnoreCase(cue) || "boss".equalsIgnoreCase(cue) || "night_falls".equalsIgnoreCase(cue)) {
+			playFinalBossMusic();
+		} else if ("title".equalsIgnoreCase(cue)) {
+			playTitleMusic();
+		} else {
+			if (!cue.startsWith("music/")) {
+				cue = "music/" + cue;
+			}
+			playMusic(cue);
+		}
+	}
+
 	public void playTitleMusic() {
 		playMusic("music/title.mp3");
 	}
