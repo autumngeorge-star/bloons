@@ -72,6 +72,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMap();
 		createMenu();
 		createInstructions();
+		SaveManager.loadSessionState(this);
 		musicPlayer.playTitleMusic();
 	}
 
@@ -180,6 +181,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				if (map.getBloonManager().hasWonGame()) {
 					titleActor.setText("YOU WIN!");
 					titleActor.setColor(Color.GOLD);
+					SaveManager.clearSaveState();
 				} else {
 					titleActor.setText("Bloons Touhou Defense\nLevel " + (map.getBloonManager().getLevel()));
 					titleActor.setColor(Color.WHITE);
@@ -207,6 +209,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			
 			if (player.getHealth() == 0) {
 				pause();
+				SaveManager.clearSaveState();
 			}
 		});
 		healthLabel.addAction(Actions.repeat(RepeatAction.FOREVER, healthLabelAction));
@@ -538,6 +541,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			
 			stage.getActors().sort(new SortByZIndex());
 		}
+		SaveManager.update(this);
 		stage.draw();
 		
 		if (map.getSelectedGirl() != null) {
