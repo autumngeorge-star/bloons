@@ -7,6 +7,8 @@ import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.entities.Bloon;
+import com.hongbao.bloons.event.GameEventBus;
+import com.hongbao.bloons.event.LevelStartedEvent;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
@@ -24,10 +26,16 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private GameEventBus eventBus;
 	
 	public BloonManager(Stage stage, Map map) {
+		this(stage, map, GameEventBus.getInstance());
+	}
+
+	public BloonManager(Stage stage, Map map, GameEventBus eventBus) {
 		this.stage = stage;
 		this.map = map;
+		this.eventBus = eventBus != null ? eventBus : GameEventBus.getInstance();
 		onstageBloons = new HashSet<>();
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
@@ -36,12 +44,7 @@ public class BloonManager {
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
-			}
+			eventBus.publish(new LevelStartedEvent(getLevel()));
 		}
 	}
 
