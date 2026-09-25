@@ -102,6 +102,7 @@ public class BloonManager {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
 			player.earnMoney(result.getCashGenerated());
+			player.addScore(result.getCashGenerated());
 			
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
@@ -121,6 +122,7 @@ public class BloonManager {
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
+			player.addScore(damage);
 			// todo play some other sound I guess
 		}
 	}
