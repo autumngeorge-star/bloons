@@ -54,32 +54,26 @@ public class SpellCard {
 		Map<Integer, List<Bullet>> bulletsToCreate = new HashMap<>();
 		for (int x = 0; x < 1000; x += 25) {
 			Bullet bullet1 = GirlFactory.createReimu().createBullet();
-			bullet1.setMaxRange(5000);
 			bullet1.setInitialDXOverride(0);
 			bullet1.setInitialDYOverride(1);
 			
 			Bullet bullet2 = GirlFactory.createReimu().createBullet();
-			bullet2.setMaxRange(5000);
 			bullet2.setInitialDXOverride((float)(Math.sqrt(3) / 2));
 			bullet2.setInitialDYOverride(0.5f);
 			
 			Bullet bullet3 = GirlFactory.createReimu().createBullet();
-			bullet3.setMaxRange(5000);
 			bullet3.setInitialDXOverride((float)(-Math.sqrt(3) / 2));
 			bullet3.setInitialDYOverride(0.5f);
 			
 			Bullet bullet4 = GirlFactory.createReimu().createBullet();
-			bullet4.setMaxRange(5000);
 			bullet4.setInitialDXOverride(0);
 			bullet4.setInitialDYOverride(-1);
 			
 			Bullet bullet5 = GirlFactory.createReimu().createBullet();
-			bullet5.setMaxRange(5000);
 			bullet5.setInitialDXOverride((float)(Math.sqrt(3) / 2));
 			bullet5.setInitialDYOverride(-0.5f);
 			
 			Bullet bullet6 = GirlFactory.createReimu().createBullet();
-			bullet6.setMaxRange(5000);
 			bullet6.setInitialDXOverride((float)(-Math.sqrt(3) / 2));
 			bullet6.setInitialDYOverride(-0.5f);
 			
@@ -112,7 +106,6 @@ public class SpellCard {
 			for (int i = 0; i < bullets; i++) {
 				Bullet bullet = yuyuko.createBullet();
 				bullet.setSpeed(5f);
-				bullet.setMaxRange(5000);
 				double currentAngle = offset * i;
 				double desiredAngle = currentAngle + (x * Math.PI / 500);
 				bullet.setInitialXOffset(-125);
@@ -125,7 +118,6 @@ public class SpellCard {
 			for (int i = 0; i < bullets; i++) {
 				Bullet bullet = yuyuko.createBullet();
 				bullet.setSpeed(5f);
-				bullet.setMaxRange(5000);
 				double currentAngle = offset * i;
 				double desiredAngle = currentAngle - (x * Math.PI / 500);
 				bullet.setInitialXOffset(125);
