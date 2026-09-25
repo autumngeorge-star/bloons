@@ -11,7 +11,11 @@ import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
 
+import com.hongbao.bloons.quadtree.Quadtree;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -25,12 +29,24 @@ public class BloonManager {
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
 	
+	private Quadtree quadtree;
+	private final List<BloonActor> candidateBuffer = new ArrayList<>(128);
+	private final List<BloonActor> bloonsToBePoppedBuffer = new ArrayList<>(16);
+	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		popSound = (Gdx.audio != null && Gdx.files != null) ? Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3")) : null;
 		bloonQueue = BloonFactory.createBloonQueue();
+		
+		float width = (stage != null && stage.getWidth() > 0) ? stage.getWidth() : 1800f;
+		float height = (stage != null && stage.getHeight() > 0) ? stage.getHeight() : 900f;
+		quadtree = new Quadtree(0, 0, width, height);
+	}
+
+	public Quadtree getQuadtree() {
+		return quadtree;
 	}
 
 	public void nextLevel() {
@@ -68,16 +84,22 @@ public class BloonManager {
 	}
 	
 	public void checkCollision(final BulletActor bulletActor) {
-		Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
+		quadtree.rebuild(onstageBloons);
 		
-		for (BloonActor bloonActor : onstageBloons) {
+		candidateBuffer.clear();
+		bloonsToBePoppedBuffer.clear();
+		
+		quadtree.query(bulletActor, candidateBuffer);
+		
+		for (int i = 0; i < candidateBuffer.size(); i++) {
+			BloonActor bloonActor = candidateBuffer.get(i);
 			float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
 			float distance = Map.distanceBetweenActors(bulletActor, bloonActor);
 			
 			if (distance < collisionDistance) {
 				if (!bulletActor.hasDamagedBloon(bloonActor)) {
 					bulletActor.damageBloon(bloonActor);
-					bloonsToBePopped.add(bloonActor);
+					bloonsToBePoppedBuffer.add(bloonActor);
 					bulletActor.decrementPierce();
 					
 					if (bulletActor.getBullet().getPierce() == 0) {
@@ -92,7 +114,9 @@ public class BloonManager {
 			bulletActor.setTarget(null);
 		}
 		
-		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
+		for (int i = 0; i < bloonsToBePoppedBuffer.size(); i++) {
+			popBloon(bloonsToBePoppedBuffer.get(i), bulletActor.getBullet().getDamage());
+		}
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
@@ -117,7 +141,9 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
