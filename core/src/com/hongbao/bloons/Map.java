@@ -214,7 +214,7 @@ public class Map {
 		// There is an extra tile on the left and right of the screen so we have a smol x offset for that
 		int xTile = (int)(balloonX + TILE_LENGTH) / TILE_LENGTH;
 		int yTile = (int)balloonY / TILE_HEIGHT;
-		if (xTile < directions.length && yTile < directions[xTile].length) {
+		if (xTile >= 0 && xTile < directions.length && yTile >= 0 && yTile < directions[xTile].length) {
 			return directions[xTile][yTile];
 		} else {
 			return new Pair<>(0f, 0f);
