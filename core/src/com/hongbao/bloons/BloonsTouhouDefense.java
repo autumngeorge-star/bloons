@@ -48,6 +48,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Map map;
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
+	private PreferencesManager preferencesManager;
 	public List<RenderableImageButton> instructions;
 	
 	
@@ -58,6 +59,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		tripleSpeed = false;
 		autoContinue = false;
 		stage = new Stage();
+		preferencesManager = new PreferencesManager();
 		player = new Player(MONEY, HEALTH);
 		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
@@ -449,6 +451,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
+	}
+
+	public PreferencesManager getPreferencesManager() {
+		return preferencesManager;
 	}
 	
 	@Override

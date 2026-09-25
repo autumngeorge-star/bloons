@@ -27,6 +27,9 @@ public class BloonQueue {
 	
 	public Set<Bloon> getBloons() {
 		HashSet<Bloon> generatedBloons = new HashSet<>();
+		if (bloons == null || currentLevel < 0 || currentLevel >= bloons.size()) {
+			return generatedBloons;
+		}
 		while (currentIndex < bloons.get(currentLevel).size()) {
 			if (intervals.get(currentLevel).get(currentIndex) == clock) {
 				generatedBloons.add(bloons.get(currentLevel).get(currentIndex));
@@ -43,17 +46,43 @@ public class BloonQueue {
 		return currentLevel;
 	}
 
+	public void setLevel(int level) {
+		if (bloons == null || bloons.isEmpty()) {
+			currentLevel = 0;
+		} else if (level < 0) {
+			currentLevel = 0;
+		} else if (level >= bloons.size()) {
+			currentLevel = bloons.size() - 1;
+		} else {
+			currentLevel = level;
+		}
+		currentIndex = 0;
+		clock = 0;
+	}
+
+	public int getLevelsCount() {
+		return bloons != null ? bloons.size() : 0;
+	}
+
 	public void nextLevel() {
-		currentLevel++;
+		if (hasNextLevel()) {
+			currentLevel++;
+		}
 		currentIndex = 0;
 		clock = 0;
 	}
 
 	public boolean hasNextLevel() {
-		return currentLevel != bloons.size() - 1;
+		if (bloons == null || bloons.isEmpty()) {
+			return false;
+		}
+		return currentLevel < bloons.size() - 1;
 	}
 
 	public boolean isEmpty() {
+		if (bloons == null || currentLevel < 0 || currentLevel >= bloons.size()) {
+			return true;
+		}
 		return currentIndex == bloons.get(currentLevel).size();
 	}
 	
