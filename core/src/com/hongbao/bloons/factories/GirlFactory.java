@@ -1,5 +1,6 @@
 package com.hongbao.bloons.factories;
 
+import com.hongbao.bloons.effects.StatusEffectApplicator;
 import com.hongbao.bloons.entities.Girl;
 
 import java.util.Arrays;
@@ -77,7 +78,7 @@ public class GirlFactory {
 	}
 
 	public static Girl createSakuya() {
-		return new Girl(
+		Girl sakuya = new Girl(
 				"Sakuya",
 				Arrays.asList(30, 20, 20),
 				Arrays.asList(20f, 20f, 20f),
@@ -91,6 +92,32 @@ public class GirlFactory {
 				500,
 				Arrays.asList(300, 350, NO_UPGRADES_AVAILABLE)
 		);
+
+		StatusEffectApplicator slowLvl0 = (target, bulletActor) -> {
+			if (target != null && target.getBloon() != null) {
+				int speed = target.getBloon().getSpeed();
+				if (speed > 1) {
+					target.getBloon().setSpeed(Math.max(1, speed - 1));
+				}
+			}
+		};
+
+		StatusEffectApplicator slowLvl1And2 = (target, bulletActor) -> {
+			if (target != null && target.getBloon() != null) {
+				int speed = target.getBloon().getSpeed();
+				if (speed > 1) {
+					target.getBloon().setSpeed(Math.max(1, speed - 2));
+				}
+			}
+		};
+
+		sakuya.setApplicators(Arrays.asList(
+				Arrays.asList(slowLvl0),
+				Arrays.asList(slowLvl1And2),
+				Arrays.asList(slowLvl1And2)
+		));
+
+		return sakuya;
 	}
 
 	public static Girl createRemilia() { // 3000
@@ -128,7 +155,7 @@ public class GirlFactory {
 	}
 
 	public static Girl createYuyuko() {
-		return new Girl(
+		Girl yuyuko = new Girl(
 				"Yuyuko",
 				Arrays.asList(40, 30, 20),
 				Arrays.asList(10f, 11f, 12f),
@@ -142,6 +169,23 @@ public class GirlFactory {
 				2000,
 				Arrays.asList(500, 1500, NO_UPGRADES_AVAILABLE)
 		);
+
+		StatusEffectApplicator slowEffect = (target, bulletActor) -> {
+			if (target != null && target.getBloon() != null) {
+				int speed = target.getBloon().getSpeed();
+				if (speed > 1) {
+					target.getBloon().setSpeed(Math.max(1, speed / 2));
+				}
+			}
+		};
+
+		yuyuko.setApplicators(Arrays.asList(
+				Arrays.asList(slowEffect),
+				Arrays.asList(slowEffect),
+				Arrays.asList(slowEffect)
+		));
+
+		return yuyuko;
 	}
 
 }

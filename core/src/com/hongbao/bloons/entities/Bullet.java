@@ -1,5 +1,10 @@
 package com.hongbao.bloons.entities;
 
+import com.hongbao.bloons.effects.StatusEffectApplicator;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Bullet {
 	
 	public static final String IMAGE_FOLDER = "img/projectiles/";
@@ -18,6 +23,8 @@ public class Bullet {
 
 	private float initialDXOverride;
 	private float initialDYOverride;
+
+	private List<StatusEffectApplicator> applicators;
 	
 	public Bullet() {
 		speed = 20f;
@@ -27,6 +34,7 @@ public class Bullet {
 		distanceTraveled = 0;
 		homing = false;
 		imageFileName = IMAGE_FOLDER + "red_spell_card.png";
+		applicators = new ArrayList<>();
 	}
 	
 	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName) {
@@ -37,6 +45,14 @@ public class Bullet {
 		this.imageFileName = IMAGE_FOLDER + imageFileName;
 		distanceTraveled = 0;
 		this.homing = homing;
+		applicators = new ArrayList<>();
+	}
+
+	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName, List<StatusEffectApplicator> applicators) {
+		this(speed, damage, pierce, maxRange, homing, imageFileName);
+		if (applicators != null) {
+			this.applicators.addAll(applicators);
+		}
 	}
 	
 	public float getSpeed() {
@@ -125,5 +141,25 @@ public class Bullet {
 	
 	public void setInitialDYOverride(float initialDYOverride) {
 		this.initialDYOverride = initialDYOverride;
+	}
+
+	public List<StatusEffectApplicator> getApplicators() {
+		return applicators;
+	}
+
+	public void setApplicators(List<StatusEffectApplicator> applicators) {
+		this.applicators = applicators != null ? new ArrayList<>(applicators) : new ArrayList<>();
+	}
+
+	public void addApplicator(StatusEffectApplicator applicator) {
+		if (applicator != null) {
+			this.applicators.add(applicator);
+		}
+	}
+
+	public void addApplicators(List<StatusEffectApplicator> applicators) {
+		if (applicators != null) {
+			this.applicators.addAll(applicators);
+		}
 	}
 }
