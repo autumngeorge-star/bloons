@@ -71,10 +71,11 @@ public class BloonManager {
 		Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
 		
 		for (BloonActor bloonActor : onstageBloons) {
-			float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
-			float distance = Map.distanceBetweenActors(bulletActor, bloonActor);
+			float collisionThreshold = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
+			float thresholdSquared = collisionThreshold * collisionThreshold;
+			float distanceSquared = Map.distanceSquaredBetweenActors(bulletActor, bloonActor);
 			
-			if (distance < collisionDistance) {
+			if (distanceSquared < thresholdSquared) {
 				if (!bulletActor.hasDamagedBloon(bloonActor)) {
 					bulletActor.damageBloon(bloonActor);
 					bloonsToBePopped.add(bloonActor);
@@ -133,9 +134,10 @@ public class BloonManager {
 		Set<BloonActor> bloonsInRange = new HashSet<>();
 		
 		for (BloonActor bloonActor : onstageBloons) {
-			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
+			float rangeThreshold = girlActor.getGirl().getVisualRange() + bloonActor.getCollisionRadius();
+			float thresholdSquared = rangeThreshold * rangeThreshold;
 			
-			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
+			if (Map.distanceSquaredBetweenActors(girlActor, bloonActor) < thresholdSquared) {
 				bloonsInRange.add(bloonActor);
 			}
 		}
@@ -161,9 +163,10 @@ public class BloonManager {
 		Set<BloonActor> bloonsInRange = new HashSet<>();
 		
 		for (BloonActor bloonActor : onstageBloons) {
-			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
+			float rangeThreshold = girlActor.getGirl().getVisualRange() + bloonActor.getCollisionRadius();
+			float thresholdSquared = rangeThreshold * rangeThreshold;
 			
-			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
+			if (Map.distanceSquaredBetweenActors(girlActor, bloonActor) < thresholdSquared) {
 				bloonsInRange.add(bloonActor);
 			}
 		}
@@ -195,19 +198,20 @@ public class BloonManager {
 			return null;
 		}
 		
-		BloonActor bloonActor = null;
+		BloonActor closestBloonActor = null;
+		float minDistanceSquared = Float.MAX_VALUE;
 		
 		for (BloonActor actor : onstageBloons) {
 			if (!bulletActor.hasDamagedBloon(actor)) {
-				if (bloonActor == null) {
-					bloonActor = actor;
-				} else if (Map.distanceBetweenActors(actor, bulletActor) < Map.distanceBetweenActors(bloonActor, bulletActor)) {
-					bloonActor = actor;
+				float distSq = Map.distanceSquaredBetweenActors(actor, bulletActor);
+				if (distSq < minDistanceSquared) {
+					minDistanceSquared = distSq;
+					closestBloonActor = actor;
 				}
 			}
 		}
 		
-		return bloonActor;
+		return closestBloonActor;
 	}
 	
 }
