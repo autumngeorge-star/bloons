@@ -870,10 +870,11 @@ public abstract class RenderableActor extends Actor {
 
 	@Override
 	public boolean remove() {
-		if (textureRegion != null && textureRegion.getTexture() != null) {
-			textureRegion.getTexture().dispose();
+		if (actor == null) {
+			return super.remove();
+		} else {
+			return actor.remove();
 		}
-		return super.remove();
 	}
 	
 	@Override

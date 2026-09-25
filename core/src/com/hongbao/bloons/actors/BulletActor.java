@@ -4,18 +4,37 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.hongbao.bloons.BloonManager;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
-public class BulletActor extends RenderableActor {
+public class BulletActor extends RenderableActor implements Poolable {
 	
+	private static final Map<String, TextureRegion> textureCache = new HashMap<>();
+
+	public static TextureRegion getTextureRegion(String imageFileName) {
+		TextureRegion region = textureCache.get(imageFileName);
+		if (region == null) {
+			Texture texture = new Texture(Gdx.files.internal(imageFileName));
+			region = new TextureRegion(texture);
+			textureCache.put(imageFileName, region);
+		}
+		return region;
+	}
+
+	public static void clearTextureCache() {
+		textureCache.clear();
+	}
+
 	private Bullet bullet;
 	private float dx; // This should be a unit vector
 	private float dy;
@@ -25,10 +44,21 @@ public class BulletActor extends RenderableActor {
 	private BloonActor target;
 	private Set<Long> damagedBloons;
 	private String spellCardOverride; // todo could be an enum
+	private boolean allocated;
 	
+	public BulletActor() {
+		this.damagedBloons = new HashSet<>();
+		this.allocated = false;
+	}
+
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
+		this();
+		init(bullet, x, y, dx, dy);
+	}
+
+	public void init(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		this.textureRegion = getTextureRegion(bullet.getImageFileName());
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
@@ -36,6 +66,8 @@ public class BulletActor extends RenderableActor {
 		calculateRotationAngle();
 		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
 		target = null; // this'll get automatically set as the bullet moves
+		frames = 0;
+		spellCardOverride = null;
 		
 		setZIndex(ZIndex.BULLET_Z_INDEX);
 		setBounds(
@@ -45,7 +77,42 @@ public class BulletActor extends RenderableActor {
 		 textureRegion.getTexture().getHeight()
 		);
 		
-		damagedBloons = new HashSet<>(bullet.getPierce());
+		if (damagedBloons == null) {
+			damagedBloons = new HashSet<>(bullet.getPierce());
+		} else {
+			damagedBloons.clear();
+		}
+		this.allocated = true;
+	}
+
+	public boolean isAllocated() {
+		return allocated;
+	}
+
+	public void setAllocated(boolean allocated) {
+		this.allocated = allocated;
+	}
+
+	@Override
+	public void reset() {
+		remove();
+		this.bullet = null;
+		this.dx = 0;
+		this.dy = 0;
+		this.rotationAngle = 0;
+		this.collisionRadius = 0;
+		this.frames = 0;
+		this.target = null;
+		if (this.damagedBloons != null) {
+			this.damagedBloons.clear();
+		}
+		this.spellCardOverride = null;
+		this.textureRegion = null;
+		this.allocated = false;
+		setPosition(0, 0);
+		setSize(0, 0);
+		clearActions();
+		clearListeners();
 	}
 	
 	public Bullet getBullet() {
@@ -73,9 +140,11 @@ public class BulletActor extends RenderableActor {
 	}
 	
 	public void decrementPierce() {
+		if (bullet == null) return;
 		bullet.decrementPierce();
-		if (bullet.getPierce() == 0) {
-			remove();
+		if (bullet.getPierce() <= 0) {
+			BloonManager bloonManager = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager();
+			bloonManager.freeBulletActor(this);
 		}
 	}
 	
@@ -108,6 +177,7 @@ public class BulletActor extends RenderableActor {
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
+		if (textureRegion == null) return;
 		batch.draw(
 		 textureRegion,
 		 getX(),
@@ -124,6 +194,7 @@ public class BulletActor extends RenderableActor {
 	
 	@Override
 	public void act(float delta) {
+		if (bullet == null) return;
 		frames++;
 		BloonManager bloonManager = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager();
 		
@@ -133,12 +204,14 @@ public class BulletActor extends RenderableActor {
 		setY(getY() + dy * bullet.getSpeed() / 5);
 		
 		if (getY() < 0 || getY() > 900 || getX() < 0 || getX() > 1500) {
-			remove();
+			bloonManager.freeBulletActor(this);
+			return;
 		}
 		
 		bullet.incrementDistanceTraveled();
 		if (bullet.getDistanceTraveled() >= bullet.getMaxRange()) {
-			remove();
+			bloonManager.freeBulletActor(this);
+			return;
 		}
 		
 		bloonManager.checkCollision(this);
@@ -161,7 +234,7 @@ public class BulletActor extends RenderableActor {
 			}
 		}
 		
-		if (bullet.isHoming()) {
+		if (bullet != null && bullet.isHoming()) {
 			if (!bloonManager.containsBloon(target)) {
 				target = bloonManager.getNewHomingTarget(this);
 			}

@@ -3,10 +3,12 @@ package com.hongbao.bloons;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Pool;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.entities.Bloon;
+import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
@@ -24,13 +26,40 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private final Pool<BulletActor> bulletPool;
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		if (Gdx.audio != null && Gdx.files != null) {
+			popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		}
 		bloonQueue = BloonFactory.createBloonQueue();
+		bulletPool = new Pool<BulletActor>() {
+			@Override
+			protected BulletActor newObject() {
+				return new BulletActor();
+			}
+		};
+	}
+
+	public Pool<BulletActor> getBulletPool() {
+		return bulletPool;
+	}
+
+	public BulletActor obtainBulletActor(Bullet bullet, float x, float y, float dx, float dy) {
+		BulletActor bulletActor = bulletPool.obtain();
+		bulletActor.init(bullet, x, y, dx, dy);
+		return bulletActor;
+	}
+
+	public void freeBulletActor(BulletActor bulletActor) {
+		if (bulletActor != null && bulletActor.isAllocated()) {
+			bulletActor.setAllocated(false);
+			bulletActor.remove();
+			bulletPool.free(bulletActor);
+		}
 	}
 
 	public void nextLevel() {
@@ -68,6 +97,10 @@ public class BloonManager {
 	}
 	
 	public void checkCollision(final BulletActor bulletActor) {
+		if (bulletActor.getBullet() == null) return;
+		int damage = bulletActor.getBullet().getDamage();
+		boolean isHoming = bulletActor.getBullet().isHoming();
+
 		Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
 		
 		for (BloonActor bloonActor : onstageBloons) {
@@ -80,7 +113,7 @@ public class BloonManager {
 					bloonsToBePopped.add(bloonActor);
 					bulletActor.decrementPierce();
 					
-					if (bulletActor.getBullet().getPierce() == 0) {
+					if (bulletActor.getBullet() == null || bulletActor.getBullet().getPierce() <= 0) {
 						// don't bother checking collisions if the bullet is used up.
 						break;
 					}
@@ -88,11 +121,11 @@ public class BloonManager {
 			}
 		}
 		
-		if (bulletActor.getBullet().isHoming()) {
+		if (isHoming && bulletActor.getBullet() != null) {
 			bulletActor.setTarget(null);
 		}
 		
-		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
+		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, damage));
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
@@ -117,7 +150,9 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
