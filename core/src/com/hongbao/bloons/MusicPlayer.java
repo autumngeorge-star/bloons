@@ -12,17 +12,39 @@ public class MusicPlayer {
 		backgroundMusic = null;
 	}
 
-	private void playMusic(String fileName) {
+	public void playMusic(String fileName) {
+		if (fileName == null || fileName.trim().isEmpty()) {
+			return;
+		}
+		String path = fileName.trim();
+		if ("stage".equalsIgnoreCase(path)) {
+			playStageMusic();
+			return;
+		}
+		if ("boss".equalsIgnoreCase(path) || "final_boss".equalsIgnoreCase(path)) {
+			playFinalBossMusic();
+			return;
+		}
+		if ("title".equalsIgnoreCase(path)) {
+			playTitleMusic();
+			return;
+		}
+		if (!path.contains("/") && !path.contains("\\")) {
+			path = "music/" + path;
+		}
+
 		boolean wasPlaying = true;
 		if (backgroundMusic != null) {
 			wasPlaying = backgroundMusic.isPlaying();
 		}
 		stopMusic();
-		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
-		backgroundMusic.setVolume(0.5f);
-		backgroundMusic.setLooping(true);
-		if (wasPlaying) {
-			backgroundMusic.play();
+		if (Gdx.audio != null && Gdx.files != null) {
+			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(path));
+			backgroundMusic.setVolume(0.5f);
+			backgroundMusic.setLooping(true);
+			if (wasPlaying) {
+				backgroundMusic.play();
+			}
 		}
 	}
 
