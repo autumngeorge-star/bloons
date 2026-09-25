@@ -1,7 +1,6 @@
 package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
@@ -11,7 +10,9 @@ import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -22,14 +23,13 @@ public class BloonManager {
 	// A dedicated collection of onstage bloons is maintained to (probably) speed up collision checking
 	// especially when there are a lot of bullets on screen.
 	private Set<BloonActor> onstageBloons;
-	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private final List<SoundEventListener> soundEventListeners = new ArrayList<>();
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
 
@@ -117,11 +117,37 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			notifyBloonPopped(bloonActor, damage);
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
-			// todo play some other sound I guess
+			notifyBloonDamaged(bloonActor, damage);
+		}
+	}
+
+	public void addSoundEventListener(SoundEventListener listener) {
+		if (listener != null && !soundEventListeners.contains(listener)) {
+			soundEventListeners.add(listener);
+		}
+	}
+
+	public void removeSoundEventListener(SoundEventListener listener) {
+		soundEventListeners.remove(listener);
+	}
+
+	public List<SoundEventListener> getSoundEventListeners() {
+		return soundEventListeners;
+	}
+
+	private void notifyBloonPopped(BloonActor bloonActor, int damage) {
+		for (SoundEventListener listener : new ArrayList<>(getSoundEventListeners())) {
+			listener.onBloonPopped(bloonActor, damage);
+		}
+	}
+
+	private void notifyBloonDamaged(BloonActor bloonActor, int damage) {
+		for (SoundEventListener listener : new ArrayList<>(getSoundEventListeners())) {
+			listener.onBloonDamaged(bloonActor, damage);
 		}
 	}
 	

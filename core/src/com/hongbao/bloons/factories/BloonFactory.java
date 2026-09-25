@@ -294,6 +294,9 @@ public class BloonFactory {
 	}
 	
 	public static BloonQueue createBloonQueueFromFile(String fileName) {
+		if (Gdx.files == null) {
+			return new BloonQueue(new ArrayList<>(), new ArrayList<>());
+		}
 		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
 		String fileContents = file.readString();
 		String[] lines = fileContents.split("\n");

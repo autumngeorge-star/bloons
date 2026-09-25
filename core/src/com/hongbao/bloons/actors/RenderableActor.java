@@ -51,10 +51,16 @@ public abstract class RenderableActor extends Actor {
 	}
 	
 	public float getCenterX() {
+		if (textureRegion == null || textureRegion.getTexture() == null) {
+			return getX() + getWidth() / 2f;
+		}
 		return getX() + textureRegion.getTexture().getWidth() / 2f;
 	}
 	
 	public float getCenterY() {
+		if (textureRegion == null || textureRegion.getTexture() == null) {
+			return getY() + getHeight() / 2f;
+		}
 		return getY() + textureRegion.getTexture().getHeight() / 2f;
 	}
 	
