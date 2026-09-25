@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 
 
-public class MusicPlayer {
+public class MusicPlayer implements LevelEventListener {
 	
 	private Music backgroundMusic;
 	
@@ -12,7 +12,19 @@ public class MusicPlayer {
 		backgroundMusic = null;
 	}
 
+	@Override
+	public void onLevelChanged(int level) {
+		if (level == 1) {
+			playStageMusic();
+		} else if (level == 40) {
+			playFinalBossMusic();
+		}
+	}
+
 	private void playMusic(String fileName) {
+		if (Gdx.audio == null || Gdx.files == null) {
+			return;
+		}
 		boolean wasPlaying = true;
 		if (backgroundMusic != null) {
 			wasPlaying = backgroundMusic.isPlaying();
