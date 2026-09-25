@@ -4,3 +4,11 @@ sourceCompatibility = 8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
+
+task runWaveEventListenerTest(type: JavaExec) {
+    dependsOn compileJava
+    main = 'com.hongbao.bloons.WaveEventListenerTest'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+test.dependsOn runWaveEventListenerTest
