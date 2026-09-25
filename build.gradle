@@ -1,16 +1,11 @@
 buildscript {
-    
-
     repositories {
         mavenLocal()
+        maven { url "https://cache-redirector.jetbrains.com/repo1.maven.org/maven2/" }
         mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
         google()
     }
     dependencies {
-        
 
     }
 }
@@ -29,11 +24,9 @@ allprojects {
 
     repositories {
         mavenLocal()
+        maven { url "https://cache-redirector.jetbrains.com/repo1.maven.org/maven2/" }
         mavenCentral()
-        jcenter()
         google()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
 }
 

@@ -46,7 +46,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Stage stage;
 	private Player player;
 	private Map map;
-	private MusicPlayer musicPlayer;
+	private SoundManager soundManager;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
 	
@@ -59,7 +59,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		autoContinue = false;
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
-		musicPlayer = new MusicPlayer();
+		soundManager = new SoundManager();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -72,7 +72,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMap();
 		createMenu();
 		createInstructions();
-		musicPlayer.playTitleMusic();
+		soundManager.playTitleMusic();
 	}
 
 	private void createInstructions() {
@@ -431,7 +431,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			}
 		});
 		
-		map = MapFactory.createHeaterMap(stage);
+		map = MapFactory.createHeaterMap(stage, soundManager);
 		
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
 		ImageButton backgroundMap = new ImageButton(drawable);
@@ -447,8 +447,13 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		return player;
 	}
 
+	public SoundManager getSoundManager() {
+		return soundManager;
+	}
+
+	@Deprecated
 	public MusicPlayer getMusicPlayer() {
-		return musicPlayer;
+		return new MusicPlayer(soundManager);
 	}
 	
 	@Override
@@ -521,7 +526,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					updateInstructions();
 				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.V)) {
-				musicPlayer.toggleMusic();
+				soundManager.toggleMusic();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
@@ -562,18 +567,21 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void pause() {
 		paused = true;
-		musicPlayer.pause();
+		soundManager.pause();
 	}
 
 	@Override
 	public void resume() {
 		paused = false;
-		musicPlayer.resume();
+		soundManager.resume();
 	}
 
 	@Override
 	public void dispose() {
 		stage.dispose();
+		if (soundManager != null) {
+			soundManager.dispose();
+		}
 	}
 
 }
