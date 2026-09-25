@@ -77,6 +77,7 @@ public class BloonManager {
 			if (distance < collisionDistance) {
 				if (!bulletActor.hasDamagedBloon(bloonActor)) {
 					bulletActor.damageBloon(bloonActor);
+					bulletActor.applyStatusEffects(bloonActor);
 					bloonsToBePopped.add(bloonActor);
 					bulletActor.decrementPierce();
 					

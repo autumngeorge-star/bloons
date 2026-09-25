@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonManager;
 import com.hongbao.bloons.BloonsTouhouDefense;
+import com.hongbao.bloons.effects.StatusEffectApplicator;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -96,6 +97,21 @@ public class BulletActor extends RenderableActor {
 	
 	public void damageBloon(BloonActor bloonActor) {
 		damagedBloons.add(bloonActor.getBloonId());
+	}
+
+	public void applyStatusEffects(BloonActor bloonActor) {
+		if (bloonActor == null || bullet == null || bullet.getApplicators() == null) {
+			return;
+		}
+		for (StatusEffectApplicator applicator : bullet.getApplicators()) {
+			if (applicator != null) {
+				try {
+					applicator.apply(bloonActor, this);
+				} catch (Exception e) {
+					// Guardrail: Gracefully handle exceptions without disrupting collision detection
+				}
+			}
+		}
 	}
 	
 	public BloonActor getTarget() {

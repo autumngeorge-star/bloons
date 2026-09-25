@@ -1,5 +1,8 @@
 package com.hongbao.bloons.entities;
 
+import com.hongbao.bloons.effects.StatusEffectApplicator;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,9 +26,14 @@ public class Girl {
 	private List<Integer> upgradeCost;
 	private int level;
 	private int totalInvestment;
+	private List<List<StatusEffectApplicator>> applicators;
 	
 	
 	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+		this(name, attackDelay, bulletSpeed, damage, pierce, range, visualRange, homing, imageFileName, bulletFileName, cost, upgradeCost, null);
+	}
+
+	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost, List<List<StatusEffectApplicator>> applicators) {
 		this.name = name;
 		this.attackDelay = attackDelay;
 		this.cooldown = attackDelay.get(0);
@@ -35,10 +43,15 @@ public class Girl {
 		this.range = range;
 		this.visualRange = visualRange;
 		this.homing = homing;
-		this.imageFileName = IMAGE_FOLDER + imageFileName;
+		if (imageFileName.startsWith(IMAGE_FOLDER)) {
+			this.imageFileName = imageFileName;
+		} else {
+			this.imageFileName = IMAGE_FOLDER + imageFileName;
+		}
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
 		this.upgradeCost = upgradeCost;
+		this.applicators = applicators != null ? applicators : new ArrayList<>();
 		level = 0;
 		totalInvestment = cost;
 	}
@@ -112,7 +125,39 @@ public class Girl {
 	}
 
 	public Bullet createBullet() {
-		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
+		Bullet bullet = new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
+		List<StatusEffectApplicator> levelApplicators = getApplicatorsForLevel(level);
+		if (levelApplicators != null) {
+			bullet.addApplicators(levelApplicators);
+		}
+		return bullet;
+	}
+
+	public List<List<StatusEffectApplicator>> getApplicators() {
+		return applicators;
+	}
+
+	public void setApplicators(List<List<StatusEffectApplicator>> applicators) {
+		this.applicators = applicators != null ? applicators : new ArrayList<>();
+	}
+
+	public List<StatusEffectApplicator> getApplicatorsForLevel(int lvl) {
+		if (applicators != null && lvl >= 0 && lvl < applicators.size()) {
+			return applicators.get(lvl);
+		}
+		return null;
+	}
+
+	public void addApplicatorForLevel(int lvl, StatusEffectApplicator applicator) {
+		if (applicators == null) {
+			applicators = new ArrayList<>();
+		}
+		while (applicators.size() <= lvl) {
+			applicators.add(new ArrayList<>());
+		}
+		if (applicator != null) {
+			applicators.get(lvl).add(applicator);
+		}
 	}
 	
 	public SpellCard createSpellCard() {
@@ -153,7 +198,8 @@ public class Girl {
 			 imageFileName,
 			 bulletFileName,
 			 cost,
-			 upgradeCost
+			 upgradeCost,
+			 applicators
 			);
 			upgradedGirl.level = level + 1;
 			return upgradedGirl;
