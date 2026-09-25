@@ -18,6 +18,7 @@ public class Bullet {
 
 	private float initialDXOverride;
 	private float initialDYOverride;
+	private int exemptionWindow = 0;
 	
 	public Bullet() {
 		speed = 20f;
@@ -125,5 +126,19 @@ public class Bullet {
 	
 	public void setInitialDYOverride(float initialDYOverride) {
 		this.initialDYOverride = initialDYOverride;
+	}
+
+	public int getExemptionWindow() {
+		return exemptionWindow;
+	}
+
+	public void setExemptionWindow(int exemptionWindow) {
+		if (exemptionWindow < 0) {
+			this.exemptionWindow = 0;
+		} else if (exemptionWindow > 2) {
+			this.exemptionWindow = 2;
+		} else {
+			this.exemptionWindow = exemptionWindow;
+		}
 	}
 }

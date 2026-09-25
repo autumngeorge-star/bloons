@@ -10,7 +10,8 @@ import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -23,30 +24,37 @@ public class BulletActor extends RenderableActor {
 	private float collisionRadius;
 	private int frames;
 	private BloonActor target;
-	private Set<Long> damagedBloons;
+	private Map<Long, Integer> damagedBloons;
 	private String spellCardOverride; // todo could be an enum
+	private int exemptionWindow;
 	
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		this.exemptionWindow = bullet.getExemptionWindow();
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
 		this.dy = dy;
 		calculateRotationAngle();
-		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
 		target = null; // this'll get automatically set as the bullet moves
 		
 		setZIndex(ZIndex.BULLET_Z_INDEX);
-		setBounds(
-		 x - textureRegion.getTexture().getWidth() / 2f,
-		 y - textureRegion.getTexture().getHeight() / 2f,
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight()
-		);
+
+		if (Gdx.files != null) {
+			textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+			collisionRadius = textureRegion.getTexture().getWidth() / 2f;
+			setBounds(
+			 x - textureRegion.getTexture().getWidth() / 2f,
+			 y - textureRegion.getTexture().getHeight() / 2f,
+			 textureRegion.getTexture().getWidth(),
+			 textureRegion.getTexture().getHeight()
+			);
+		}
 		
-		damagedBloons = new HashSet<>(bullet.getPierce());
+		damagedBloons = new HashMap<>(bullet.getPierce());
 	}
+
+
 	
 	public Bullet getBullet() {
 		return bullet;
@@ -80,14 +88,18 @@ public class BulletActor extends RenderableActor {
 	}
 	
 	public boolean hasDamagedBloon(BloonActor bloonActor) {
-		if (damagedBloons.contains(bloonActor.getBloonId())) {
+		if (damagedBloons.containsKey(bloonActor.getBloonId())) {
 			return true;
 		}
 		
 		Set<Long> parentIds = bloonActor.getParentBloonIds();
 		for (Long parentId : parentIds) {
-			if (damagedBloons.contains(parentId)) {
-				return true;
+			Integer hitFrame = damagedBloons.get(parentId);
+			if (hitFrame != null) {
+				int frameDelta = this.frames - hitFrame;
+				if (frameDelta <= exemptionWindow) {
+					return true;
+				}
 			}
 		}
 		
@@ -95,7 +107,37 @@ public class BulletActor extends RenderableActor {
 	}
 	
 	public void damageBloon(BloonActor bloonActor) {
-		damagedBloons.add(bloonActor.getBloonId());
+		damagedBloons.put(bloonActor.getBloonId(), frames);
+	}
+
+	public int getExemptionWindow() {
+		return exemptionWindow;
+	}
+
+	public void setExemptionWindow(int exemptionWindow) {
+		if (exemptionWindow < 0) {
+			this.exemptionWindow = 0;
+		} else if (exemptionWindow > 2) {
+			this.exemptionWindow = 2;
+		} else {
+			this.exemptionWindow = exemptionWindow;
+		}
+	}
+
+	public int getFrames() {
+		return frames;
+	}
+
+	public void setFrames(int frames) {
+		this.frames = frames;
+	}
+
+	@Override
+	public boolean remove() {
+		if (damagedBloons != null) {
+			damagedBloons.clear();
+		}
+		return super.remove();
 	}
 	
 	public BloonActor getTarget() {
