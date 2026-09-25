@@ -2,7 +2,6 @@ package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -23,6 +22,7 @@ import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.services.AssetProviderService;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,18 +46,20 @@ public class Map {
 	private RenderableLabel upgradeActor;
 	private RenderableLabel sellActor;
 	private boolean hoveringOverUpgrade;
+	private AssetProviderService assetProviderService;
 
-	public Map(String backgroundImage, Stage stage) {
+	public Map(String backgroundImage, Stage stage, AssetProviderService assetProviderService) {
 		this.backgroundImage = backgroundImage;
-		this.bloonManager = new BloonManager(stage, this);
+		this.assetProviderService = assetProviderService;
+		this.bloonManager = new BloonManager(stage, this, assetProviderService);
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;
 		hoveringOverUpgrade = false;
 
-		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
+		Skin skin = assetProviderService.getUiSkin();
 
-		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
+		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(assetProviderService.getUiTexture("girl_details_template.png"))));
 		infoBackground.setPosition(1504, 4);
 		this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
 

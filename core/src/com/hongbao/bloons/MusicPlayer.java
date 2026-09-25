@@ -1,15 +1,17 @@
 package com.hongbao.bloons;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.hongbao.bloons.services.AssetProviderService;
 
 
 public class MusicPlayer {
 	
 	private Music backgroundMusic;
+	private AssetProviderService assetProviderService;
 	
-	public MusicPlayer() {
-		backgroundMusic = null;
+	public MusicPlayer(AssetProviderService assetProviderService) {
+		this.backgroundMusic = null;
+		this.assetProviderService = assetProviderService;
 	}
 
 	private void playMusic(String fileName) {
@@ -18,7 +20,7 @@ public class MusicPlayer {
 			wasPlaying = backgroundMusic.isPlaying();
 		}
 		stopMusic();
-		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
+		backgroundMusic = assetProviderService.getMusic(fileName);
 		backgroundMusic.setVolume(0.5f);
 		backgroundMusic.setLooping(true);
 		if (wasPlaying) {

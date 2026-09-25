@@ -1,7 +1,6 @@
 package com.hongbao.bloons.actors;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonManager;
@@ -9,6 +8,7 @@ import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.SpellCard;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.services.AssetProviderService;
 
 import java.util.List;
 
@@ -17,10 +17,12 @@ public class SpellCardActor extends RenderableActor {
 	
 	private SpellCard spellCard;
 	private float rotationAngle;
+	private AssetProviderService assetProviderService;
 	
-	public SpellCardActor(SpellCard spellCard, float x, float y) {
+	public SpellCardActor(SpellCard spellCard, float x, float y, AssetProviderService assetProviderService) {
 		this.spellCard = spellCard;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(spellCard.getImageFileName())));
+		this.assetProviderService = assetProviderService;
+		textureRegion = new TextureRegion(assetProviderService.getSpellCardTexture(spellCard));
 		rotationAngle = 0;
 		
 		setZIndex(ZIndex.SPELL_CARD_Z_INDEX);
@@ -68,7 +70,8 @@ public class SpellCardActor extends RenderableActor {
 					 getCenterX(),
 					 getCenterY(),
 					 bullet.getInitialDXOverride(),
-					 bullet.getInitialDYOverride()
+					 bullet.getInitialDYOverride(),
+					 assetProviderService
 					); // todo the spell needs a direction maybe
 					bulletActor.setSpellCardOverride(spellCard.getOverrideName());
 					bloonManager.addBulletToStage(bulletActor);

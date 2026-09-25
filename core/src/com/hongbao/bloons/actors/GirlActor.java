@@ -1,13 +1,13 @@
 package com.hongbao.bloons.actors;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.services.AssetProviderService;
 
 
 public class GirlActor extends RenderableActor {
@@ -18,10 +18,12 @@ public class GirlActor extends RenderableActor {
 	private float rotationAngle;
 	private float collisionRadius;
 	private boolean active;
+	private AssetProviderService assetProviderService;
 	
-	public GirlActor(Girl girl, float x, float y) {
+	public GirlActor(Girl girl, float x, float y, AssetProviderService assetProviderService) {
 		this.girl = girl;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(girl.getImageFileName())));
+		this.assetProviderService = assetProviderService;
+		textureRegion = new TextureRegion(assetProviderService.getGirlTexture(girl));
 		rotationAngle = 0;
 		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
 		active = false;
@@ -75,7 +77,7 @@ public class GirlActor extends RenderableActor {
 		lookAtBloon(target);
 		
 		Bullet bullet = girl.createBullet();
-		return new BulletActor(bullet, getCenterX(), getCenterY(), dx, dy);
+		return new BulletActor(bullet, getCenterX(), getCenterY(), dx, dy, assetProviderService);
 	}
 	
 	public void lookAtBloon(BloonActor target) {
@@ -88,7 +90,7 @@ public class GirlActor extends RenderableActor {
 	public SpellCardActor createSpellCardActor() {
 		if (true) { // todo Girl should have a method that checks the cooldown or something
 			// maybe some direction based on the girl's direction
-			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
+			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY(), assetProviderService);
 		}
 		return null;
 	}

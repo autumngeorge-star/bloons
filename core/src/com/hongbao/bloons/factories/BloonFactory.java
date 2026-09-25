@@ -5,6 +5,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.hongbao.bloons.BloonQueue;
 import com.hongbao.bloons.entities.Bloon;
 
+import com.hongbao.bloons.services.AssetProviderService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -285,16 +287,16 @@ public class BloonFactory {
 		}
 	}
 	
-	public static BloonQueue createBloonQueue() {
+	public static BloonQueue createBloonQueue(AssetProviderService assetProviderService) {
 		if (HELLA_BLOONS) {
-			return createBloonQueueFromFile("hella_bloons.txt");
+			return createBloonQueueFromFile("hella_bloons.txt", assetProviderService);
 		} else {
-			return createBloonQueueFromFile("default.txt");
+			return createBloonQueueFromFile("default.txt", assetProviderService);
 		}
 	}
 	
-	public static BloonQueue createBloonQueueFromFile(String fileName) {
-		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
+	public static BloonQueue createBloonQueueFromFile(String fileName, AssetProviderService assetProviderService) {
+		FileHandle file = assetProviderService.getBloonQueueFile(fileName);
 		String fileContents = file.readString();
 		String[] lines = fileContents.split("\n");
 		long timer = 0;
