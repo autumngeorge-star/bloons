@@ -47,6 +47,10 @@ public class Map {
 	private RenderableLabel sellActor;
 	private boolean hoveringOverUpgrade;
 
+	public Map(BloonManager bloonManager) {
+		this.bloonManager = bloonManager;
+	}
+
 	public Map(String backgroundImage, Stage stage) {
 		this.backgroundImage = backgroundImage;
 		this.bloonManager = new BloonManager(stage, this);

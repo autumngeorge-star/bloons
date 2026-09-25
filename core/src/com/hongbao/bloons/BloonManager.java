@@ -88,8 +88,10 @@ public class BloonManager {
 			}
 		}
 		
-		if (bulletActor.getBullet().isHoming()) {
-			bulletActor.setTarget(null);
+		if (bulletActor.getBullet().isHoming() && bulletActor.getTarget() != null) {
+			if (bulletActor.hasDamagedBloon(bulletActor.getTarget()) || !containsBloon(bulletActor.getTarget())) {
+				bulletActor.setTarget(null);
+			}
 		}
 		
 		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
@@ -185,29 +187,83 @@ public class BloonManager {
 		return onstageBloons.contains(target);
 	}
 
+	public void addBloonToStage(BloonActor bloonActor) {
+		stage.addActor(bloonActor);
+		onstageBloons.add(bloonActor);
+	}
+
 	public void removeBloonFromStage(BloonActor actor) {
 		onstageBloons.remove(actor);
 	}
 	
-	public BloonActor getNewHomingTarget(BulletActor bulletActor) {
-		// Gets the closest bloon to the current bullet
+	public boolean hasForwardHomingTarget(BulletActor bulletActor) {
 		if (onstageBloons.isEmpty()) {
-			return null;
+			return false;
 		}
 		
-		BloonActor bloonActor = null;
+		float vx = bulletActor.getDx();
+		float vy = bulletActor.getDy();
+		if (vx == 0 && vy == 0) {
+			return true;
+		}
 		
 		for (BloonActor actor : onstageBloons) {
 			if (!bulletActor.hasDamagedBloon(actor)) {
-				if (bloonActor == null) {
-					bloonActor = actor;
-				} else if (Map.distanceBetweenActors(actor, bulletActor) < Map.distanceBetweenActors(bloonActor, bulletActor)) {
-					bloonActor = actor;
+				float targetDx = actor.getCenterX() - bulletActor.getCenterX();
+				float targetDy = actor.getCenterY() - bulletActor.getCenterY();
+				float dot = vx * targetDx + vy * targetDy;
+				if (dot > 0) {
+					return true;
 				}
 			}
 		}
 		
-		return bloonActor;
+		return false;
+	}
+
+	public BloonActor getNewHomingTarget(BulletActor bulletActor) {
+		if (onstageBloons.isEmpty()) {
+			return null;
+		}
+		
+		float vx = bulletActor.getDx();
+		float vy = bulletActor.getDy();
+		boolean hasVelocity = (vx != 0 || vy != 0);
+		
+		BloonActor bestForwardActor = null;
+		float bestForwardScore = -Float.MAX_VALUE;
+		
+		BloonActor bestBackwardActor = null;
+		float bestBackwardScore = -Float.MAX_VALUE;
+		
+		for (BloonActor actor : onstageBloons) {
+			if (!bulletActor.hasDamagedBloon(actor)) {
+				float targetDx = actor.getCenterX() - bulletActor.getCenterX();
+				float targetDy = actor.getCenterY() - bulletActor.getCenterY();
+				float dist = (float) Math.sqrt(targetDx * targetDx + targetDy * targetDy);
+				
+				float dot = vx * targetDx + vy * targetDy;
+				boolean isForward = !hasVelocity || (dot > 0);
+				
+				float cosTheta = (hasVelocity && dist > 0) ? (dot / dist) : 1.0f;
+				float progress = actor.getBloon().getDistanceTravelled();
+				float score = progress - dist * 0.5f + cosTheta * 100.0f;
+				
+				if (isForward) {
+					if (bestForwardActor == null || score > bestForwardScore) {
+						bestForwardActor = actor;
+						bestForwardScore = score;
+					}
+				} else {
+					if (bestBackwardActor == null || score > bestBackwardScore) {
+						bestBackwardActor = actor;
+						bestBackwardScore = score;
+					}
+				}
+			}
+		}
+		
+		return (bestForwardActor != null) ? bestForwardActor : bestBackwardActor;
 	}
 	
 }
