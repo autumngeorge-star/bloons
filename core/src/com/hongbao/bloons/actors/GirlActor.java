@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.entities.SpellCard;
 import com.hongbao.bloons.helpers.ZIndex;
 
 
@@ -19,6 +20,11 @@ public class GirlActor extends RenderableActor {
 	private float collisionRadius;
 	private boolean active;
 	
+	protected GirlActor(Girl girl) {
+		this.girl = girl;
+		this.active = false;
+	}
+
 	public GirlActor(Girl girl, float x, float y) {
 		this.girl = girl;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(girl.getImageFileName())));
@@ -86,9 +92,11 @@ public class GirlActor extends RenderableActor {
 	}
 	
 	public SpellCardActor createSpellCardActor() {
-		if (true) { // todo Girl should have a method that checks the cooldown or something
-			// maybe some direction based on the girl's direction
-			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
+		if (isActive() && girl != null && girl.hasSpellCard()) {
+			SpellCard spellCard = girl.createSpellCard();
+			if (spellCard != null) {
+				return new SpellCardActor(spellCard, getCenterX(), getCenterY());
+			}
 		}
 		return null;
 	}

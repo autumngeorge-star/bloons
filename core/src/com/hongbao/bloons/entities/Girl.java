@@ -115,7 +115,14 @@ public class Girl {
 		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
 	}
 	
+	public boolean hasSpellCard() {
+		return name != null && (name.equals("Reimu") || name.equals("Yuyuko"));
+	}
+	
 	public SpellCard createSpellCard() {
+		if (!hasSpellCard()) {
+			return null;
+		}
 		if (name.equals("Reimu")) {
 			return SpellCard.createReimuSpellCard();
 		}
