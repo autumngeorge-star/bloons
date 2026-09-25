@@ -3,6 +3,8 @@ package com.hongbao.bloons;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -24,6 +26,7 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.comparators.SortByZIndex;
+import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
@@ -48,6 +51,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Map map;
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
+	private AssetManager assetManager;
 	public List<RenderableImageButton> instructions;
 	
 	
@@ -57,6 +61,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		paused = false;
 		tripleSpeed = false;
 		autoContinue = false;
+		assetManager = new AssetManager();
+		loadBulletAssets();
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
 		musicPlayer = new MusicPlayer();
@@ -73,6 +79,38 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMenu();
 		createInstructions();
 		musicPlayer.playTitleMusic();
+	}
+
+	private void loadBulletAssets() {
+		FileHandle projectilesDir = Gdx.files.internal(Bullet.IMAGE_FOLDER);
+		if (projectilesDir.exists() && projectilesDir.isDirectory()) {
+			for (FileHandle file : projectilesDir.list()) {
+				if (!file.isDirectory() && file.name().endsWith(".png")) {
+					assetManager.load(file.path(), Texture.class);
+				}
+			}
+		} else {
+			String[] bulletTextures = new String[] {
+				Bullet.IMAGE_FOLDER + "bat.png",
+				Bullet.IMAGE_FOLDER + "black_spell_card.png",
+				Bullet.IMAGE_FOLDER + "blue_knives.png",
+				Bullet.IMAGE_FOLDER + "blue_magic_missile.png",
+				Bullet.IMAGE_FOLDER + "magic_spike.png",
+				Bullet.IMAGE_FOLDER + "pink_butterfly.png",
+				Bullet.IMAGE_FOLDER + "projectiles.png",
+				Bullet.IMAGE_FOLDER + "purple_energy.png",
+				Bullet.IMAGE_FOLDER + "red_spell_card.png",
+				Bullet.IMAGE_FOLDER + "sword_slash.png"
+			};
+			for (String path : bulletTextures) {
+				assetManager.load(path, Texture.class);
+			}
+		}
+		assetManager.finishLoading();
+	}
+
+	public AssetManager getAssetManager() {
+		return assetManager;
 	}
 
 	private void createInstructions() {
@@ -574,6 +612,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void dispose() {
 		stage.dispose();
+		if (assetManager != null) {
+			assetManager.dispose();
+		}
 	}
 
 }
