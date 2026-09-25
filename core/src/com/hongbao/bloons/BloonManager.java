@@ -22,38 +22,55 @@ public class BloonManager {
 	// A dedicated collection of onstage bloons is maintained to (probably) speed up collision checking
 	// especially when there are a lot of bullets on screen.
 	private Set<BloonActor> onstageBloons;
-	private Sound popSound; // todo another sound for damaging bloons
+	private SoundManager soundManager;
 	private BloonQueue bloonQueue;
 	
 	public BloonManager(Stage stage, Map map) {
+		this(stage, map, new SoundManager());
+	}
+
+	public BloonManager(Stage stage, Map map, SoundManager soundManager) {
 		this.stage = stage;
 		this.map = map;
+		this.soundManager = soundManager;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
-		bloonQueue = BloonFactory.createBloonQueue();
+		if (Gdx.files != null) {
+			bloonQueue = BloonFactory.createBloonQueue();
+		}
+	}
+
+	public SoundManager getSoundManager() {
+		return soundManager;
+	}
+
+	public void setSoundManager(SoundManager soundManager) {
+		this.soundManager = soundManager;
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			if (soundManager != null) {
+				soundManager.playLevelMusic(getLevel());
 			}
 		}
 	}
 
 	public boolean canGoToNextLevel() {
+		if (bloonQueue == null) {
+			return false;
+		}
 		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 
 	public int getLevel() {
-		return bloonQueue.getLevel();
+		return bloonQueue != null ? bloonQueue.getLevel() : 0;
 	}
 
 	public boolean hasWonGame() {
+		if (bloonQueue == null) {
+			return false;
+		}
 		return !bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 	
@@ -117,7 +134,9 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (soundManager != null) {
+				soundManager.playPopSound();
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
