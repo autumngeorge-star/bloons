@@ -111,6 +111,7 @@ gradle-app.setting
 ## OS Specific
 .DS_Store
 Thumbs.db
+core/libs/
 
 ## iOS
 /ios/xcode/*.xcodeproj/*
