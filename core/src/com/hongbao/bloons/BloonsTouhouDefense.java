@@ -59,6 +59,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		autoContinue = false;
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
+		player.loadHighScore();
 		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
@@ -178,6 +179,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				}
 			} else {
 				if (map.getBloonManager().hasWonGame()) {
+					player.saveHighScore();
 					titleActor.setText("YOU WIN!");
 					titleActor.setColor(Color.GOLD);
 				} else {
@@ -206,11 +208,28 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			((Label)healthLabelAction.getActor()).setText(String.valueOf(player.getHealth()));
 			
 			if (player.getHealth() == 0) {
+				player.saveHighScore();
 				pause();
 			}
 		});
 		healthLabel.addAction(Actions.repeat(RepeatAction.FOREVER, healthLabelAction));
 		stage.addActor(new RenderableLabel(healthLabel, ZIndex.MENU_ITEM_Z_INDEX));
+		
+		Label scoreLabel = new Label("Score: " + player.getScore(), skin);
+		scoreLabel.setPosition(1520, 735);
+		scoreLabel.setFontScale(1.2f, 1.2f);
+		final RunnableAction scoreLabelAction = new RunnableAction();
+		scoreLabelAction.setRunnable(() -> ((Label)scoreLabelAction.getActor()).setText("Score: " + player.getScore()));
+		scoreLabel.addAction(Actions.repeat(RepeatAction.FOREVER, scoreLabelAction));
+		stage.addActor(new RenderableLabel(scoreLabel, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label highScoreLabel = new Label("High Score: " + player.getHighScore(), skin);
+		highScoreLabel.setPosition(1520, 710);
+		highScoreLabel.setFontScale(1.2f, 1.2f);
+		final RunnableAction highScoreLabelAction = new RunnableAction();
+		highScoreLabelAction.setRunnable(() -> ((Label)highScoreLabelAction.getActor()).setText("High Score: " + player.getHighScore()));
+		highScoreLabel.addAction(Actions.repeat(RepeatAction.FOREVER, highScoreLabelAction));
+		stage.addActor(new RenderableLabel(highScoreLabel, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseReimu = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/reimu_box.png")))));
 		purchaseReimu.setPosition(1504, 676);
@@ -562,6 +581,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void pause() {
 		paused = true;
+		if (player != null) {
+			player.saveHighScore();
+		}
 		musicPlayer.pause();
 	}
 
@@ -573,6 +595,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		if (player != null) {
+			player.saveHighScore();
+		}
 		stage.dispose();
 	}
 

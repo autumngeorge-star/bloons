@@ -36,11 +36,17 @@ public class BloonManager {
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+			if (app != null && app.getPlayer() != null) {
+				app.getPlayer().saveHighScore();
+			}
+			if (app != null && app.getMusicPlayer() != null) {
+				MusicPlayer musicPlayer = app.getMusicPlayer();
+				if (map.getBloonManager().getLevel() == 1) {
+					musicPlayer.playStageMusic();
+				} else if (map.getBloonManager().getLevel() == 40) {
+					musicPlayer.playFinalBossMusic();
+				}
 			}
 		}
 	}
@@ -101,7 +107,10 @@ public class BloonManager {
 		if (bloonActor.getBloon().willPopBloon(damage)) {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
-			player.earnMoney(result.getCashGenerated());
+			if (player != null) {
+				player.earnMoney(result.getCashGenerated());
+				player.addScore(result.getCashGenerated());
+			}
 			
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
@@ -120,7 +129,10 @@ public class BloonManager {
 			popSound.play(0.5f);
 		} else {
 			bloonActor.damage(damage);
-			player.earnMoney(damage);
+			if (player != null) {
+				player.earnMoney(damage);
+				player.addScore(damage);
+			}
 			// todo play some other sound I guess
 		}
 	}
