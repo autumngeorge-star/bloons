@@ -10,6 +10,7 @@ import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.loader.WaveMetadata;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,13 +37,36 @@ public class BloonManager {
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			WaveMetadata metadata = bloonQueue.getCurrentWaveMetadata();
+			if (metadata != null) {
+				MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
+				String musicTrack = metadata.getMusicTrack();
+				if (musicTrack != null) {
+					String lowerTrack = musicTrack.trim().toLowerCase();
+					if ("stage".equals(lowerTrack) || lowerTrack.contains("demystify_feast")) {
+						musicPlayer.playStageMusic();
+					} else if ("boss".equals(lowerTrack) || "final_boss".equals(lowerTrack) || lowerTrack.contains("night_falls")) {
+						musicPlayer.playFinalBossMusic();
+					} else if ("title".equals(lowerTrack) || lowerTrack.contains("title")) {
+						musicPlayer.playTitleMusic();
+					}
+				}
+				if (metadata.getRewardMoney() > 0) {
+					Player player = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getPlayer();
+					if (player != null) {
+						player.earnMoney(metadata.getRewardMoney());
+					}
+				}
 			}
 		}
+	}
+
+	public WaveMetadata getCurrentWaveMetadata() {
+		return bloonQueue.getCurrentWaveMetadata();
+	}
+
+	public BloonQueue getBloonQueue() {
+		return bloonQueue;
 	}
 
 	public boolean canGoToNextLevel() {
