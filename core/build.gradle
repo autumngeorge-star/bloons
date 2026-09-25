@@ -3,4 +3,24 @@ apply plugin: "java"
 sourceCompatibility = 8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets {
+    main {
+        java {
+            srcDirs = [ "src/" ]
+            exclude "test/**"
+        }
+    }
+    test {
+        java {
+            srcDirs = [ "src/test/java" ]
+        }
+    }
+}
+
+task testStatusTransfer(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
+    mainClass = 'com.hongbao.bloons.BloonActorStatusTransferTest'
+    jvmArgs = ['-ea']
+}
+
+test.dependsOn testStatusTransfer
