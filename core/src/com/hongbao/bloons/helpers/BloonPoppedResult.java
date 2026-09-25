@@ -59,6 +59,7 @@ public class BloonPoppedResult {
 			for (int x = 0; x < bloonsToBeCreated; x++) {
 				Bloon bloonOfType = BloonFactory.createBloonOfType(poppedColor.getValue(), newBloonHealth);
 				bloonOfType.setDistanceTravelled(bloon.getDistanceTravelled());
+				bloonOfType.inheritStatusFrom(bloon);
 				bloonsGenerated.add(bloonOfType);
 			}
 		}

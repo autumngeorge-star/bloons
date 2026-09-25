@@ -2,7 +2,11 @@ package com.hongbao.bloons.entities;
 
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.hongbao.bloons.entities.Bloon.Color.BFB;
@@ -89,7 +93,8 @@ public class Bloon {
 	private Color color;
 	private String imageFileName;
 	private int health;
-	private int speed;
+	private float speedMultiplier = 1.0f;
+	private Map<String, StatusEffect> statusEffects = new LinkedHashMap<>();
 	private int distanceTravelled;
 	private boolean camo;
 	private boolean regen;
@@ -97,7 +102,6 @@ public class Bloon {
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
 		this.health = health;
-		speed = COLOR_TO_SPEED.get(color);
 		this.camo = camo;
 		this.regen = regen;
 		this.imageFileName = createImageFileName(color.getValue(), camo, regen);
@@ -127,12 +131,32 @@ public class Bloon {
 		this.health = health;
 	}
 	
+	public int getBaseSpeed() {
+		Integer base = COLOR_TO_SPEED.get(color);
+		return base != null ? base : 0;
+	}
+
+	public float getSpeedMultiplier() {
+		float totalMultiplier = this.speedMultiplier;
+		for (StatusEffect effect : statusEffects.values()) {
+			totalMultiplier *= effect.getSpeedMultiplier();
+		}
+		return totalMultiplier;
+	}
+
+	public void setSpeedMultiplier(float speedMultiplier) {
+		this.speedMultiplier = speedMultiplier;
+	}
+
 	public int getSpeed() {
-		return speed;
+		return Math.round(getBaseSpeed() * getSpeedMultiplier());
 	}
 	
 	public void setSpeed(int speed) {
-		this.speed = speed;
+		int baseSpeed = getBaseSpeed();
+		if (baseSpeed > 0) {
+			this.speedMultiplier = (float) speed / baseSpeed;
+		}
 	}
 	
 	public int getDistanceTravelled() {
@@ -144,7 +168,59 @@ public class Bloon {
 	}
 	
 	public void incrementDistanceTravelled() {
-		distanceTravelled += speed;
+		distanceTravelled += getSpeed();
+	}
+
+	public void addStatusEffect(StatusEffect effect) {
+		if (effect != null && effect.getName() != null) {
+			statusEffects.put(effect.getName(), effect.copy());
+		}
+	}
+
+	public boolean removeStatusEffect(String name) {
+		return statusEffects.remove(name) != null;
+	}
+
+	public StatusEffect getStatusEffect(String name) {
+		StatusEffect effect = statusEffects.get(name);
+		return effect != null ? effect.copy() : null;
+	}
+
+	public boolean hasStatusEffect(String name) {
+		return statusEffects.containsKey(name);
+	}
+
+	public List<StatusEffect> getStatusEffects() {
+		List<StatusEffect> copyList = new ArrayList<>();
+		for (StatusEffect effect : statusEffects.values()) {
+			copyList.add(effect.copy());
+		}
+		return copyList;
+	}
+
+	public void clearStatusEffects() {
+		statusEffects.clear();
+	}
+
+	public void updateStatusEffects(float delta) {
+		Iterator<Map.Entry<String, StatusEffect>> iterator = statusEffects.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Map.Entry<String, StatusEffect> entry = iterator.next();
+			StatusEffect effect = entry.getValue();
+			effect.update(delta);
+			if (effect.isExpired()) {
+				iterator.remove();
+			}
+		}
+	}
+
+	public void inheritStatusFrom(Bloon parent) {
+		if (parent == null) return;
+		this.speedMultiplier = parent.speedMultiplier;
+		this.statusEffects.clear();
+		for (StatusEffect effect : parent.statusEffects.values()) {
+			this.statusEffects.put(effect.getName(), effect.copy());
+		}
 	}
 	
 	public boolean isCamo() {
