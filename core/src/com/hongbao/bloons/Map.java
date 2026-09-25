@@ -36,7 +36,7 @@ public class Map {
 
 	private String backgroundImage;
 	private BloonManager bloonManager;
-	private Pair<Float, Float>[][] directions;
+	private MapGrid mapGrid;
 	private Set<GirlActor> onStageGirls;
 	private GirlActor selectedGirl;
 	private Stage stage;
@@ -180,8 +180,16 @@ public class Map {
 		sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
 	}
 
+	public MapGrid getMapGrid() {
+		return mapGrid;
+	}
+
+	public void setMapGrid(MapGrid mapGrid) {
+		this.mapGrid = mapGrid;
+	}
+
 	public void setDirections(Pair<Float, Float>[][] directions) {
-		this.directions = directions;
+		this.mapGrid = new MapGrid(directions);
 	}
 
 	public void setBackgroundImage(String backgroundImage) {
@@ -210,15 +218,7 @@ public class Map {
 	}
 
 	public Pair<Float, Float> getDirection(float balloonX, float balloonY) {
-		// Each "direction tile" is 50x50 px, maybe some minor tweaking later
-		// There is an extra tile on the left and right of the screen so we have a smol x offset for that
-		int xTile = (int)(balloonX + TILE_LENGTH) / TILE_LENGTH;
-		int yTile = (int)balloonY / TILE_HEIGHT;
-		if (xTile < directions.length && yTile < directions[xTile].length) {
-			return directions[xTile][yTile];
-		} else {
-			return new Pair<>(0f, 0f);
-		}
+		return mapGrid != null ? mapGrid.getDirection(balloonX, balloonY) : new Pair<>(0f, 0f);
 	}
 
 	public BloonManager getBloonManager() {
@@ -239,11 +239,13 @@ public class Map {
 			return false;
 		}
 		
-		for (int i = 0; i < directions.length; i++) {
-			for (int j = 0; j < directions[i].length; j++) {
-				if (directions[i][j] != null && (directions[i][j].getFirst() != 0 || directions[i][j].getSecond() != 0)) {
-					if (Math.abs(x - getCenterXOfTile(i)) < r + (TILE_LENGTH / 2f) && Math.abs(y - getCenterYOfTile(j)) < r + (TILE_HEIGHT / 2f)) {
-						return false;
+		if (mapGrid != null) {
+			for (int i = 0; i < MapGrid.COLUMNS; i++) {
+				for (int j = 0; j < MapGrid.ROWS; j++) {
+					if (mapGrid.isPathTile(i, j)) {
+						if (Math.abs(x - getCenterXOfTile(i)) < r + (TILE_LENGTH / 2f) && Math.abs(y - getCenterYOfTile(j)) < r + (TILE_HEIGHT / 2f)) {
+							return false;
+						}
 					}
 				}
 			}
@@ -279,11 +281,11 @@ public class Map {
 	}
 	
 	private static float getCenterXOfTile(int tile) {
-		return tile * TILE_LENGTH + (TILE_LENGTH / 2f);
+		return MapGrid.getCenterXOfTile(tile);
 	}
 	
 	private static float getCenterYOfTile(int tile) {
-		return tile * TILE_HEIGHT + (TILE_HEIGHT / 2f);
+		return MapGrid.getCenterYOfTile(tile);
 	}
 	
 	public static float distanceBetweenActors(RenderableActor actor1, RenderableActor actor2) {
