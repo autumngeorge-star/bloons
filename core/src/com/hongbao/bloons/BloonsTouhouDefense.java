@@ -54,6 +54,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void create() {
 		Gdx.graphics.setWindowedMode(1800, 900);
+		EntityTextureRegistry.preloadAll();
 		paused = false;
 		tripleSpeed = false;
 		autoContinue = false;
@@ -574,6 +575,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void dispose() {
 		stage.dispose();
+		EntityTextureRegistry.dispose();
 	}
 
 }
