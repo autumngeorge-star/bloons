@@ -68,7 +68,7 @@ public class GirlActor extends RenderableActor {
 		float dy = target.getCenterY() - getCenterY();
 		
 		// make it a unit vector
-		float distance = (float) Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+		float distance = (float) Math.sqrt(dx * dx + dy * dy);
 		dx /= distance;
 		dy /= distance;
 		

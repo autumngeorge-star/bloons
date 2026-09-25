@@ -52,13 +52,19 @@ public class BloonActor extends RenderableActor {
 	}
 	
 	@Override
-	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+	protected float getCenterOffsetX() {
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return textureRegion.getTexture().getWidth() * SCALE / 2f;
+		}
+		return getWidth() / 2f;
 	}
-	
+
 	@Override
-	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+	protected float getCenterOffsetY() {
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return textureRegion.getTexture().getHeight() * SCALE / 2f;
+		}
+		return getHeight() / 2f;
 	}
 	
 	public float getCollisionRadius() {
