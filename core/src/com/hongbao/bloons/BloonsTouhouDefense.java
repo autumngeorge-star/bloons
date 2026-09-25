@@ -28,6 +28,11 @@ import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.persistence.FailoverPersistenceService;
+import com.hongbao.bloons.persistence.JsonFileStorageAdapter;
+import com.hongbao.bloons.persistence.PlayerData;
+import com.hongbao.bloons.persistence.PersistenceService;
+import com.hongbao.bloons.persistence.PreferencesStorageAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +54,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private PersistenceService persistenceService;
 	
 	
 	@Override
@@ -58,7 +64,16 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		tripleSpeed = false;
 		autoContinue = false;
 		stage = new Stage();
-		player = new Player(MONEY, HEALTH);
+		
+		if (persistenceService == null) {
+			persistenceService = new FailoverPersistenceService(
+				new JsonFileStorageAdapter(),
+				new PreferencesStorageAdapter()
+			);
+		}
+		
+		PlayerData savedData = persistenceService.loadData();
+		player = new Player(savedData.getMoney(), savedData.getHealth());
 		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
@@ -70,6 +85,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		Gdx.input.setInputProcessor(stage);
 		
 		createMap();
+		if (savedData.getLevel() > 0) {
+			map.getBloonManager().setLevel(savedData.getLevel());
+		}
 		createMenu();
 		createInstructions();
 		musicPlayer.playTitleMusic();
@@ -562,18 +580,48 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void pause() {
 		paused = true;
-		musicPlayer.pause();
+		if (musicPlayer != null) {
+			musicPlayer.pause();
+		}
+		saveGameStateSync();
 	}
 
 	@Override
 	public void resume() {
 		paused = false;
-		musicPlayer.resume();
+		if (musicPlayer != null) {
+			musicPlayer.resume();
+		}
 	}
 
 	@Override
 	public void dispose() {
-		stage.dispose();
+		saveGameStateSync();
+		if (stage != null) {
+			stage.dispose();
+		}
+	}
+
+	public void saveGameState() {
+		if (persistenceService != null && player != null && map != null) {
+			PlayerData data = new PlayerData(player.getMoney(), player.getHealth(), map.getBloonManager().getLevel());
+			persistenceService.saveDataAsync(data);
+		}
+	}
+
+	public void saveGameStateSync() {
+		if (persistenceService != null && player != null && map != null) {
+			PlayerData data = new PlayerData(player.getMoney(), player.getHealth(), map.getBloonManager().getLevel());
+			persistenceService.saveData(data);
+		}
+	}
+
+	public PersistenceService getPersistenceService() {
+		return persistenceService;
+	}
+
+	public void setPersistenceService(PersistenceService persistenceService) {
+		this.persistenceService = persistenceService;
 	}
 
 }
