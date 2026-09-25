@@ -92,10 +92,13 @@ public class BloonManager {
 			bulletActor.setTarget(null);
 		}
 		
-		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
+		bloonsToBePopped.forEach((bloonActor) -> applyDamage(bloonActor, bulletActor.getBullet().getDamage()));
 	}
 	
-	public void popBloon(BloonActor bloonActor, int damage) {
+	public void applyDamage(BloonActor bloonActor, int damage) {
+		if (bloonActor == null || damage <= 0) {
+			return;
+		}
 		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
 		
 		if (bloonActor.getBloon().willPopBloon(damage)) {
@@ -119,10 +122,15 @@ public class BloonManager {
 			
 			popSound.play(0.5f);
 		} else {
-			bloonActor.damage(damage);
+			bloonActor.getBloon().damage(damage);
+			bloonActor.reloadTexture();
 			player.earnMoney(damage);
-			// todo play some other sound I guess
+			popSound.play(0.5f);
 		}
+	}
+	
+	public void popBloon(BloonActor bloonActor, int damage) {
+		applyDamage(bloonActor, damage);
 	}
 	
 	public void addBulletToStage(BulletActor bulletActor) {
