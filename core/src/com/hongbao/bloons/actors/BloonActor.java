@@ -97,8 +97,11 @@ public class BloonActor extends RenderableActor {
 	}
 	
 	public void move(Pair<Float, Float> direction) {
-		setX(getX() + direction.getFirst() * bloon.getSpeed() / 5);
-		setY(getY() + direction.getSecond() * bloon.getSpeed() / 5);
+		if (bloon.isFrozen()) {
+			return;
+		}
+		setX(getX() + direction.getFirst() * bloon.getEffectiveSpeed() / 5);
+		setY(getY() + direction.getSecond() * bloon.getEffectiveSpeed() / 5);
 		
 		bloon.incrementDistanceTravelled();
 
