@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonManager;
 import com.hongbao.bloons.BloonsTouhouDefense;
+import com.hongbao.bloons.cache.BulletTextureCache;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -28,7 +29,7 @@ public class BulletActor extends RenderableActor {
 	
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		textureRegion = BulletTextureCache.getTextureRegion(bullet.getImageFileName());
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
@@ -46,6 +47,14 @@ public class BulletActor extends RenderableActor {
 		);
 		
 		damagedBloons = new HashSet<>(bullet.getPierce());
+	}
+	
+	@Override
+	public boolean remove() {
+		if (getParent() != null) {
+			return getParent().removeActor(this, true);
+		}
+		return false;
 	}
 	
 	public Bullet getBullet() {
