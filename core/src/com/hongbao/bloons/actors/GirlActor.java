@@ -86,8 +86,8 @@ public class GirlActor extends RenderableActor {
 	}
 	
 	public SpellCardActor createSpellCardActor() {
-		if (true) { // todo Girl should have a method that checks the cooldown or something
-			// maybe some direction based on the girl's direction
+		if (girl != null && girl.isSpellCardReady()) {
+			girl.resetSpellCardCooldown();
 			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
 		}
 		return null;
@@ -112,6 +112,9 @@ public class GirlActor extends RenderableActor {
 	@Override
 	public void act(float delta) {
 		if (active) {
+			if (girl.getSpellCardCooldown() > 0) {
+				girl.decrementSpellCardCooldown();
+			}
 			if (girl.getCooldown() == 0) {
 				boolean attacked = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager().attackBloonIfInRange(this);
 				if (attacked) {

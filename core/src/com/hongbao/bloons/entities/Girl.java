@@ -7,6 +7,7 @@ public class Girl {
 	
 	public static final String IMAGE_FOLDER = "img/characters/";
 	public static final int NO_UPGRADES_AVAILABLE = -1;
+	public static final int TICKS_PER_SECOND = 180;
 	
 	private String name;
 	private List<Integer> attackDelay;
@@ -23,9 +24,15 @@ public class Girl {
 	private List<Integer> upgradeCost;
 	private int level;
 	private int totalInvestment;
+	private int spellCardCooldown;
+	private int spellCardMaxCooldown;
 	
 	
 	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+		this(name, attackDelay, bulletSpeed, damage, pierce, range, visualRange, homing, imageFileName, bulletFileName, cost, upgradeCost, 0);
+	}
+
+	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost, int spellCardMaxCooldown) {
 		this.name = name;
 		this.attackDelay = attackDelay;
 		this.cooldown = attackDelay.get(0);
@@ -39,6 +46,8 @@ public class Girl {
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
 		this.upgradeCost = upgradeCost;
+		this.spellCardMaxCooldown = spellCardMaxCooldown;
+		this.spellCardCooldown = 0;
 		level = 0;
 		totalInvestment = cost;
 	}
@@ -153,13 +162,63 @@ public class Girl {
 			 imageFileName,
 			 bulletFileName,
 			 cost,
-			 upgradeCost
+			 upgradeCost,
+			 spellCardMaxCooldown
 			);
 			upgradedGirl.level = level + 1;
+			upgradedGirl.spellCardCooldown = spellCardCooldown;
 			return upgradedGirl;
 		} else {
 			return null;
 		}
+	}
+
+	public int getSpellCardCooldown() {
+		return spellCardCooldown;
+	}
+
+	public void setSpellCardCooldown(int spellCardCooldown) {
+		this.spellCardCooldown = Math.max(0, spellCardCooldown);
+	}
+
+	public int getSpellCardMaxCooldown() {
+		return spellCardMaxCooldown;
+	}
+
+	public void setSpellCardMaxCooldown(int spellCardMaxCooldown) {
+		this.spellCardMaxCooldown = Math.max(0, spellCardMaxCooldown);
+	}
+
+	public void decrementSpellCardCooldown() {
+		if (spellCardCooldown > 0) {
+			spellCardCooldown--;
+		}
+	}
+
+	public void resetSpellCardCooldown() {
+		spellCardCooldown = spellCardMaxCooldown;
+	}
+
+	public boolean hasSpellCard() {
+		return spellCardMaxCooldown > 0;
+	}
+
+	public boolean isSpellCardReady() {
+		return hasSpellCard() && spellCardCooldown == 0;
+	}
+
+	public int getSpellCardCooldownSeconds() {
+		return (int) Math.ceil((double) spellCardCooldown / TICKS_PER_SECOND);
+	}
+
+	public String getSpellCardStatus() {
+		if (!hasSpellCard()) {
+			return "SPELL CARD: N/A";
+		}
+		if (isSpellCardReady()) {
+			return "SPELL CARD: READY";
+		}
+		return "SPELL CARD: " + getSpellCardCooldownSeconds() + "s";
 	}
 	
 }
