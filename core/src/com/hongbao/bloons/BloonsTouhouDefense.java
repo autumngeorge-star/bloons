@@ -27,6 +27,7 @@ import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
+import com.hongbao.bloons.event.GameEventBus;
 import com.hongbao.bloons.helpers.ZIndex;
 
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
 		musicPlayer = new MusicPlayer();
+		musicPlayer.subscribeTo(GameEventBus.getInstance());
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
