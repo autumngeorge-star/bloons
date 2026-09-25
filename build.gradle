@@ -3,6 +3,7 @@ buildscript {
 
     repositories {
         mavenLocal()
+        maven { url "https://maven-central.storage-download.googleapis.com/maven2/" }
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
@@ -20,7 +21,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "bloons-tower-defence"
-        gdxVersion = '1.9.10'
+        gdxVersion = '1.12.1'
         roboVMVersion = '2.3.8'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
@@ -29,6 +30,7 @@ allprojects {
 
     repositories {
         mavenLocal()
+        maven { url "https://maven-central.storage-download.googleapis.com/maven2/" }
         mavenCentral()
         jcenter()
         google()
@@ -43,7 +45,7 @@ project(":desktop") {
 
     dependencies {
         implementation project(":core")
-        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
