@@ -49,10 +49,13 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
-	
-	
+	private MapSelectionOverlay mapSelectionOverlay;
+	private RenderableImageButton backgroundMapActor;
+
+
 	@Override
 	public void create() {
+		MapProgressManager.init();
 		Gdx.graphics.setWindowedMode(1800, 900);
 		paused = false;
 		tripleSpeed = false;
@@ -64,12 +67,27 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		instructions = new ArrayList<>();
 
 		final RunnableAction bloonCreationAction = new RunnableAction();
-		bloonCreationAction.setRunnable(() -> map.getBloonManager().createBloons());
+		bloonCreationAction.setRunnable(() -> {
+			if (map != null && map.getBloonManager() != null) {
+				map.getBloonManager().createBloons();
+			}
+		});
 		stage.addAction(Actions.repeat(RepeatAction.FOREVER, bloonCreationAction));
 
 		Gdx.input.setInputProcessor(stage);
-		
-		createMap();
+
+		mapSelectionOverlay = new MapSelectionOverlay(this, stage);
+
+		stage.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (event.getStage() != null && map != null) {
+					map.setSelectedGirl(null);
+				}
+			}
+		});
+
+		loadMap(MapType.BASIC_MAP);
 		createMenu();
 		createInstructions();
 		musicPlayer.playTitleMusic();
@@ -403,15 +421,29 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		yuyukoCost.setFontScale(1.5f,1.5f);
 		yuyukoCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
 		stage.addActor(new RenderableLabel(yuyukoCost, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label mapSelectBtn = new Label("MAP SELECT", skin);
+		mapSelectBtn.setBounds(1504, 110, 292, 40);
+		mapSelectBtn.setAlignment(Align.center);
+		mapSelectBtn.setColor(Color.GOLD);
+		mapSelectBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (instructions.isEmpty() && mapSelectionOverlay != null) {
+					mapSelectionOverlay.show(map.getMapType());
+				}
+			}
+		});
+		stage.addActor(new RenderableLabel(mapSelectBtn, ZIndex.MENU_ITEM_Z_INDEX));
 	}
-	
+
 	private RunnableAction createNewCostLabelAction() {
 		// Apparently they don't like sharing
 		RunnableAction costLabelAction = new RunnableAction();
 		costLabelAction.setRunnable(() -> {
 			Label label = (Label)costLabelAction.getActor();
 			int cost = Integer.parseInt(label.getText().toString());
-			
+
 			if (cost <= player.getMoney()) {
 				label.setColor(Color.WHITE);
 			} else {
@@ -420,23 +452,30 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		});
 		return costLabelAction;
 	}
-	
-	public void createMap() {
-		stage.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				if (event.getStage() != null) {
-					map.setSelectedGirl(null);
-				}
-			}
-		});
-		
-		map = MapFactory.createHeaterMap(stage);
-		
+
+	public void loadMap(MapType mapType) {
+		if (this.map != null) {
+			this.map.cleanup();
+		}
+		if (backgroundMapActor != null) {
+			backgroundMapActor.remove();
+		}
+
+		this.map = mapType.createMap(stage);
+		this.map.setMapType(mapType);
+
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
 		ImageButton backgroundMap = new ImageButton(drawable);
 		backgroundMap.setPosition(0, 0);
-		stage.addActor(backgroundMap);
+		backgroundMapActor = new RenderableImageButton(backgroundMap, ZIndex.BACKGROUND_Z_INDEX);
+		stage.addActor(backgroundMapActor);
+
+		this.player = new Player(MONEY, HEALTH);
+		this.paused = false;
+	}
+
+	public void createMap() {
+		loadMap(MapType.BASIC_MAP);
 	}
 	
 	public Map getMap() {
@@ -526,6 +565,14 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
 				autoContinue = !autoContinue;
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+				if (mapSelectionOverlay != null) {
+					if (mapSelectionOverlay.isVisible()) {
+						mapSelectionOverlay.hide();
+					} else {
+						mapSelectionOverlay.show(map.getMapType());
+					}
+				}
 			}
 			
 			if (girl != null) {
