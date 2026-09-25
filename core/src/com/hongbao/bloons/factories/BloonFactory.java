@@ -286,6 +286,9 @@ public class BloonFactory {
 	}
 	
 	public static BloonQueue createBloonQueue() {
+		if (Gdx.files == null) {
+			return new BloonQueue(new ArrayList<>(), new ArrayList<>());
+		}
 		if (HELLA_BLOONS) {
 			return createBloonQueueFromFile("hella_bloons.txt");
 		} else {

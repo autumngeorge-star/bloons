@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.math.Vector2;
+import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
@@ -24,11 +26,37 @@ import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
 public class Map {
+
+	public static class PathProgressResult {
+		private final int segmentIndex;
+		private final float offsetAlongSegment;
+		private final float totalProgress;
+
+		public PathProgressResult(int segmentIndex, float offsetAlongSegment, float totalProgress) {
+			this.segmentIndex = segmentIndex;
+			this.offsetAlongSegment = offsetAlongSegment;
+			this.totalProgress = totalProgress;
+		}
+
+		public int getSegmentIndex() {
+			return segmentIndex;
+		}
+
+		public float getOffsetAlongSegment() {
+			return offsetAlongSegment;
+		}
+
+		public float getTotalProgress() {
+			return totalProgress;
+		}
+	}
 
 	public static final String BACKGROUND_MAPS_FOLDER = "img/maps/";
 	public static final int TILE_LENGTH = 50;
@@ -37,6 +65,9 @@ public class Map {
 	private String backgroundImage;
 	private BloonManager bloonManager;
 	private Pair<Float, Float>[][] directions;
+	private List<Vector2> waypoints = new ArrayList<>();
+	private float[] segmentLengths = new float[0];
+	private float[] cumulativeDistances = new float[0];
 	private Set<GirlActor> onStageGirls;
 	private GirlActor selectedGirl;
 	private Stage stage;
@@ -55,133 +86,299 @@ public class Map {
 		this.stage = stage;
 		hoveringOverUpgrade = false;
 
-		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
+		if (Gdx.files != null) {
+			Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
 
-		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
-		infoBackground.setPosition(1504, 4);
-		this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
+			ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
+			infoBackground.setPosition(1504, 4);
+			this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
-		Label leftDataBackground = new Label("DATA", skin);
-		leftDataBackground.setBounds(1510, 56, 292, 110);
-		leftDataBackground.setColor(Color.BLACK);
-		final RunnableAction leftDataLabelAction = new RunnableAction();
-		leftDataLabelAction.setRunnable(() -> {
-			Girl girl = getSelectedGirl().getGirl();
-			Girl upgradedStats = girl.getUpgradedStats();
-			if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
-				leftDataActor.getActor().setText(
-				 girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
-				  "Damage: " + girl.getDamage() + " (" + upgradedStats.getDamage() + ")\n" +
-				  "Pierce: " + girl.getPierce() + " (" + upgradedStats.getPierce() + ")\n" +
-				  "Cooldown: " + girl.getAttackDelay() + " (" + upgradedStats.getAttackDelay() + ")\n" +
-				  "Sight: " + (int)girl.getVisualRange() + " (" + (int)upgradedStats.getVisualRange() + ")"
-				);
-			} else {
-				leftDataActor.getActor().setText(
-				 girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
-				  "Damage: " + girl.getDamage() + "\n" +
-				  "Pierce: " + girl.getPierce() +"\n" +
-				  "Cooldown: " + girl.getAttackDelay() +"\n" +
-				  "Sight: " + (int)girl.getVisualRange()
-				);
-			}
-		});
-		leftDataBackground.addAction(Actions.repeat(RepeatAction.FOREVER, leftDataLabelAction));
-		leftDataActor = new RenderableLabel(leftDataBackground, ZIndex.MENU_ITEM_Z_INDEX);
-
-		Label rightDataBackground = new Label("DATA", skin);
-		rightDataBackground.setBounds(1658, 56, 292, 110);
-		rightDataBackground.setColor(Color.BLACK);
-		final RunnableAction rightDataLabelAction = new RunnableAction();
-		rightDataLabelAction.setRunnable(() -> {
-			Girl girl = getSelectedGirl().getGirl();
-			Girl upgradedStats = girl.getUpgradedStats();
-			if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
-				rightDataActor.getActor().setText(
-				  "Range: " + (int)girl.getRange() + " (" + (int)upgradedStats.getRange() + ")\n" +
-				  "Upgrade: " + girl.getUpgradeCostString() + " (" + upgradedStats.getUpgradeCostString() + ")\n" +
-				  "Sell: $" + girl.getSellPrice() + "\n" +
-				  " \n" +
-				  " "
-				);
-			} else {
-				rightDataActor.getActor().setText(
-				 "Range: " + (int)girl.getRange() +"\n" +
-				  "Upgrade: " + girl.getUpgradeCostString() + "\n" +
-				  "Sell: $" + girl.getSellPrice() + "\n" +
-				  " \n" +
-				  " "
-				);
-			}
-		});
-		rightDataBackground.addAction(Actions.repeat(RepeatAction.FOREVER, rightDataLabelAction));
-		rightDataActor = new RenderableLabel(rightDataBackground, ZIndex.MENU_ITEM_Z_INDEX);
-
-		Label upgradeBackground = new Label("UPGRADE", skin);
-		upgradeBackground.setBounds(1504, 4, 144, 50);
-		upgradeBackground.setAlignment(Align.center);
-		upgradeBackground.setColor(Color.BLUE);
-		upgradeBackground.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				upgradeSelectedGirl();
-			}
-
-			@Override
-			public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-				hoveringOverUpgrade = true;
-			}
-
-			@Override
-			public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-				hoveringOverUpgrade = false;
-			}
-		});
-		final RunnableAction upgradeLabelAction = new RunnableAction();
-		upgradeLabelAction.setRunnable(() -> {
-            if (getSelectedGirl() != null && !getSelectedGirl().isActive()) {
-                upgradeBackground.setColor(Color.GRAY);
-            } else if (getSelectedGirl().getGirl().getUpgradeCost() == Girl.NO_UPGRADES_AVAILABLE) {
-				upgradeBackground.setText("FULLY UPGRADED");
-				upgradeBackground.setColor(Color.GRAY);
-			} else {
-				Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
-				upgradeBackground.setText("UPGRADE");
-				if (player.getMoney() >= getSelectedGirl().getGirl().getUpgradeCost()) {
-					upgradeBackground.setColor(Color.BLUE);
+			Label leftDataBackground = new Label("DATA", skin);
+			leftDataBackground.setBounds(1510, 56, 292, 110);
+			leftDataBackground.setColor(Color.BLACK);
+			final RunnableAction leftDataLabelAction = new RunnableAction();
+			leftDataLabelAction.setRunnable(() -> {
+				Girl girl = getSelectedGirl().getGirl();
+				Girl upgradedStats = girl.getUpgradedStats();
+				if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
+					leftDataActor.getActor().setText(
+					 girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
+					  "Damage: " + girl.getDamage() + " (" + upgradedStats.getDamage() + ")\n" +
+					  "Pierce: " + girl.getPierce() + " (" + upgradedStats.getPierce() + ")\n" +
+					  "Cooldown: " + girl.getAttackDelay() + " (" + upgradedStats.getAttackDelay() + ")\n" +
+					  "Sight: " + (int)girl.getVisualRange() + " (" + (int)upgradedStats.getVisualRange() + ")"
+					);
 				} else {
-					upgradeBackground.setColor(Color.RED);
+					leftDataActor.getActor().setText(
+					 girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
+					  "Damage: " + girl.getDamage() + "\n" +
+					  "Pierce: " + girl.getPierce() +"\n" +
+					  "Cooldown: " + girl.getAttackDelay() +"\n" +
+					  "Sight: " + (int)girl.getVisualRange()
+					);
 				}
-			}
-		});
-		upgradeBackground.addAction(Actions.repeat(RepeatAction.FOREVER, upgradeLabelAction));
-		upgradeActor = new RenderableLabel(upgradeBackground, ZIndex.MENU_ITEM_Z_INDEX);
+			});
+			leftDataBackground.addAction(Actions.repeat(RepeatAction.FOREVER, leftDataLabelAction));
+			leftDataActor = new RenderableLabel(leftDataBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
-		Label sellBackground = new Label("SELL", skin);
-		sellBackground.setBounds(1652, 4, 144, 50);
-		sellBackground.setAlignment(Align.center);
-		sellBackground.setColor(Color.RED);
-		sellBackground.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				sellSelectedGirl();
-			}
-		});
+			Label rightDataBackground = new Label("DATA", skin);
+			rightDataBackground.setBounds(1658, 56, 292, 110);
+			rightDataBackground.setColor(Color.BLACK);
+			final RunnableAction rightDataLabelAction = new RunnableAction();
+			rightDataLabelAction.setRunnable(() -> {
+				Girl girl = getSelectedGirl().getGirl();
+				Girl upgradedStats = girl.getUpgradedStats();
+				if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
+					rightDataActor.getActor().setText(
+					  "Range: " + (int)girl.getRange() + " (" + (int)upgradedStats.getRange() + ")\n" +
+					  "Upgrade: " + girl.getUpgradeCostString() + " (" + upgradedStats.getUpgradeCostString() + ")\n" +
+					  "Sell: $" + girl.getSellPrice() + "\n" +
+					  " \n" +
+					  " "
+					);
+				} else {
+					rightDataActor.getActor().setText(
+					 "Range: " + (int)girl.getRange() +"\n" +
+					  "Upgrade: " + girl.getUpgradeCostString() + "\n" +
+					  "Sell: $" + girl.getSellPrice() + "\n" +
+					  " \n" +
+					  " "
+					);
+				}
+			});
+			rightDataBackground.addAction(Actions.repeat(RepeatAction.FOREVER, rightDataLabelAction));
+			rightDataActor = new RenderableLabel(rightDataBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
-		final RunnableAction sellLabelAction = new RunnableAction();
-		sellLabelAction.setRunnable(() -> {
-			if (getSelectedGirl() != null && !getSelectedGirl().isActive()) {
-				sellBackground.setColor(Color.GRAY);
-			} else {
-				sellBackground.setColor(Color.RED);
-			}
-        });
-        sellBackground.addAction(Actions.repeat(RepeatAction.FOREVER, sellLabelAction));
-		sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
+			Label upgradeBackground = new Label("UPGRADE", skin);
+			upgradeBackground.setBounds(1504, 4, 144, 50);
+			upgradeBackground.setAlignment(Align.center);
+			upgradeBackground.setColor(Color.BLUE);
+			upgradeBackground.addListener(new ClickListener() {
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					upgradeSelectedGirl();
+				}
+
+				@Override
+				public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+					hoveringOverUpgrade = true;
+				}
+
+				@Override
+				public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+					hoveringOverUpgrade = false;
+				}
+			});
+			final RunnableAction upgradeLabelAction = new RunnableAction();
+			upgradeLabelAction.setRunnable(() -> {
+				if (getSelectedGirl() != null && !getSelectedGirl().isActive()) {
+					upgradeBackground.setColor(Color.GRAY);
+				} else if (getSelectedGirl().getGirl().getUpgradeCost() == Girl.NO_UPGRADES_AVAILABLE) {
+					upgradeBackground.setText("FULLY UPGRADED");
+					upgradeBackground.setColor(Color.GRAY);
+				} else {
+					Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+					upgradeBackground.setText("UPGRADE");
+					if (player.getMoney() >= getSelectedGirl().getGirl().getUpgradeCost()) {
+						upgradeBackground.setColor(Color.BLUE);
+					} else {
+						upgradeBackground.setColor(Color.RED);
+					}
+				}
+			});
+			upgradeBackground.addAction(Actions.repeat(RepeatAction.FOREVER, upgradeLabelAction));
+			upgradeActor = new RenderableLabel(upgradeBackground, ZIndex.MENU_ITEM_Z_INDEX);
+
+			Label sellBackground = new Label("SELL", skin);
+			sellBackground.setBounds(1652, 4, 144, 50);
+			sellBackground.setAlignment(Align.center);
+			sellBackground.setColor(Color.RED);
+			sellBackground.addListener(new ClickListener() {
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					sellSelectedGirl();
+				}
+			});
+
+			final RunnableAction sellLabelAction = new RunnableAction();
+			sellLabelAction.setRunnable(() -> {
+				if (getSelectedGirl() != null && !getSelectedGirl().isActive()) {
+					sellBackground.setColor(Color.GRAY);
+				} else {
+					sellBackground.setColor(Color.RED);
+				}
+			});
+			sellBackground.addAction(Actions.repeat(RepeatAction.FOREVER, sellLabelAction));
+			sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
+		}
 	}
 
 	public void setDirections(Pair<Float, Float>[][] directions) {
 		this.directions = directions;
+		if (this.waypoints.isEmpty()) {
+			generateWaypointsFromDirections();
+		}
+	}
+
+	public void setWaypoints(List<Vector2> waypoints) {
+		this.waypoints = waypoints != null ? new ArrayList<>(waypoints) : new ArrayList<>();
+		cacheWaypointDistances();
+	}
+
+	public void setWaypointsFromPairs(List<Pair<Float, Float>> pairWaypoints) {
+		this.waypoints = new ArrayList<>();
+		if (pairWaypoints != null) {
+			for (Pair<Float, Float> p : pairWaypoints) {
+				this.waypoints.add(new Vector2(p.getFirst(), p.getSecond()));
+			}
+		}
+		cacheWaypointDistances();
+	}
+
+	public List<Vector2> getWaypoints() {
+		return waypoints;
+	}
+
+	public float[] getSegmentLengths() {
+		return segmentLengths;
+	}
+
+	public float[] getCumulativeDistances() {
+		return cumulativeDistances;
+	}
+
+	public float getTotalPathDistance() {
+		if (cumulativeDistances == null || cumulativeDistances.length == 0) {
+			return 0f;
+		}
+		return cumulativeDistances[cumulativeDistances.length - 1];
+	}
+
+	public void cacheWaypointDistances() {
+		if (waypoints == null || waypoints.size() < 2) {
+			segmentLengths = new float[0];
+			cumulativeDistances = new float[0];
+			return;
+		}
+		int numSegments = waypoints.size() - 1;
+		segmentLengths = new float[numSegments];
+		cumulativeDistances = new float[waypoints.size()];
+		cumulativeDistances[0] = 0f;
+		for (int i = 0; i < numSegments; i++) {
+			Vector2 p1 = waypoints.get(i);
+			Vector2 p2 = waypoints.get(i + 1);
+			float len = p1.dst(p2);
+			segmentLengths[i] = len;
+			cumulativeDistances[i + 1] = cumulativeDistances[i] + len;
+		}
+	}
+
+	private void generateWaypointsFromDirections() {
+		if (directions == null) {
+			return;
+		}
+		List<Vector2> generated = new ArrayList<>();
+
+		int startY = -1;
+		for (int y = 0; y < directions[0].length; y++) {
+			if (directions[0][y] != null && (directions[0][y].getFirst() != 0 || directions[0][y].getSecond() != 0)) {
+				startY = y;
+				break;
+			}
+		}
+		if (startY == -1) {
+			return;
+		}
+
+		generated.add(new Vector2(-TILE_LENGTH / 2f, getCenterYOfTile(startY)));
+
+		int currentX = 0;
+		int currentY = startY;
+		Pair<Float, Float> currentDir = directions[currentX][currentY];
+
+		while (currentX >= 0 && currentX < directions.length && currentY >= 0 && currentY < directions[currentX].length) {
+			Pair<Float, Float> dir = directions[currentX][currentY];
+			if (dir == null || (dir.getFirst() == 0f && dir.getSecond() == 0f)) {
+				break;
+			}
+
+			if (Math.abs(dir.getFirst() - currentDir.getFirst()) > 0.01f || Math.abs(dir.getSecond() - currentDir.getSecond()) > 0.01f) {
+				generated.add(new Vector2(getCenterXOfTile(currentX), getCenterYOfTile(currentY)));
+				currentDir = dir;
+			}
+
+			int nextX = currentX;
+			int nextY = currentY;
+			if (dir.getFirst() > 0.1f) nextX++;
+			else if (dir.getFirst() < -0.1f) nextX--;
+
+			if (dir.getSecond() > 0.1f) nextY++;
+			else if (dir.getSecond() < -0.1f) nextY--;
+
+			if (nextX == currentX && nextY == currentY) {
+				break;
+			}
+			currentX = nextX;
+			currentY = nextY;
+		}
+
+		if (currentX >= directions.length) {
+			generated.add(new Vector2(directions.length * TILE_LENGTH, getCenterYOfTile(Math.min(currentY, directions[0].length - 1))));
+		} else {
+			generated.add(new Vector2(getCenterXOfTile(Math.max(0, Math.min(currentX, directions.length - 1))), getCenterYOfTile(Math.max(0, Math.min(currentY, directions[0].length - 1)))));
+		}
+
+		setWaypoints(generated);
+	}
+
+	public PathProgressResult calculatePathProgress(float x, float y) {
+		if (waypoints == null || waypoints.size() < 2) {
+			return new PathProgressResult(0, 0f, 0f);
+		}
+
+		int numSegments = waypoints.size() - 1;
+		int bestSegmentIndex = 0;
+		float bestOffset = 0f;
+		float minPerpDistanceSq = Float.MAX_VALUE;
+
+		for (int i = 0; i < numSegments; i++) {
+			Vector2 w1 = waypoints.get(i);
+			Vector2 w2 = waypoints.get(i + 1);
+			float segLen = segmentLengths[i];
+
+			if (segLen <= 0) continue;
+
+			float vx = w2.x - w1.x;
+			float vy = w2.y - w1.y;
+
+			float ux = x - w1.x;
+			float uy = y - w1.y;
+
+			float t = (ux * vx + uy * vy) / segLen;
+			float tClamped = Math.max(0f, Math.min(segLen, t));
+
+			float qx = w1.x + (vx / segLen) * tClamped;
+			float qy = w1.y + (vy / segLen) * tClamped;
+
+			float distSq = (x - qx) * (x - qx) + (y - qy) * (y - qy);
+
+			if (distSq < minPerpDistanceSq - 0.01f || (Math.abs(distSq - minPerpDistanceSq) <= 0.01f && t >= 0f)) {
+				minPerpDistanceSq = distSq;
+				bestSegmentIndex = i;
+				bestOffset = tClamped;
+			}
+		}
+
+		float totalProgress = cumulativeDistances[bestSegmentIndex] + bestOffset;
+		return new PathProgressResult(bestSegmentIndex, bestOffset, totalProgress);
+	}
+
+	public void updateBloonProgress(BloonActor bloonActor) {
+		if (bloonActor == null || bloonActor.getBloon() == null) {
+			return;
+		}
+		PathProgressResult result = calculatePathProgress(bloonActor.getCenterX(), bloonActor.getCenterY());
+		bloonActor.getBloon().updateProgress(result.getSegmentIndex(), result.getOffsetAlongSegment(), result.getTotalProgress());
 	}
 
 	public void setBackgroundImage(String backgroundImage) {
