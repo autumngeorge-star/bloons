@@ -2,9 +2,10 @@ package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.utils.Disposable;
 
 
-public class MusicPlayer {
+public class MusicPlayer implements Disposable {
 	
 	private Music backgroundMusic;
 	
@@ -16,8 +17,8 @@ public class MusicPlayer {
 		boolean wasPlaying = true;
 		if (backgroundMusic != null) {
 			wasPlaying = backgroundMusic.isPlaying();
+			dispose();
 		}
-		stopMusic();
 		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
 		backgroundMusic.setVolume(0.5f);
 		backgroundMusic.setLooping(true);
@@ -63,6 +64,15 @@ public class MusicPlayer {
 			} else {
 				resume();
 			}
+		}
+	}
+
+	@Override
+	public void dispose() {
+		if (backgroundMusic != null) {
+			backgroundMusic.stop();
+			backgroundMusic.dispose();
+			backgroundMusic = null;
 		}
 	}
 
