@@ -460,14 +460,11 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public void render() {
 		if (!paused) {
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-			if (tripleSpeed) {
-				for (int x = 0; x < 9; x++) {
-					stage.act(Gdx.graphics.getDeltaTime());
-				}
-			} else {
-				for (int x = 0; x < 3; x++) {
-					stage.act(Gdx.graphics.getDeltaTime());
-				}
+			float delta = Gdx.graphics.getDeltaTime();
+			int subSteps = tripleSpeed ? 9 : 3;
+			for (int x = 0; x < subSteps; x++) {
+				map.getBloonManager().updateStatusEffects(delta);
+				stage.act(delta);
 			}
 
 			if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {

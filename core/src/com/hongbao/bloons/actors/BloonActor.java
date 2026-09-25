@@ -27,12 +27,15 @@ public class BloonActor extends RenderableActor {
 	
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
-
-		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
-		
 		setZIndex(ZIndex.BLOON_Z_INDEX);
-		setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
+		if (Gdx.files != null) {
+			textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+			collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
+			setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
+		} else {
+			collisionRadius = 15f;
+			setBounds(x - 15f, y - 15f, 30f, 30f);
+		}
 		
 		if (parent != null) {
 			parentBloonIds = new HashSet(parent.getParentBloonIds());
@@ -53,12 +56,18 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		}
+		return getX() + getWidth() / 2f;
 	}
 	
 	@Override
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		}
+		return getY() + getHeight() / 2f;
 	}
 	
 	public float getCollisionRadius() {
@@ -85,47 +94,66 @@ public class BloonActor extends RenderableActor {
 	// Please avoid calling this method directly, instead use the BloonManager pop()
 	public BloonPoppedResult pop(int damage) {
 		BloonPoppedResult bloonPoppedResult = bloon.pop(damage);
-		textureRegion.getTexture().dispose();
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
 		return bloonPoppedResult;
 	}
 	
 	public void release() {
-		((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
-		textureRegion.getTexture().dispose();
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
+		}
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
 	}
 	
 	public void move(Pair<Float, Float> direction) {
-		setX(getX() + direction.getFirst() * bloon.getSpeed() / 5);
-		setY(getY() + direction.getSecond() * bloon.getSpeed() / 5);
+		move(direction, 1f / 60f);
+	}
+
+	public void move(Pair<Float, Float> direction, float delta) {
+		float effectiveSpeed = bloon.getEffectiveSpeed();
+		float stepFactor = delta * 60f;
+		setX(getX() + direction.getFirst() * effectiveSpeed / 5f * stepFactor);
+		setY(getY() + direction.getSecond() * effectiveSpeed / 5f * stepFactor);
 		
-		bloon.incrementDistanceTravelled();
+		bloon.setDistanceTravelled((int)(bloon.getDistanceTravelled() + effectiveSpeed * stepFactor));
 
 		if (getCenterX() > 1500) {
 			release();
-			((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager().removeBloonFromStage(this);
+			if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+				((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager().removeBloonFromStage(this);
+			}
 		}
 	}
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
+		if (textureRegion == null || textureRegion.getTexture() == null) {
+			return;
+		}
 		if (bloon.isBlimp()) {
-			BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
-			Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
-			float rotationAngle = (float)(Math.atan2(direction.getFirst(), direction.getSecond()) / Math.PI * 180);
-			batch.draw(
-			 textureRegion,
-			 getX(),
-			 getY(),
-			 getCenterX() - getX(),
-			 getCenterY() - getY(),
-			 textureRegion.getTexture().getWidth() * SCALE,
-			 textureRegion.getTexture().getHeight() * SCALE,
-			 1f,
-			 1f,
-			 -rotationAngle
-			);
+			if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+				BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
+				Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
+				float rotationAngle = (float)(Math.atan2(direction.getFirst(), direction.getSecond()) / Math.PI * 180);
+				batch.draw(
+				 textureRegion,
+				 getX(),
+				 getY(),
+				 getCenterX() - getX(),
+				 getCenterY() - getY(),
+				 textureRegion.getTexture().getWidth() * SCALE,
+				 textureRegion.getTexture().getHeight() * SCALE,
+				 1f,
+				 1f,
+				 -rotationAngle
+				);
+			}
 		} else {
 			batch.draw(textureRegion.getTexture(), getX(), getY(), textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
 		}
@@ -133,11 +161,14 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public void act(float delta) {
-		BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
-		Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
-		if (direction.getFirst() < 0) {
-			System.out.println(direction.getFirst());
+		Pair<Float, Float> direction = new Pair<>(1f, 0f);
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
+			direction = app.getMap().getDirection(getCenterX(), getCenterY());
+			if (direction.getFirst() < 0) {
+				System.out.println(direction.getFirst());
+			}
 		}
-		move(direction);
+		move(direction, delta);
 	}
 }

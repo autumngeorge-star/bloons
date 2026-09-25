@@ -93,6 +93,7 @@ public class Bloon {
 	private int distanceTravelled;
 	private boolean camo;
 	private boolean regen;
+	private Map<String, StatusEffect> activeStatusEffects = new HashMap<>();
 
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
@@ -219,6 +220,37 @@ public class Bloon {
 	
 	public boolean isBlimp() {
 		return color == MOAB || color == BFB || color == ZOMG;
+	}
+	
+	public Map<String, StatusEffect> getActiveStatusEffects() {
+		return activeStatusEffects;
+	}
+
+	public void addStatusEffect(StatusEffect statusEffect) {
+		activeStatusEffects.put(statusEffect.getName(), statusEffect);
+	}
+
+	public void removeStatusEffect(String name) {
+		activeStatusEffects.remove(name);
+	}
+
+	public boolean hasStatusEffect(String name) {
+		return activeStatusEffects.containsKey(name);
+	}
+
+	public float getSpeedMultiplier() {
+		if (activeStatusEffects.isEmpty()) {
+			return 1.0f;
+		}
+		float multiplier = 1.0f;
+		for (StatusEffect effect : activeStatusEffects.values()) {
+			multiplier *= effect.getSpeedModification();
+		}
+		return Math.max(0.0f, multiplier);
+	}
+
+	public float getEffectiveSpeed() {
+		return speed * getSpeedMultiplier();
 	}
 	
 }
