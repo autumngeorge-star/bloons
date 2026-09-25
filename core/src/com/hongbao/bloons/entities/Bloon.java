@@ -91,6 +91,9 @@ public class Bloon {
 	private int health;
 	private int speed;
 	private int distanceTravelled;
+	private int currentSegmentIndex;
+	private float distanceAlongSegment;
+	private float pathProgress;
 	private boolean camo;
 	private boolean regen;
 
@@ -141,10 +144,44 @@ public class Bloon {
 	
 	public void setDistanceTravelled(int distanceTravelled) {
 		this.distanceTravelled = distanceTravelled;
+		this.pathProgress = distanceTravelled;
+	}
+
+	public int getCurrentSegmentIndex() {
+		return currentSegmentIndex;
+	}
+
+	public void setCurrentSegmentIndex(int currentSegmentIndex) {
+		this.currentSegmentIndex = currentSegmentIndex;
+	}
+
+	public float getDistanceAlongSegment() {
+		return distanceAlongSegment;
+	}
+
+	public void setDistanceAlongSegment(float distanceAlongSegment) {
+		this.distanceAlongSegment = distanceAlongSegment;
+	}
+
+	public float getPathProgress() {
+		return pathProgress;
+	}
+
+	public void setPathProgress(float pathProgress) {
+		this.pathProgress = pathProgress;
+		this.distanceTravelled = (int) pathProgress;
+	}
+
+	public void updateProgress(int segmentIndex, float distanceAlongSegment, float pathProgress) {
+		this.currentSegmentIndex = segmentIndex;
+		this.distanceAlongSegment = distanceAlongSegment;
+		this.pathProgress = pathProgress;
+		this.distanceTravelled = (int) pathProgress;
 	}
 	
 	public void incrementDistanceTravelled() {
 		distanceTravelled += speed;
+		pathProgress += speed;
 	}
 	
 	public boolean isCamo() {

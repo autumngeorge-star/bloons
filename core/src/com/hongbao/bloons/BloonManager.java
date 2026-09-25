@@ -29,7 +29,7 @@ public class BloonManager {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		popSound = (Gdx.files != null && Gdx.audio != null) ? Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3")) : null;
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
 
@@ -62,6 +62,7 @@ public class BloonManager {
 		
 		for (Bloon bloon : bloonsToBeCreated) {
 			BloonActor actor = new BloonActor(bloon, -25, 425, null); // todo make these numbers an attribute in map or something
+			map.updateBloonProgress(actor);
 			stage.addActor(actor);
 			onstageBloons.add(actor);
 		}
@@ -112,12 +113,15 @@ public class BloonManager {
 					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
 					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
 				}
+				map.updateBloonProgress(generatedBloonActor);
 				stage.addActor(generatedBloonActor);
 				onstageBloons.add(generatedBloonActor);
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
@@ -146,7 +150,7 @@ public class BloonManager {
 			BloonActor bloonActor = bloonsInRange.iterator().next();
 			
 			for (BloonActor actor : bloonsInRange) {
-				if (actor.getBloon().getDistanceTravelled() > bloonActor.getBloon().getDistanceTravelled()) {
+				if (actor.getBloon().getPathProgress() > bloonActor.getBloon().getPathProgress()) {
 					bloonActor = actor;
 				}
 			}
@@ -172,7 +176,7 @@ public class BloonManager {
 			BloonActor bloonActor = bloonsInRange.iterator().next();
 			
 			for (BloonActor actor : bloonsInRange) {
-				if (actor.getBloon().getDistanceTravelled() > bloonActor.getBloon().getDistanceTravelled()) {
+				if (actor.getBloon().getPathProgress() > bloonActor.getBloon().getPathProgress()) {
 					bloonActor = actor;
 				}
 			}

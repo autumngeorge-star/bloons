@@ -4,6 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.Map;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.Arrays;
+
 
 public class MapFactory {
 	
@@ -17,6 +19,10 @@ public class MapFactory {
 			directions[x][8] = new Pair<>(1f, 0f);
 		}
 		
+		map.setWaypointsFromPairs(Arrays.asList(
+			new Pair<>(-25f, 425f),
+			new Pair<>(1600f, 425f)
+		));
 		map.setDirections(directions);
 		return map;
 	}
@@ -37,6 +43,12 @@ public class MapFactory {
 			directions[x][11] = new Pair<>(1f, 0f);
 		}
 		
+		map.setWaypointsFromPairs(Arrays.asList(
+			new Pair<>(-25f, 425f),
+			new Pair<>(225f, 425f),
+			new Pair<>(225f, 575f),
+			new Pair<>(1600f, 575f)
+		));
 		map.setDirections(directions);
 		return map;
 	}
@@ -178,6 +190,26 @@ public class MapFactory {
 		directions[30][8] = new Pair<>(1f, 0f);
 		directions[31][8] = new Pair<>(1f, 0f);
 		
+		map.setWaypointsFromPairs(Arrays.asList(
+			new Pair<>(-25f, 425f),
+			new Pair<>(225f, 425f),
+			new Pair<>(225f, 825f),
+			new Pair<>(375f, 825f),
+			new Pair<>(375f, 125f),
+			new Pair<>(525f, 125f),
+			new Pair<>(525f, 825f),
+			new Pair<>(675f, 825f),
+			new Pair<>(675f, 125f),
+			new Pair<>(825f, 125f),
+			new Pair<>(825f, 825f),
+			new Pair<>(975f, 825f),
+			new Pair<>(975f, 125f),
+			new Pair<>(1125f, 125f),
+			new Pair<>(1125f, 825f),
+			new Pair<>(1275f, 825f),
+			new Pair<>(1275f, 425f),
+			new Pair<>(1600f, 425f)
+		));
 		map.setDirections(directions);
 		return map;
 	}
