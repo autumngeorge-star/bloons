@@ -25,6 +25,27 @@ public class Girl {
 	private int totalInvestment;
 	
 	
+	private GirlConfig config;
+	
+	
+	public Girl(GirlConfig config) {
+		this(
+		 config.getName(),
+		 config.getAttackDelay(),
+		 config.getBulletSpeed(),
+		 config.getDamage(),
+		 config.getPierce(),
+		 config.getRange(),
+		 config.getVisualRange(),
+		 config.getHoming(),
+		 config.getImageFileName(),
+		 config.getBulletFileName(),
+		 config.getCost(),
+		 config.getUpgradeCost()
+		);
+		this.config = config;
+	}
+
 	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
 		this.name = name;
 		this.attackDelay = attackDelay;
@@ -35,12 +56,16 @@ public class Girl {
 		this.range = range;
 		this.visualRange = visualRange;
 		this.homing = homing;
-		this.imageFileName = IMAGE_FOLDER + imageFileName;
+		this.imageFileName = imageFileName.startsWith("img/") ? imageFileName : IMAGE_FOLDER + imageFileName;
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
 		this.upgradeCost = upgradeCost;
 		level = 0;
 		totalInvestment = cost;
+	}
+
+	public GirlConfig getConfig() {
+		return config;
 	}
 
 	public String getName() {
@@ -141,20 +166,25 @@ public class Girl {
 	
 	public Girl getUpgradedStats() {
 		if (getUpgradeCost() != NO_UPGRADES_AVAILABLE) {
-			Girl upgradedGirl = new Girl(
-			 name,
-			 attackDelay,
-			 bulletSpeed,
-			 damage,
-			 pierce,
-			 range,
-			 visualRange,
-			 homing,
-			 imageFileName,
-			 bulletFileName,
-			 cost,
-			 upgradeCost
-			);
+			Girl upgradedGirl;
+			if (config != null) {
+				upgradedGirl = new Girl(config);
+			} else {
+				upgradedGirl = new Girl(
+				 name,
+				 attackDelay,
+				 bulletSpeed,
+				 damage,
+				 pierce,
+				 range,
+				 visualRange,
+				 homing,
+				 imageFileName,
+				 bulletFileName,
+				 cost,
+				 upgradeCost
+				);
+			}
 			upgradedGirl.level = level + 1;
 			return upgradedGirl;
 		} else {
