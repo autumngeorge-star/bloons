@@ -10,9 +10,7 @@ import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
 
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 
 public class BloonActor extends RenderableActor {
@@ -20,12 +18,11 @@ public class BloonActor extends RenderableActor {
 	public static final float SCALE = 0.5f;
 	public static final Random RANDOM = new Random();
 	
-	private Set<Long> parentBloonIds;
 	private Long bloonId;
 	private Bloon bloon;
 	private float collisionRadius;
 	
-	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
+	public BloonActor(Bloon bloon, float x, float y) {
 		this.bloon = bloon;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
 
@@ -34,12 +31,6 @@ public class BloonActor extends RenderableActor {
 		setZIndex(ZIndex.BLOON_Z_INDEX);
 		setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
 		
-		if (parent != null) {
-			parentBloonIds = new HashSet(parent.getParentBloonIds());
-			parentBloonIds.add(parent.getBloonId());
-		} else {
-			parentBloonIds = new HashSet<>();
-		}
 		bloonId = RANDOM.nextLong();
 	}
 
@@ -71,10 +62,6 @@ public class BloonActor extends RenderableActor {
 	
 	public Long getBloonId() {
 		return bloonId;
-	}
-	
-	public Set<Long> getParentBloonIds() {
-		return parentBloonIds;
 	}
 	
 	// Please avoid calling this method directly, instead use the BloonManager damage()
