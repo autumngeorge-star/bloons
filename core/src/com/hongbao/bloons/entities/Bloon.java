@@ -90,9 +90,11 @@ public class Bloon {
 	private String imageFileName;
 	private int health;
 	private int speed;
-	private int distanceTravelled;
+	private float distanceTravelled;
 	private boolean camo;
 	private boolean regen;
+	private boolean frozen = false;
+	private float speedMultiplier = 1.0f;
 
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
@@ -135,16 +137,47 @@ public class Bloon {
 		this.speed = speed;
 	}
 	
-	public int getDistanceTravelled() {
+	public float getDistanceTravelled() {
 		return distanceTravelled;
 	}
 	
+	public void setDistanceTravelled(float distanceTravelled) {
+		this.distanceTravelled = distanceTravelled;
+	}
+
 	public void setDistanceTravelled(int distanceTravelled) {
 		this.distanceTravelled = distanceTravelled;
 	}
 	
 	public void incrementDistanceTravelled() {
-		distanceTravelled += speed;
+		distanceTravelled += getEffectiveSpeed();
+	}
+
+	public boolean isFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(boolean frozen) {
+		this.frozen = frozen;
+	}
+
+	public float getSpeedMultiplier() {
+		return speedMultiplier;
+	}
+
+	public void setSpeedMultiplier(float speedMultiplier) {
+		if (speedMultiplier < 0.0f) {
+			this.speedMultiplier = 0.0f;
+		} else {
+			this.speedMultiplier = speedMultiplier;
+		}
+	}
+
+	public float getEffectiveSpeed() {
+		if (frozen) {
+			return 0.0f;
+		}
+		return speed * speedMultiplier;
 	}
 	
 	public boolean isCamo() {
