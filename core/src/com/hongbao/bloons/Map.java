@@ -35,6 +35,7 @@ public class Map {
 	public static final int TILE_HEIGHT = 50;
 
 	private String backgroundImage;
+	private MapType mapType;
 	private BloonManager bloonManager;
 	private Pair<Float, Float>[][] directions;
 	private Set<GirlActor> onStageGirls;
@@ -182,6 +183,14 @@ public class Map {
 
 	public void setDirections(Pair<Float, Float>[][] directions) {
 		this.directions = directions;
+	}
+
+	public MapType getMapType() {
+		return mapType;
+	}
+
+	public void setMapType(MapType mapType) {
+		this.mapType = mapType;
 	}
 
 	public void setBackgroundImage(String backgroundImage) {

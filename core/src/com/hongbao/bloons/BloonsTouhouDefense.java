@@ -28,6 +28,7 @@ import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.ui.MapSelectionOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private ProgressionManager progressionManager;
+	private ImageButton backgroundMap;
+	private MapSelectionOverlay mapSelectionOverlay;
 	
 	
 	@Override
@@ -57,6 +61,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		paused = false;
 		tripleSpeed = false;
 		autoContinue = false;
+		progressionManager = new ProgressionManager();
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
 		musicPlayer = new MusicPlayer();
@@ -73,6 +78,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMenu();
 		createInstructions();
 		musicPlayer.playTitleMusic();
+
+		showMapSelectionOverlay();
 	}
 
 	private void createInstructions() {
@@ -189,6 +196,23 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		title.addAction(Actions.repeat(RepeatAction.FOREVER, titleAction));
 		stage.addActor(new RenderableLabel(title, ZIndex.MENU_ITEM_Z_INDEX));
 
+
+		com.badlogic.gdx.scenes.scene2d.ui.TextButton selectMapBtn = new com.badlogic.gdx.scenes.scene2d.ui.TextButton("SELECT MAP", skin);
+		selectMapBtn.setBounds(1510, 735, 280, 25);
+		selectMapBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (!map.getBloonManager().isWaveActive()) {
+					showMapSelectionOverlay();
+				}
+			}
+		});
+		stage.addActor(new com.hongbao.bloons.actors.RenderableActor() {
+			{
+				setActor(selectMapBtn);
+				setZIndex(ZIndex.MENU_ITEM_Z_INDEX);
+			}
+		});
 
 		Label moneyLabel = new Label(String.valueOf(player.getMoney()), skin);
 		moneyLabel.setPosition(1680, 765);
@@ -421,6 +445,39 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		return costLabelAction;
 	}
 	
+	public void showMapSelectionOverlay() {
+		if (mapSelectionOverlay != null) {
+			mapSelectionOverlay.remove();
+		}
+		if (map != null && map.getBloonManager().isWaveActive()) {
+			return; // Map selection during an active wave is forbidden
+		}
+		mapSelectionOverlay = new MapSelectionOverlay(
+				progressionManager,
+				map != null && map.getMapType() != null ? map.getMapType() : MapType.BASIC_MAP,
+				this::selectMap,
+				null
+		);
+		stage.addActor(mapSelectionOverlay);
+	}
+
+	public void selectMap(MapType selectedMapType) {
+		if (map != null && map.getBloonManager().isWaveActive()) {
+			return;
+		}
+		if (map != null && map.getSelectedGirl() != null) {
+			map.setSelectedGirl(null);
+		}
+
+		map = MapFactory.createMap(selectedMapType, stage);
+		map.getBloonManager().setProgressionManager(progressionManager);
+
+		if (backgroundMap != null) {
+			Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
+			backgroundMap.getStyle().imageUp = drawable;
+		}
+	}
+
 	public void createMap() {
 		stage.addListener(new ClickListener() {
 			@Override
@@ -431,10 +488,11 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			}
 		});
 		
-		map = MapFactory.createHeaterMap(stage);
+		map = MapFactory.createMap(MapType.BASIC_MAP, stage);
+		map.getBloonManager().setProgressionManager(progressionManager);
 		
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
-		ImageButton backgroundMap = new ImageButton(drawable);
+		backgroundMap = new ImageButton(drawable);
 		backgroundMap.setPosition(0, 0);
 		stage.addActor(backgroundMap);
 	}
@@ -526,6 +584,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
 				autoContinue = !autoContinue;
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+				if (!map.getBloonManager().isWaveActive()) {
+					showMapSelectionOverlay();
+				}
 			}
 			
 			if (girl != null) {
