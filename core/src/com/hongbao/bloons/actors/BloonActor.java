@@ -27,12 +27,16 @@ public class BloonActor extends RenderableActor {
 	
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
-
-		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
+		if (Gdx.gl != null && Gdx.files != null && Gdx.files.internal(bloon.getImageFileName()).exists()) {
+			textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+			collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
+			setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
+		} else {
+			collisionRadius = 25f;
+			setBounds(x - 25f, y - 25f, 50f, 50f);
+		}
 		
 		setZIndex(ZIndex.BLOON_Z_INDEX);
-		setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
 		
 		if (parent != null) {
 			parentBloonIds = new HashSet(parent.getParentBloonIds());
@@ -53,12 +57,18 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		}
+		return getX() + getWidth() / 2f;
 	}
 	
 	@Override
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		}
+		return getY() + getHeight() / 2f;
 	}
 	
 	public float getCollisionRadius() {
@@ -85,14 +95,20 @@ public class BloonActor extends RenderableActor {
 	// Please avoid calling this method directly, instead use the BloonManager pop()
 	public BloonPoppedResult pop(int damage) {
 		BloonPoppedResult bloonPoppedResult = bloon.pop(damage);
-		textureRegion.getTexture().dispose();
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
 		return bloonPoppedResult;
 	}
 	
 	public void release() {
-		((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
-		textureRegion.getTexture().dispose();
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
+		}
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
 	}
 	
