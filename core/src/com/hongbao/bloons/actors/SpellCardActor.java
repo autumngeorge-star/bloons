@@ -63,7 +63,7 @@ public class SpellCardActor extends RenderableActor {
 				BloonManager bloonManager = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager();
 				
 				for (Bullet bullet : bulletsToCreate) {
-					BulletActor bulletActor = new BulletActor(
+					BulletActor bulletActor = bloonManager.obtainBulletActor(
 					 bullet,
 					 getCenterX(),
 					 getCenterY(),

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.hongbao.bloons.BloonManager;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
@@ -75,7 +76,8 @@ public class GirlActor extends RenderableActor {
 		lookAtBloon(target);
 		
 		Bullet bullet = girl.createBullet();
-		return new BulletActor(bullet, getCenterX(), getCenterY(), dx, dy);
+		BloonManager bloonManager = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager();
+		return bloonManager.obtainBulletActor(bullet, getCenterX(), getCenterY(), dx, dy);
 	}
 	
 	public void lookAtBloon(BloonActor target) {
