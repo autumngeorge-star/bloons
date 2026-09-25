@@ -17,6 +17,8 @@ import java.util.Set;
 
 public class BloonManager {
 	
+	public static final int CHILD_BLOON_OFFSET = 20;
+
 	private Stage stage;
 	private Map map;
 	// A dedicated collection of onstage bloons is maintained to (probably) speed up collision checking
@@ -110,7 +112,10 @@ public class BloonManager {
 					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
 				} else {
 					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
-					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
+					float newX = previousBloonActor.getCenterX() - direction.getFirst() * CHILD_BLOON_OFFSET;
+					float newY = previousBloonActor.getCenterY() - direction.getSecond() * CHILD_BLOON_OFFSET;
+					generatedBloonActor = new BloonActor(bloon, newX, newY, bloonActor);
+					bloon.setDistanceTravelled(previousBloonActor.getBloon().getDistanceTravelled() - CHILD_BLOON_OFFSET);
 				}
 				stage.addActor(generatedBloonActor);
 				onstageBloons.add(generatedBloonActor);
