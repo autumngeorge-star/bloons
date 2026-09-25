@@ -9,6 +9,8 @@ public class Bullet {
 	private int pierce;
 	private float maxRange; // Because of how actions are evaluated, this is an approximation. But that's fine.
 	private float distanceTraveled;
+	private float maxDuration;
+	private float elapsedDuration;
 	private boolean homing;
 	private String imageFileName;
 
@@ -25,17 +27,25 @@ public class Bullet {
 		pierce = 2;
 		maxRange = 500;
 		distanceTraveled = 0;
+		maxDuration = 0;
+		elapsedDuration = 0;
 		homing = false;
 		imageFileName = IMAGE_FOLDER + "red_spell_card.png";
 	}
 	
 	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName) {
+		this(speed, damage, pierce, maxRange, 0f, homing, imageFileName);
+	}
+	
+	public Bullet(float speed, int damage, int pierce, float maxRange, float maxDuration, boolean homing, String imageFileName) {
 		this.speed = speed;
 		this.damage = damage;
 		this.pierce = pierce;
 		this.maxRange = maxRange;
+		this.maxDuration = maxDuration;
 		this.imageFileName = IMAGE_FOLDER + imageFileName;
 		distanceTraveled = 0;
+		elapsedDuration = 0;
 		this.homing = homing;
 	}
 	
@@ -77,6 +87,30 @@ public class Bullet {
 	
 	public void incrementDistanceTraveled() {
 		distanceTraveled += speed / 5;
+	}
+	
+	public float getMaxDuration() {
+		return maxDuration;
+	}
+	
+	public void setMaxDuration(float maxDuration) {
+		this.maxDuration = maxDuration;
+	}
+	
+	public float getElapsedDuration() {
+		return elapsedDuration;
+	}
+	
+	public void setElapsedDuration(float elapsedDuration) {
+		this.elapsedDuration = elapsedDuration;
+	}
+	
+	public void incrementElapsedDuration() {
+		elapsedDuration += 1f;
+	}
+	
+	public void incrementElapsedDuration(float amount) {
+		elapsedDuration += amount;
 	}
 	
 	public boolean isHoming() {
