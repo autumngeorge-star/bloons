@@ -182,6 +182,19 @@ public class Bloon {
 		return new BloonPoppedResult(this, damage);
 	}
 	
+	public String getAtlasRegionName() {
+		StringBuilder regionNameBuilder = new StringBuilder();
+		regionNameBuilder.append(color.getValue());
+		if (camo) {
+			regionNameBuilder.append(CAMO_BLOON_DENOTATION);
+		}
+		if (regen) {
+			regionNameBuilder.append(REGROWTH_BLOON_DENOTATION);
+		}
+		regionNameBuilder.append("_bloon");
+		return regionNameBuilder.toString();
+	}
+
 	private static String createImageFileName(String color, boolean camo, boolean regen) {
 		StringBuilder fileNameBuilder = new StringBuilder(IMAGE_FOLDER);
 		fileNameBuilder.append(color);

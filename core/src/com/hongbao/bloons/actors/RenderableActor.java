@@ -51,11 +51,17 @@ public abstract class RenderableActor extends Actor {
 	}
 	
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() / 2f;
+		if (textureRegion != null) {
+			return getX() + textureRegion.getRegionWidth() / 2f;
+		}
+		return getX() + getWidth() / 2f;
 	}
 	
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() / 2f;
+		if (textureRegion != null) {
+			return getY() + textureRegion.getRegionHeight() / 2f;
+		}
+		return getY() + getHeight() / 2f;
 	}
 	
 	@Override
@@ -870,9 +876,6 @@ public abstract class RenderableActor extends Actor {
 
 	@Override
 	public boolean remove() {
-		if (textureRegion != null && textureRegion.getTexture() != null) {
-			textureRegion.getTexture().dispose();
-		}
 		return super.remove();
 	}
 	
