@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Disposable;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
@@ -28,7 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class Map {
+public class Map implements Disposable {
 
 	public static final String BACKGROUND_MAPS_FOLDER = "img/maps/";
 	public static final int TILE_LENGTH = 50;
@@ -46,6 +47,8 @@ public class Map {
 	private RenderableLabel upgradeActor;
 	private RenderableLabel sellActor;
 	private boolean hoveringOverUpgrade;
+	private Skin skin;
+	private Texture detailsTemplateTexture;
 
 	public Map(String backgroundImage, Stage stage) {
 		this.backgroundImage = backgroundImage;
@@ -55,9 +58,10 @@ public class Map {
 		this.stage = stage;
 		hoveringOverUpgrade = false;
 
-		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
+		skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
 
-		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
+		detailsTemplateTexture = new Texture(Gdx.files.internal("img/ui/girl_details_template.png"));
+		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(detailsTemplateTexture)));
 		infoBackground.setPosition(1504, 4);
 		this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
@@ -355,6 +359,21 @@ public class Map {
 		onStageGirls.remove(selectedGirl);
 		selectedGirl.remove();
 		setSelectedGirl(null);
+	}
+
+	@Override
+	public void dispose() {
+		if (skin != null) {
+			skin.dispose();
+			skin = null;
+		}
+		if (detailsTemplateTexture != null) {
+			detailsTemplateTexture.dispose();
+			detailsTemplateTexture = null;
+		}
+		if (bloonManager != null) {
+			bloonManager.dispose();
+		}
 	}
 	
 }
