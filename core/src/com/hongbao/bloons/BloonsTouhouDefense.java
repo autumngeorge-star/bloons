@@ -181,7 +181,12 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					titleActor.setText("YOU WIN!");
 					titleActor.setColor(Color.GOLD);
 				} else {
-					titleActor.setText("Bloons Touhou Defense\nLevel " + (map.getBloonManager().getLevel()));
+					com.hongbao.bloons.loader.WaveMetadata meta = map.getBloonManager().getCurrentWaveMetadata();
+					if (meta != null && meta.getTitle() != null) {
+						titleActor.setText("Bloons Touhou Defense\n" + meta.getTitle());
+					} else {
+						titleActor.setText("Bloons Touhou Defense\nLevel " + (map.getBloonManager().getLevel()));
+					}
 					titleActor.setColor(Color.WHITE);
 				}
 			}

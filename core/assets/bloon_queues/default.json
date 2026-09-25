@@ -1,0 +1,1001 @@
+{
+  "title": "Default Waves",
+  "waves": [
+    {
+      "title": "Level 0",
+      "music": null,
+      "reward": 0,
+      "spawns": []
+    },
+    {
+      "title": "Level 1",
+      "music": "stage",
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 20,
+          "delay": 30,
+          "types": [
+            "red"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 2",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 35,
+          "delay": 30,
+          "types": [
+            "red"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 3",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 25,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 5,
+          "delay": 30,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 4",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 35,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 18,
+          "delay": 30,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 5",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 5,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 27,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 6",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 7",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 5,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 8",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 14,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 9",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 30,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 10",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 102,
+          "delay": 15,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 11",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 6,
+          "delay": 10,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 12,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 12,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 3,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 12",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 5,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 13",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 50,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 23,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 14",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 49,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 9,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 15",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 12,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 16",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 40,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 8,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 17",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 12,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 18",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 80,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 19",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 20",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 6,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 21",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 40,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "amount": 14,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 22",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 16,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 23",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 7,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 24",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 1,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 25",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 25,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 26",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 23,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 27",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 100,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 60,
+          "delay": 5,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "amount": 45,
+          "delay": 5,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "amount": 45,
+          "delay": 5,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 28",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 6,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 29",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 50,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "amount": 50,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 30",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 9,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 31",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 16,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 8,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "amount": 2,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 32",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 45,
+          "delay": 15,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 33",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 13,
+          "delay": 50,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 34",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 26,
+          "delay": 20,
+          "types": [
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow",
+            "zebra"
+          ]
+        },
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 35",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 35,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 5,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 25,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "amount": 5,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 36",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "pink",
+            "pink",
+            "pink",
+            "pink",
+            "pink",
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 37",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 57,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "amount": 15,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 38",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 42,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "amount": 17,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 10,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "amount": 14,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        },
+        {
+          "amount": 2,
+          "delay": 20,
+          "types": [
+            "ceramic"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 39",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 20,
+          "delay": 10,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "amount": 20,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "amount": 18,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        },
+        {
+          "amount": 2,
+          "delay": 20,
+          "types": [
+            "ceramic"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 40",
+      "music": "boss",
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 1,
+          "delay": 1,
+          "types": [
+            "moab"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 41",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 1,
+          "delay": 1,
+          "types": [
+            "bfb"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 42",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 1,
+          "delay": 1,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 43",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 2,
+          "delay": 20,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 44",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 3,
+          "delay": 20,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 45",
+      "music": null,
+      "reward": 100,
+      "spawns": [
+        {
+          "amount": 4,
+          "delay": 20,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    }
+  ]
+}

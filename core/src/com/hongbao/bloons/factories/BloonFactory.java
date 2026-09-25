@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.hongbao.bloons.BloonQueue;
 import com.hongbao.bloons.entities.Bloon;
+import com.hongbao.bloons.entities.BloonType;
+import com.hongbao.bloons.loader.WaveLoaderFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -194,59 +196,7 @@ public class BloonFactory {
 	}
 	
 	public static Bloon createBloonOfType(String type) {
-		// todo george at some point add all the variations of bloons too :(
-		if (type.endsWith("\r")) {
-			type = type.substring(0, type.length() - 1);
-		}
-		if ("red".equals(type)) {
-			return createRedBloon();
-		}
-		if ("red_camo".equals(type)) {
-			return createRedCamoBloon();
-		}
-		if ("red_regen".equals(type)) {
-			return createRedRegenBloon();
-		}
-		if ("red_camo_regen".equals(type)) {
-			return createRedCamoRegenBloon();
-		}
-		if ("blue".equals(type)) {
-			return createBlueBloon();
-		}
-		if ("green".equals(type)) {
-			return createGreenBloon();
-		}
-		if ("yellow".equals(type)) {
-			return createYellowBloon();
-		}
-		if ("pink".equals(type)) {
-			return createPinkBloon();
-		}
-		if ("black".equals(type)) {
-			return createBlackBloon();
-		}
-		if ("lead".equals(type)) {
-			return createLeadBloon();
-		}
-		if ("zebra".equals(type)) {
-			return createZebraBloon();
-		}
-		if ("rainbow".equals(type)) {
-			return createRainbowBloon();
-		}
-		if ("ceramic".equals(type)) {
-			return createCeramicBloon();
-		}
-		if ("moab".equals(type)) {
-			return createMOAB();
-		}
-		if ("bfb".equals(type)) {
-			return createBFB();
-		}
-		if ("zomg".equals(type)) {
-			return createZOMG();
-		}
-		throw new RuntimeException("Unexpected bloon type: " +type);
+		return BloonType.fromString(type).createBloon();
 	}
 	
 	public static Bloon createRandomBloon() {
@@ -289,56 +239,13 @@ public class BloonFactory {
 		if (HELLA_BLOONS) {
 			return createBloonQueueFromFile("hella_bloons.txt");
 		} else {
-			return createBloonQueueFromFile("default.txt");
+			return createBloonQueueFromFile("default.json");
 		}
 	}
 	
 	public static BloonQueue createBloonQueueFromFile(String fileName) {
 		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
-		String fileContents = file.readString();
-		String[] lines = fileContents.split("\n");
-		long timer = 0;
-
-		List<List<Bloon>> bloonLevels = new ArrayList<>();
-		List<List<Long>> intervalLevels = new ArrayList<>();
-
-		List<Bloon> bloons = new ArrayList<>();
-		List<Long> intervals = new ArrayList<>();
-		
-		for (String line : lines) {
-			if (line.startsWith("//")) {
-				// do nothing
-			} else if (line.contains(" ")) {
-				String[] parts = line.split(" ");
-				if (parts.length == 3) {
-					int amount = Integer.parseInt(parts[0]);
-					long delay = Long.parseLong(parts[1]);
-					String bloonTypes = parts[2];
-					
-					for (int x = 0; x < amount; x++) {
-						String[] types = bloonTypes.split(",");
-						for (String type : types) {
-							Bloon bloon = createBloonOfType(type);
-							bloons.add(bloon);
-							intervals.add(timer);
-							timer += delay;
-						}
-					}
-				} else {
-					System.out.println("BloonFactory.createBloonQueue(wtf2) { " + line + " }");
-				}
-			} else if (line.contains("END")) {
-				bloonLevels.add(bloons);
-				intervalLevels.add(intervals);
-				bloons = new ArrayList<>();
-				intervals = new ArrayList<>();
-				timer = 0;
-			} else {
-				System.out.println("BloonFactory.createBloonQueue(wtf1) { " + line + " }");
-			}
-		}
-			
-		return new BloonQueue(bloonLevels, intervalLevels);
+		return WaveLoaderFactory.getLoader(file).loadWaveQueue(file);
 	}
 	
 }
