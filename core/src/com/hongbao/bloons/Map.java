@@ -35,6 +35,7 @@ public class Map {
 	public static final int TILE_HEIGHT = 50;
 
 	private String backgroundImage;
+	private SoundManager soundManager;
 	private BloonManager bloonManager;
 	private Pair<Float, Float>[][] directions;
 	private Set<GirlActor> onStageGirls;
@@ -49,7 +50,8 @@ public class Map {
 
 	public Map(String backgroundImage, Stage stage) {
 		this.backgroundImage = backgroundImage;
-		this.bloonManager = new BloonManager(stage, this);
+		this.soundManager = new SoundManager();
+		this.bloonManager = new BloonManager(stage, this, soundManager);
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;
@@ -223,6 +225,10 @@ public class Map {
 
 	public BloonManager getBloonManager() {
 		return bloonManager;
+	}
+
+	public SoundManager getSoundManager() {
+		return soundManager;
 	}
 
 	public boolean canPlaceGirl(GirlActor girlActor) {
