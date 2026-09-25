@@ -1,0 +1,1003 @@
+{
+  "title": "Default Bloon Queue",
+  "music": "music/demystify_feast.mp3",
+  "cashBonus": 100,
+  "waves": [
+    {
+      "title": "Preparation",
+      "music": "",
+      "cashBonus": 0,
+      "spawns": []
+    },
+    {
+      "title": "Level 1",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 20,
+          "delay": 30,
+          "types": [
+            "red"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 2",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 35,
+          "delay": 30,
+          "types": [
+            "red"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 3",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 25,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "count": 5,
+          "delay": 30,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 4",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 35,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "count": 18,
+          "delay": 30,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 5",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 5,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "count": 27,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 6",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 15,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "count": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "count": 4,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 7",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 20,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "count": 20,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "count": 5,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 8",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 10,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "count": 20,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "count": 14,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 9",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 30,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 10",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 102,
+          "delay": 15,
+          "types": [
+            "blue"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 11",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 6,
+          "delay": 10,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "count": 12,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "count": 12,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "count": 3,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 12",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "count": 10,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "count": 5,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 13",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 50,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "count": 23,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 14",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 49,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "count": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "count": 10,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "count": 9,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 15",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 20,
+          "delay": 20,
+          "types": [
+            "red"
+          ]
+        },
+        {
+          "count": 15,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "count": 12,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "count": 10,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "count": 4,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 16",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 40,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "count": 8,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 17",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 12,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 18",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 80,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 19",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 10,
+          "delay": 20,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "count": 4,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "count": 20,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 20",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 6,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 21",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 40,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "count": 14,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 22",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 16,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 23",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 7,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 24",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 20,
+          "delay": 20,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "count": 1,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 25",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 25,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "count": 10,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 26",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 23,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "count": 4,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 27",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 100,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "count": 60,
+          "delay": 5,
+          "types": [
+            "blue"
+          ]
+        },
+        {
+          "count": 45,
+          "delay": 5,
+          "types": [
+            "green"
+          ]
+        },
+        {
+          "count": 45,
+          "delay": 5,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 28",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 6,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 29",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 50,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        },
+        {
+          "count": 50,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 30",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 9,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 31",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 16,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "count": 8,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "count": 2,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 32",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 10,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "count": 45,
+          "delay": 15,
+          "types": [
+            "black"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 33",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 20,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "count": 13,
+          "delay": 50,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 34",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 26,
+          "delay": 20,
+          "types": [
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow",
+            "zebra"
+          ]
+        },
+        {
+          "count": 4,
+          "delay": 20,
+          "types": [
+            "yellow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 35",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 35,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "count": 5,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "count": 25,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "count": 5,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 36",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 20,
+          "delay": 20,
+          "types": [
+            "pink",
+            "pink",
+            "pink",
+            "pink",
+            "pink",
+            "rainbow"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 37",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 57,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "count": 10,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "count": 15,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 38",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 42,
+          "delay": 20,
+          "types": [
+            "pink"
+          ]
+        },
+        {
+          "count": 17,
+          "delay": 20,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "count": 10,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "count": 14,
+          "delay": 20,
+          "types": [
+            "lead"
+          ]
+        },
+        {
+          "count": 2,
+          "delay": 20,
+          "types": [
+            "ceramic"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 39",
+      "music": "music/demystify_feast.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 20,
+          "delay": 10,
+          "types": [
+            "black"
+          ]
+        },
+        {
+          "count": 20,
+          "delay": 20,
+          "types": [
+            "zebra"
+          ]
+        },
+        {
+          "count": 18,
+          "delay": 20,
+          "types": [
+            "rainbow"
+          ]
+        },
+        {
+          "count": 2,
+          "delay": 20,
+          "types": [
+            "ceramic"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 40",
+      "music": "music/night_falls.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 1,
+          "delay": 1,
+          "types": [
+            "moab"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 41",
+      "music": "music/night_falls.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 1,
+          "delay": 1,
+          "types": [
+            "bfb"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 42",
+      "music": "music/night_falls.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 1,
+          "delay": 1,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 43",
+      "music": "music/night_falls.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 2,
+          "delay": 20,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 44",
+      "music": "music/night_falls.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 3,
+          "delay": 20,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Level 45",
+      "music": "music/night_falls.mp3",
+      "cashBonus": 100,
+      "spawns": [
+        {
+          "count": 4,
+          "delay": 20,
+          "types": [
+            "zomg"
+          ]
+        }
+      ]
+    }
+  ]
+}
