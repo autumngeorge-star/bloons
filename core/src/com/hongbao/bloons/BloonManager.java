@@ -10,9 +10,13 @@ import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.score.ScoreEvent;
+import com.hongbao.bloons.score.ScoreListener;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class BloonManager {
@@ -24,6 +28,7 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private final List<ScoreListener> scoreListeners;
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
@@ -31,6 +36,23 @@ public class BloonManager {
 		onstageBloons = new HashSet<>();
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
+		scoreListeners = new CopyOnWriteArrayList<>();
+	}
+
+	public void addScoreListener(ScoreListener listener) {
+		if (listener != null && !scoreListeners.contains(listener)) {
+			scoreListeners.add(listener);
+		}
+	}
+
+	public void removeScoreListener(ScoreListener listener) {
+		scoreListeners.remove(listener);
+	}
+
+	public void publishScoreEvent(ScoreEvent event) {
+		for (ScoreListener listener : scoreListeners) {
+			listener.onScoreEvent(event);
+		}
 	}
 
 	public void nextLevel() {
@@ -118,9 +140,11 @@ public class BloonManager {
 			}
 			
 			popSound.play(0.5f);
+			publishScoreEvent(new ScoreEvent(result.getCashGenerated(), ScoreEvent.Type.BLOON_POPPED, bloonActor.getBloon()));
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
+			publishScoreEvent(new ScoreEvent(damage, ScoreEvent.Type.BLOON_DAMAGE, bloonActor.getBloon()));
 			// todo play some other sound I guess
 		}
 	}

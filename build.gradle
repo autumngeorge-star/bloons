@@ -1,22 +1,18 @@
 buildscript {
-    
-
     repositories {
+        maven { url "https://maven-central.storage-download.googleapis.com/maven2/" }
         mavenLocal()
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
         google()
     }
     dependencies {
         
-
     }
 }
 
 allprojects {
-
     version = '1.0'
     ext {
         appName = "bloons-tower-defence"
@@ -28,9 +24,9 @@ allprojects {
     }
 
     repositories {
+        maven { url "https://maven-central.storage-download.googleapis.com/maven2/" }
         mavenLocal()
         mavenCentral()
-        jcenter()
         google()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
@@ -40,7 +36,6 @@ allprojects {
 project(":desktop") {
     apply plugin: "java-library"
 
-
     dependencies {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
@@ -48,13 +43,11 @@ project(":desktop") {
         api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-        
     }
 }
 
 project(":core") {
     apply plugin: "java-library"
-
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -62,6 +55,11 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
         api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        
+        testImplementation "junit:junit:4.13.2"
+        testImplementation "org.mockito:mockito-core:3.12.4"
+    }
+
+    test {
+        useJUnit()
     }
 }

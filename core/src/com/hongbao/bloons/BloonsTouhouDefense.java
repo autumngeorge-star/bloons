@@ -28,6 +28,11 @@ import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.score.ScoreEvent;
+import com.hongbao.bloons.score.ScoreListener;
+import com.hongbao.bloons.score.ScoreManager;
+import com.hongbao.bloons.storage.GameStorageService;
+import com.hongbao.bloons.storage.PreferencesStorageServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +54,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private ScoreManager scoreManager;
 	
 	
 	@Override
@@ -62,6 +68,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
+		scoreManager = new ScoreManager();
 
 		final RunnableAction bloonCreationAction = new RunnableAction();
 		bloonCreationAction.setRunnable(() -> map.getBloonManager().createBloons());
@@ -70,9 +77,14 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		Gdx.input.setInputProcessor(stage);
 		
 		createMap();
+		map.getBloonManager().addScoreListener(scoreManager);
 		createMenu();
 		createInstructions();
 		musicPlayer.playTitleMusic();
+	}
+
+	public ScoreManager getScoreManager() {
+		return scoreManager;
 	}
 
 	private void createInstructions() {
@@ -211,6 +223,21 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		});
 		healthLabel.addAction(Actions.repeat(RepeatAction.FOREVER, healthLabelAction));
 		stage.addActor(new RenderableLabel(healthLabel, ZIndex.MENU_ITEM_Z_INDEX));
+		
+		Label scoreLabel = new Label("Score: " + scoreManager.getCurrentScore(), skin);
+		scoreLabel.setPosition(1510, 735);
+		scoreLabel.setFontScale(1.2f, 1.2f);
+		stage.addActor(new RenderableLabel(scoreLabel, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label highScoreLabel = new Label("High Score: " + scoreManager.getHighScore(), skin);
+		highScoreLabel.setPosition(1650, 735);
+		highScoreLabel.setFontScale(1.2f, 1.2f);
+		stage.addActor(new RenderableLabel(highScoreLabel, ZIndex.MENU_ITEM_Z_INDEX));
+
+		scoreManager.addScoreListener(event -> {
+			scoreLabel.setText("Score: " + scoreManager.getCurrentScore());
+			highScoreLabel.setText("High Score: " + scoreManager.getHighScore());
+		});
 		
 		ImageButton purchaseReimu = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/reimu_box.png")))));
 		purchaseReimu.setPosition(1504, 676);
