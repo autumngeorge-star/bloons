@@ -23,9 +23,15 @@ public class Girl {
 	private List<Integer> upgradeCost;
 	private int level;
 	private int totalInvestment;
+	private int spellCardDelay;
+	private int spellCardCooldown;
 	
 	
 	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+		this(name, attackDelay, bulletSpeed, damage, pierce, range, visualRange, homing, imageFileName, bulletFileName, cost, upgradeCost, 1800);
+	}
+
+	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost, int spellCardDelay) {
 		this.name = name;
 		this.attackDelay = attackDelay;
 		this.cooldown = attackDelay.get(0);
@@ -35,10 +41,16 @@ public class Girl {
 		this.range = range;
 		this.visualRange = visualRange;
 		this.homing = homing;
-		this.imageFileName = IMAGE_FOLDER + imageFileName;
+		if (imageFileName.startsWith(IMAGE_FOLDER)) {
+			this.imageFileName = imageFileName;
+		} else {
+			this.imageFileName = IMAGE_FOLDER + imageFileName;
+		}
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
 		this.upgradeCost = upgradeCost;
+		this.spellCardDelay = spellCardDelay;
+		this.spellCardCooldown = 0;
 		level = 0;
 		totalInvestment = cost;
 	}
@@ -61,6 +73,28 @@ public class Girl {
 	
 	public void resetCooldown() {
 		cooldown = attackDelay.get(level);
+	}
+
+	public int getSpellCardDelay() {
+		return spellCardDelay;
+	}
+
+	public int getSpellCardCooldown() {
+		return spellCardCooldown;
+	}
+
+	public boolean canActivateSpellCard() {
+		return createSpellCard() != null && spellCardCooldown <= 0;
+	}
+
+	public void triggerSpellCardCooldown() {
+		spellCardCooldown = spellCardDelay;
+	}
+
+	public void decrementSpellCardCooldown() {
+		if (spellCardCooldown > 0) {
+			spellCardCooldown--;
+		}
 	}
 	
 	public int getDamage() {
@@ -153,9 +187,11 @@ public class Girl {
 			 imageFileName,
 			 bulletFileName,
 			 cost,
-			 upgradeCost
+			 upgradeCost,
+			 spellCardDelay
 			);
 			upgradedGirl.level = level + 1;
+			upgradedGirl.spellCardCooldown = spellCardCooldown;
 			return upgradedGirl;
 		} else {
 			return null;

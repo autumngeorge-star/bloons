@@ -20,6 +20,7 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.actors.SpellCardActor;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -94,24 +95,35 @@ public class Map {
 		rightDataBackground.setColor(Color.BLACK);
 		final RunnableAction rightDataLabelAction = new RunnableAction();
 		rightDataLabelAction.setRunnable(() -> {
-			Girl girl = getSelectedGirl().getGirl();
-			Girl upgradedStats = girl.getUpgradedStats();
-			if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
-				rightDataActor.getActor().setText(
-				  "Range: " + (int)girl.getRange() + " (" + (int)upgradedStats.getRange() + ")\n" +
-				  "Upgrade: " + girl.getUpgradeCostString() + " (" + upgradedStats.getUpgradeCostString() + ")\n" +
-				  "Sell: $" + girl.getSellPrice() + "\n" +
-				  " \n" +
-				  " "
-				);
-			} else {
-				rightDataActor.getActor().setText(
-				 "Range: " + (int)girl.getRange() +"\n" +
-				  "Upgrade: " + girl.getUpgradeCostString() + "\n" +
-				  "Sell: $" + girl.getSellPrice() + "\n" +
-				  " \n" +
-				  " "
-				);
+			if (getSelectedGirl() != null && getSelectedGirl().getGirl() != null) {
+				Girl girl = getSelectedGirl().getGirl();
+				Girl upgradedStats = girl.getUpgradedStats();
+				String spellCardStatus;
+				if (girl.createSpellCard() == null) {
+					spellCardStatus = "Spell Card: N/A";
+				} else if (girl.canActivateSpellCard()) {
+					spellCardStatus = "Spell Card: Ready";
+				} else {
+					spellCardStatus = "Spell Card: " + girl.getSpellCardCooldown();
+				}
+
+				if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
+					rightDataActor.getActor().setText(
+					  "Range: " + (int)girl.getRange() + " (" + (int)upgradedStats.getRange() + ")\n" +
+					  "Upgrade: " + girl.getUpgradeCostString() + " (" + upgradedStats.getUpgradeCostString() + ")\n" +
+					  "Sell: $" + girl.getSellPrice() + "\n" +
+					  spellCardStatus + "\n" +
+					  " "
+					);
+				} else {
+					rightDataActor.getActor().setText(
+					 "Range: " + (int)girl.getRange() +"\n" +
+					  "Upgrade: " + girl.getUpgradeCostString() + "\n" +
+					  "Sell: $" + girl.getSellPrice() + "\n" +
+					  spellCardStatus + "\n" +
+					  " "
+					);
+				}
 			}
 		});
 		rightDataBackground.addAction(Actions.repeat(RepeatAction.FOREVER, rightDataLabelAction));
@@ -274,7 +286,10 @@ public class Map {
 	
 	public void placeSpellCard() {
 		if (selectedGirl != null) {
-			stage.addActor(selectedGirl.createSpellCardActor());
+			SpellCardActor spellCardActor = selectedGirl.createSpellCardActor();
+			if (spellCardActor != null) {
+				stage.addActor(spellCardActor);
+			}
 		}
 	}
 	
@@ -295,6 +310,14 @@ public class Map {
 		hideGirlDetailsModule();
 
 		Girl girl = getSelectedGirl().getGirl();
+		String spellCardStatus;
+		if (girl.createSpellCard() == null) {
+			spellCardStatus = "Spell Card: N/A";
+		} else if (girl.canActivateSpellCard()) {
+			spellCardStatus = "Spell Card: Ready";
+		} else {
+			spellCardStatus = "Spell Card: " + girl.getSpellCardCooldown();
+		}
 
 		leftDataActor.getActor().setText(
 		 		girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
@@ -307,7 +330,7 @@ public class Map {
 				"Range: " + (int)girl.getRange() +"\n" +
 				"Upgrade: " + girl.getUpgradeCostString() + "\n" +
 				"Sell: $" + girl.getSellPrice() + "\n" +
-				" \n" +
+				spellCardStatus + "\n" +
 				" "
 		);
 		stage.addActor(infoBackground);
