@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.hongbao.bloons.BloonManager;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
@@ -134,10 +135,19 @@ public class BloonActor extends RenderableActor {
 	@Override
 	public void act(float delta) {
 		BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
-		Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
-		if (direction.getFirst() < 0) {
-			System.out.println(direction.getFirst());
+
+		int periodicDamage = bloon.updateStatusEffects(delta);
+		if (periodicDamage > 0) {
+			BloonManager bloonManager = app.getMap().getBloonManager();
+			bloonManager.popBloon(this, periodicDamage);
 		}
-		move(direction);
+
+		if (getParent() != null) {
+			Pair<Float, Float> direction = app.getMap().getDirection(getCenterX(), getCenterY());
+			if (direction.getFirst() < 0) {
+				System.out.println(direction.getFirst());
+			}
+			move(direction);
+		}
 	}
 }

@@ -1,5 +1,8 @@
 package com.hongbao.bloons.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Bullet {
 	
 	public static final String IMAGE_FOLDER = "img/projectiles/";
@@ -11,6 +14,7 @@ public class Bullet {
 	private float distanceTraveled;
 	private boolean homing;
 	private String imageFileName;
+	private List<StatusEffect> statusEffects = new ArrayList<>();
 
 	private float initialXOffset;
 
@@ -125,5 +129,26 @@ public class Bullet {
 	
 	public void setInitialDYOverride(float initialDYOverride) {
 		this.initialDYOverride = initialDYOverride;
+	}
+
+	public List<StatusEffect> getStatusEffects() {
+		return statusEffects;
+	}
+
+	public void addStatusEffect(StatusEffect statusEffect) {
+		if (statusEffects == null) {
+			statusEffects = new ArrayList<>();
+		}
+		if (statusEffect != null) {
+			statusEffects.add(statusEffect);
+		}
+	}
+
+	public void setStatusEffects(List<StatusEffect> statusEffects) {
+		this.statusEffects = statusEffects;
+	}
+
+	public boolean hasStatusEffects() {
+		return statusEffects != null && !statusEffects.isEmpty();
 	}
 }
