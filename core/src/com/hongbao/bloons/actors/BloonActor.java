@@ -53,20 +53,22 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		return getCenter().x;
 	}
 	
 	@Override
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		return getCenter().y;
 	}
 	
+	@Override
 	public float getCollisionRadius() {
 		return collisionRadius;
 	}
 	
 	public void setCollisionRadius(float collisionRadius) {
 		this.collisionRadius = collisionRadius;
+		updateCenterAndBounds();
 	}
 	
 	public Long getBloonId() {

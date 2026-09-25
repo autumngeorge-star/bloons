@@ -2,6 +2,7 @@ package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
@@ -71,10 +72,7 @@ public class BloonManager {
 		Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
 		
 		for (BloonActor bloonActor : onstageBloons) {
-			float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
-			float distance = Map.distanceBetweenActors(bulletActor, bloonActor);
-			
-			if (distance < collisionDistance) {
+			if (Intersector.overlaps(bulletActor.getCircle(), bloonActor.getCircle())) {
 				if (!bulletActor.hasDamagedBloon(bloonActor)) {
 					bulletActor.damageBloon(bloonActor);
 					bloonsToBePopped.add(bloonActor);
@@ -133,9 +131,7 @@ public class BloonManager {
 		Set<BloonActor> bloonsInRange = new HashSet<>();
 		
 		for (BloonActor bloonActor : onstageBloons) {
-			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
-			
-			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
+			if (Intersector.overlaps(girlActor.getRangeCircle(), bloonActor.getCircle())) {
 				bloonsInRange.add(bloonActor);
 			}
 		}
@@ -161,9 +157,7 @@ public class BloonManager {
 		Set<BloonActor> bloonsInRange = new HashSet<>();
 		
 		for (BloonActor bloonActor : onstageBloons) {
-			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
-			
-			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
+			if (Intersector.overlaps(girlActor.getRangeCircle(), bloonActor.getCircle())) {
 				bloonsInRange.add(bloonActor);
 			}
 		}
@@ -201,7 +195,7 @@ public class BloonManager {
 			if (!bulletActor.hasDamagedBloon(actor)) {
 				if (bloonActor == null) {
 					bloonActor = actor;
-				} else if (Map.distanceBetweenActors(actor, bulletActor) < Map.distanceBetweenActors(bloonActor, bulletActor)) {
+				} else if (actor.getCenter().dst2(bulletActor.getCenter()) < bloonActor.getCenter().dst2(bulletActor.getCenter())) {
 					bloonActor = actor;
 				}
 			}

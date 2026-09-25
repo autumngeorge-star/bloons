@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.hongbao.bloons.BloonManager;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
@@ -19,6 +20,7 @@ public class BulletActor extends RenderableActor {
 	private Bullet bullet;
 	private float dx; // This should be a unit vector
 	private float dy;
+	protected final Vector2 direction = new Vector2();
 	private float rotationAngle;
 	private float collisionRadius;
 	private int frames;
@@ -33,6 +35,7 @@ public class BulletActor extends RenderableActor {
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
 		this.dy = dy;
+		this.direction.set(dx, dy);
 		calculateRotationAngle();
 		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
 		target = null; // this'll get automatically set as the bullet moves
@@ -47,6 +50,10 @@ public class BulletActor extends RenderableActor {
 		
 		damagedBloons = new HashSet<>(bullet.getPierce());
 	}
+
+	public Vector2 getDirectionVector() {
+		return direction;
+	}
 	
 	public Bullet getBullet() {
 		return bullet;
@@ -60,12 +67,14 @@ public class BulletActor extends RenderableActor {
 		rotationAngle = (float)(Math.atan2(dx, dy) / Math.PI * 180);
 	}
 	
+	@Override
 	public float getCollisionRadius() {
 		return collisionRadius;
 	}
 	
 	public void setCollisionRadius(float collisionRadius) {
 		this.collisionRadius = collisionRadius;
+		updateCenterAndBounds();
 	}
 	
 	public void setSpellCardOverride(String spellCardOverride) {
@@ -167,13 +176,9 @@ public class BulletActor extends RenderableActor {
 			}
 			
 			if (target != null) {
-				dx = target.getCenterX() - getCenterX();
-				dy = target.getCenterY() - getCenterY();
-				
-				// make it a unit vector
-				float distance = (float) Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-				dx /= distance;
-				dy /= distance;
+				direction.set(target.getCenter()).sub(getCenter()).nor();
+				dx = direction.x;
+				dy = direction.y;
 			}
 			calculateRotationAngle();
 		}
