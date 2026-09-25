@@ -77,9 +77,27 @@ public class BloonActor extends RenderableActor {
 		return parentBloonIds;
 	}
 	
-	// Please avoid calling this method directly, instead use the BloonManager damage()
+	public void reloadTexture() {
+		float centerX = getCenterX();
+		float centerY = getCenterY();
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
+		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
+		setBounds(
+			centerX - textureRegion.getTexture().getWidth() * SCALE / 2f,
+			centerY - textureRegion.getTexture().getHeight() * SCALE / 2f,
+			textureRegion.getTexture().getWidth() * SCALE,
+			textureRegion.getTexture().getHeight() * SCALE
+		);
+	}
+
+	// Please avoid calling this method directly, instead use BloonManager.applyDamage()
+	@Deprecated
 	public void damage(int damage) {
 		bloon.damage(damage);
+		reloadTexture();
 	}
 	
 	// Please avoid calling this method directly, instead use the BloonManager pop()
