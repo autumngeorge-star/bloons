@@ -27,15 +27,19 @@ public class BloonActor extends RenderableActor {
 	
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
-
-		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
+		if (Gdx.files != null) {
+			textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+			collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
+			setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
+		} else {
+			collisionRadius = 15f;
+			setBounds(x - 15f, y - 15f, 30f, 30f);
+		}
 		
 		setZIndex(ZIndex.BLOON_Z_INDEX);
-		setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
 		
 		if (parent != null) {
-			parentBloonIds = new HashSet(parent.getParentBloonIds());
+			parentBloonIds = new HashSet<>(parent.getParentBloonIds());
 			parentBloonIds.add(parent.getBloonId());
 		} else {
 			parentBloonIds = new HashSet<>();
@@ -53,12 +57,18 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		}
+		return getX() + getWidth() / 2f;
 	}
 	
 	@Override
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		}
+		return getY() + getHeight() / 2f;
 	}
 	
 	public float getCollisionRadius() {
