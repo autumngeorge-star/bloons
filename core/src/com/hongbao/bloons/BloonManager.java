@@ -11,7 +11,9 @@ import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -22,6 +24,7 @@ public class BloonManager {
 	// A dedicated collection of onstage bloons is maintained to (probably) speed up collision checking
 	// especially when there are a lot of bullets on screen.
 	private Set<BloonActor> onstageBloons;
+	private List<BloonActor> bloonsToPopBuffer;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
 	
@@ -29,6 +32,7 @@ public class BloonManager {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
+		bloonsToPopBuffer = new ArrayList<>();
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
 	}
@@ -68,7 +72,7 @@ public class BloonManager {
 	}
 	
 	public void checkCollision(final BulletActor bulletActor) {
-		Set<BloonActor> bloonsToBePopped = new HashSet<>(); // to avoid ConcurrentModificationException
+		bloonsToPopBuffer.clear();
 		
 		for (BloonActor bloonActor : onstageBloons) {
 			float collisionDistance = bloonActor.getCollisionRadius() + bulletActor.getCollisionRadius();
@@ -77,7 +81,7 @@ public class BloonManager {
 			if (distance < collisionDistance) {
 				if (!bulletActor.hasDamagedBloon(bloonActor)) {
 					bulletActor.damageBloon(bloonActor);
-					bloonsToBePopped.add(bloonActor);
+					bloonsToPopBuffer.add(bloonActor);
 					bulletActor.decrementPierce();
 					
 					if (bulletActor.getBullet().getPierce() == 0) {
@@ -92,7 +96,9 @@ public class BloonManager {
 			bulletActor.setTarget(null);
 		}
 		
-		bloonsToBePopped.forEach((bloonActor) -> popBloon(bloonActor, bulletActor.getBullet().getDamage()));
+		for (int i = 0; i < bloonsToPopBuffer.size(); i++) {
+			popBloon(bloonsToPopBuffer.get(i), bulletActor.getBullet().getDamage());
+		}
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
@@ -130,54 +136,42 @@ public class BloonManager {
 	}
 	
 	public boolean attackBloonIfInRange(GirlActor girlActor) {
-		Set<BloonActor> bloonsInRange = new HashSet<>();
+		BloonActor targetBloon = null;
 		
 		for (BloonActor bloonActor : onstageBloons) {
 			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
 			
 			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
-				bloonsInRange.add(bloonActor);
+				if (targetBloon == null || bloonActor.getBloon().getDistanceTravelled() > targetBloon.getBloon().getDistanceTravelled()) {
+					targetBloon = bloonActor;
+				}
 			}
 		}
 		
-		if (bloonsInRange.isEmpty()) {
+		if (targetBloon == null) {
 			return false;
 		} else {
-			BloonActor bloonActor = bloonsInRange.iterator().next();
-			
-			for (BloonActor actor : bloonsInRange) {
-				if (actor.getBloon().getDistanceTravelled() > bloonActor.getBloon().getDistanceTravelled()) {
-					bloonActor = actor;
-				}
-			}
-			
-			BulletActor bulletActor = girlActor.createBulletActor(bloonActor);
+			BulletActor bulletActor = girlActor.createBulletActor(targetBloon);
 			stage.addActor(bulletActor);
 			return true;
 		}
 	}
 	
 	public void lookAtBloon(GirlActor girlActor) {
-		Set<BloonActor> bloonsInRange = new HashSet<>();
+		BloonActor targetBloon = null;
 		
 		for (BloonActor bloonActor : onstageBloons) {
 			float distance = Map.distanceBetweenActors(girlActor, bloonActor);
 			
 			if (distance - bloonActor.getCollisionRadius() < girlActor.getGirl().getVisualRange()) {
-				bloonsInRange.add(bloonActor);
+				if (targetBloon == null || bloonActor.getBloon().getDistanceTravelled() > targetBloon.getBloon().getDistanceTravelled()) {
+					targetBloon = bloonActor;
+				}
 			}
 		}
 		
-		if (!bloonsInRange.isEmpty()) {
-			BloonActor bloonActor = bloonsInRange.iterator().next();
-			
-			for (BloonActor actor : bloonsInRange) {
-				if (actor.getBloon().getDistanceTravelled() > bloonActor.getBloon().getDistanceTravelled()) {
-					bloonActor = actor;
-				}
-			}
-			
-			girlActor.lookAtBloon(bloonActor);
+		if (targetBloon != null) {
+			girlActor.lookAtBloon(targetBloon);
 		}
 	}
 	
