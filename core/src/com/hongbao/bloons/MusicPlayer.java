@@ -53,7 +53,13 @@ public class MusicPlayer {
 	public void stopMusic() {
 		if (backgroundMusic != null) {
 			backgroundMusic.stop();
+			backgroundMusic.dispose();
+			backgroundMusic = null;
 		}
+	}
+
+	public void dispose() {
+		stopMusic();
 	}
 
 	public void toggleMusic() {
