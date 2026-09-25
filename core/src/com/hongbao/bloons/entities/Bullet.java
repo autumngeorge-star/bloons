@@ -7,8 +7,8 @@ public class Bullet {
 	private float speed;
 	private int damage;
 	private int pierce;
-	private float maxRange; // Because of how actions are evaluated, this is an approximation. But that's fine.
-	private float distanceTraveled;
+	private float maxLifetimeSeconds;
+	private float elapsedTimeSeconds;
 	private boolean homing;
 	private String imageFileName;
 
@@ -23,19 +23,19 @@ public class Bullet {
 		speed = 20f;
 		damage = 2;
 		pierce = 2;
-		maxRange = 500;
-		distanceTraveled = 0;
+		maxLifetimeSeconds = 2.0833333f;
+		elapsedTimeSeconds = 0f;
 		homing = false;
 		imageFileName = IMAGE_FOLDER + "red_spell_card.png";
 	}
 	
-	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName) {
+	public Bullet(float speed, int damage, int pierce, float maxLifetimeSeconds, boolean homing, String imageFileName) {
 		this.speed = speed;
 		this.damage = damage;
 		this.pierce = pierce;
-		this.maxRange = maxRange;
+		this.maxLifetimeSeconds = maxLifetimeSeconds;
 		this.imageFileName = IMAGE_FOLDER + imageFileName;
-		distanceTraveled = 0;
+		this.elapsedTimeSeconds = 0f;
 		this.homing = homing;
 	}
 	
@@ -63,20 +63,44 @@ public class Bullet {
 		pierce--;
 	}
 	
+	public float getMaxLifetimeSeconds() {
+		return maxLifetimeSeconds;
+	}
+	
+	public void setMaxLifetimeSeconds(float maxLifetimeSeconds) {
+		this.maxLifetimeSeconds = maxLifetimeSeconds;
+	}
+	
+	public float getElapsedTimeSeconds() {
+		return elapsedTimeSeconds;
+	}
+	
+	public void setElapsedTimeSeconds(float elapsedTimeSeconds) {
+		this.elapsedTimeSeconds = elapsedTimeSeconds;
+	}
+	
+	public void updateElapsedTime(float delta) {
+		this.elapsedTimeSeconds += delta;
+	}
+	
+	public boolean isExpired() {
+		return elapsedTimeSeconds >= maxLifetimeSeconds;
+	}
+
 	public float getMaxRange() {
-		return maxRange;
+		return maxLifetimeSeconds * 12f * speed;
 	}
 	
 	public void setMaxRange(float maxRange) {
-		this.maxRange = maxRange;
+		this.maxLifetimeSeconds = maxRange / (12f * speed);
 	}
 	
 	public float getDistanceTraveled() {
-		return distanceTraveled;
+		return elapsedTimeSeconds * 12f * speed;
 	}
 	
 	public void incrementDistanceTraveled() {
-		distanceTraveled += speed / 5;
+		this.elapsedTimeSeconds += (1f / 60f);
 	}
 	
 	public boolean isHoming() {

@@ -125,20 +125,23 @@ public class BulletActor extends RenderableActor {
 	@Override
 	public void act(float delta) {
 		frames++;
+		float clampedDelta = Math.min(delta, 0.1f);
 		BloonManager bloonManager = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager();
 		
 		setDirectionIfApplicable(bloonManager);
 		
-		setX(getX() + dx * bullet.getSpeed() / 5);
-		setY(getY() + dy * bullet.getSpeed() / 5);
+		setX(getX() + dx * bullet.getSpeed() * 12f * clampedDelta);
+		setY(getY() + dy * bullet.getSpeed() * 12f * clampedDelta);
 		
 		if (getY() < 0 || getY() > 900 || getX() < 0 || getX() > 1500) {
 			remove();
+			return;
 		}
 		
-		bullet.incrementDistanceTraveled();
-		if (bullet.getDistanceTraveled() >= bullet.getMaxRange()) {
+		bullet.updateElapsedTime(clampedDelta);
+		if (bullet.isExpired()) {
 			remove();
+			return;
 		}
 		
 		bloonManager.checkCollision(this);
