@@ -46,6 +46,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Stage stage;
 	private Player player;
 	private Map map;
+	private AudioManager audioManager;
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
@@ -59,7 +60,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		autoContinue = false;
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
-		musicPlayer = new MusicPlayer();
+		audioManager = new AudioManager();
+		musicPlayer = new MusicPlayer(audioManager);
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -447,6 +449,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		return player;
 	}
 
+	public AudioManager getAudioManager() {
+		return audioManager;
+	}
+
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
 	}
@@ -574,6 +580,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void dispose() {
 		stage.dispose();
+		if (audioManager != null) {
+			audioManager.dispose();
+		}
 	}
 
 }

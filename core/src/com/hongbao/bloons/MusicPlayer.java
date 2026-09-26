@@ -1,28 +1,33 @@
 package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
-
 
 public class MusicPlayer {
-	
-	private Music backgroundMusic;
-	
+
+	private AudioManager audioManager;
+
 	public MusicPlayer() {
-		backgroundMusic = null;
+		this.audioManager = null;
+	}
+
+	public MusicPlayer(AudioManager audioManager) {
+		this.audioManager = audioManager;
+	}
+
+	private AudioManager getAudioManager() {
+		if (audioManager != null) {
+			return audioManager;
+		}
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			return ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getAudioManager();
+		}
+		return null;
 	}
 
 	private void playMusic(String fileName) {
-		boolean wasPlaying = true;
-		if (backgroundMusic != null) {
-			wasPlaying = backgroundMusic.isPlaying();
-		}
-		stopMusic();
-		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(fileName));
-		backgroundMusic.setVolume(0.5f);
-		backgroundMusic.setLooping(true);
-		if (wasPlaying) {
-			backgroundMusic.play();
+		AudioManager mgr = getAudioManager();
+		if (mgr != null) {
+			mgr.playMusic(fileName, 0.5f, true);
 		}
 	}
 
@@ -37,32 +42,32 @@ public class MusicPlayer {
 	public void playFinalBossMusic() {
 		playMusic("music/night_falls.mp3");
 	}
-	
+
 	public void pause() {
-		if (backgroundMusic != null) {
-			backgroundMusic.pause();
+		AudioManager mgr = getAudioManager();
+		if (mgr != null) {
+			mgr.pauseMusic();
 		}
 	}
-	
+
 	public void resume() {
-		if (backgroundMusic != null) {
-			backgroundMusic.play();
+		AudioManager mgr = getAudioManager();
+		if (mgr != null) {
+			mgr.resumeMusic();
 		}
 	}
-	
+
 	public void stopMusic() {
-		if (backgroundMusic != null) {
-			backgroundMusic.stop();
+		AudioManager mgr = getAudioManager();
+		if (mgr != null) {
+			mgr.stopMusic();
 		}
 	}
 
 	public void toggleMusic() {
-		if (backgroundMusic != null) {
-			if (backgroundMusic.isPlaying()) {
-				pause();
-			} else {
-				resume();
-			}
+		AudioManager mgr = getAudioManager();
+		if (mgr != null) {
+			mgr.toggleMusic();
 		}
 	}
 
