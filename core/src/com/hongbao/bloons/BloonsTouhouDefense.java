@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -23,6 +24,7 @@ import com.badlogic.gdx.utils.Align;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.actors.RenderableTextButton;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
@@ -152,9 +154,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		stage.addActor(new RenderableImageButton(background, ZIndex.MENU_Z_INDEX));
 
 		Label title = new Label("Bloons Touhou Defense\nLevel 1", skin);
-		title.setPosition(1600, 820);
-		title.setBounds(1500, 800, 300, 100);
-		title.setFontScale(1.5f,1.5f);
+		title.setPosition(1550, 820);
+		title.setBounds(1550, 800, 200, 100);
+		title.setFontScale(1.3f,1.3f);
 		title.setAlignment(Align.center);
 		title.addListener(new ClickListener() {
 			@Override
@@ -165,29 +167,52 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		final RunnableAction titleAction = new RunnableAction();
 		titleAction.setRunnable(() -> {
 			Label titleActor = (Label) titleAction.getActor();
-			if (map.getBloonManager().canGoToNextLevel()) {
+			BloonManager bloonManager = map.getBloonManager();
+			if (bloonManager.canGoToNextLevel()) {
 				if (autoContinue) {
-					map.getBloonManager().nextLevel();
+					bloonManager.nextLevel();
 				} else {
-					if (map.getBloonManager().getLevel() == 0) {
-						titleActor.setText("START\n(click here)");
-					} else {
-						titleActor.setText("NEXT LEVEL\n(click here)");
-					}
+					titleActor.setText("Level " + bloonManager.getSelectedLevel() + "\n(click here)");
 					titleActor.setColor(Color.BLACK);
 				}
 			} else {
-				if (map.getBloonManager().hasWonGame()) {
+				if (bloonManager.hasWonGame()) {
 					titleActor.setText("YOU WIN!");
 					titleActor.setColor(Color.GOLD);
 				} else {
-					titleActor.setText("Bloons Touhou Defense\nLevel " + (map.getBloonManager().getLevel()));
+					titleActor.setText("Bloons Touhou Defense\nLevel " + (bloonManager.getLevel()));
 					titleActor.setColor(Color.WHITE);
 				}
 			}
 		});
 		title.addAction(Actions.repeat(RepeatAction.FOREVER, titleAction));
 		stage.addActor(new RenderableLabel(title, ZIndex.MENU_ITEM_Z_INDEX));
+
+		TextButton prevLevelBtn = new TextButton("<", skin);
+		prevLevelBtn.setPosition(1510, 830);
+		prevLevelBtn.setSize(40, 40);
+		prevLevelBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (map.getBloonManager().canGoToNextLevel()) {
+					map.getBloonManager().decrementSelectedLevel();
+				}
+			}
+		});
+		stage.addActor(new RenderableTextButton(prevLevelBtn, ZIndex.MENU_ITEM_Z_INDEX));
+
+		TextButton nextLevelBtn = new TextButton(">", skin);
+		nextLevelBtn.setPosition(1750, 830);
+		nextLevelBtn.setSize(40, 40);
+		nextLevelBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (map.getBloonManager().canGoToNextLevel()) {
+					map.getBloonManager().incrementSelectedLevel();
+				}
+			}
+		});
+		stage.addActor(new RenderableTextButton(nextLevelBtn, ZIndex.MENU_ITEM_Z_INDEX));
 
 
 		Label moneyLabel = new Label(String.valueOf(player.getMoney()), skin);
