@@ -23,9 +23,16 @@ public class Girl {
 	private List<Integer> upgradeCost;
 	private int level;
 	private int totalInvestment;
+	private int spellCardCooldownTimer;
+	private int spellCardMaxCooldown;
 	
 	
 	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+		this(name, attackDelay, bulletSpeed, damage, pierce, range, visualRange, homing, imageFileName, bulletFileName, cost, upgradeCost,
+				name.equals("Reimu") ? 600 : (name.equals("Yuyuko") ? 800 : 0));
+	}
+
+	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost, int spellCardMaxCooldown) {
 		this.name = name;
 		this.attackDelay = attackDelay;
 		this.cooldown = attackDelay.get(0);
@@ -35,10 +42,12 @@ public class Girl {
 		this.range = range;
 		this.visualRange = visualRange;
 		this.homing = homing;
-		this.imageFileName = IMAGE_FOLDER + imageFileName;
+		this.imageFileName = imageFileName.startsWith(IMAGE_FOLDER) ? imageFileName : IMAGE_FOLDER + imageFileName;
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
 		this.upgradeCost = upgradeCost;
+		this.spellCardMaxCooldown = spellCardMaxCooldown;
+		this.spellCardCooldownTimer = 0;
 		level = 0;
 		totalInvestment = cost;
 	}
@@ -139,6 +148,47 @@ public class Girl {
 		return currentCash >= getUpgradeCost();
 	}
 	
+	public int getSpellCardCooldownTimer() {
+		return spellCardCooldownTimer;
+	}
+
+	public void setSpellCardCooldownTimer(int spellCardCooldownTimer) {
+		this.spellCardCooldownTimer = spellCardCooldownTimer;
+	}
+
+	public int getSpellCardMaxCooldown() {
+		return spellCardMaxCooldown;
+	}
+
+	public void setSpellCardMaxCooldown(int spellCardMaxCooldown) {
+		this.spellCardMaxCooldown = spellCardMaxCooldown;
+	}
+
+	public boolean hasSpellCard() {
+		return spellCardMaxCooldown > 0;
+	}
+
+	public boolean isSpellCardReady() {
+		return hasSpellCard() && spellCardCooldownTimer <= 0;
+	}
+
+	public void decrementSpellCardCooldownTimer() {
+		if (spellCardCooldownTimer > 0) {
+			spellCardCooldownTimer--;
+		}
+	}
+
+	public void resetSpellCardCooldownTimer() {
+		spellCardCooldownTimer = spellCardMaxCooldown;
+	}
+
+	public float getSpellCardCooldownPercent() {
+		if (spellCardMaxCooldown <= 0) {
+			return 0f;
+		}
+		return (float) (spellCardMaxCooldown - Math.max(0, spellCardCooldownTimer)) / spellCardMaxCooldown;
+	}
+
 	public Girl getUpgradedStats() {
 		if (getUpgradeCost() != NO_UPGRADES_AVAILABLE) {
 			Girl upgradedGirl = new Girl(
@@ -153,9 +203,11 @@ public class Girl {
 			 imageFileName,
 			 bulletFileName,
 			 cost,
-			 upgradeCost
+			 upgradeCost,
+			 spellCardMaxCooldown
 			);
 			upgradedGirl.level = level + 1;
+			upgradedGirl.spellCardCooldownTimer = spellCardCooldownTimer;
 			return upgradedGirl;
 		} else {
 			return null;

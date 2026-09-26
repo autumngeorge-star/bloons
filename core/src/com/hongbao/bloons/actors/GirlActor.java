@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.entities.SpellCard;
 import com.hongbao.bloons.helpers.ZIndex;
 
 
@@ -85,10 +86,37 @@ public class GirlActor extends RenderableActor {
 		rotationAngle = (float)(Math.atan2(dx, dy) / Math.PI * 180);
 	}
 	
+	public int getSpellCardCooldownTimer() {
+		return girl != null ? girl.getSpellCardCooldownTimer() : 0;
+	}
+
+	public void setSpellCardCooldownTimer(int spellCardCooldownTimer) {
+		if (girl != null) {
+			girl.setSpellCardCooldownTimer(spellCardCooldownTimer);
+		}
+	}
+
+	public int getSpellCardMaxCooldown() {
+		return girl != null ? girl.getSpellCardMaxCooldown() : 0;
+	}
+
+	public void setSpellCardMaxCooldown(int spellCardMaxCooldown) {
+		if (girl != null) {
+			girl.setSpellCardMaxCooldown(spellCardMaxCooldown);
+		}
+	}
+
+	public boolean isSpellCardReady() {
+		return girl != null && girl.isSpellCardReady();
+	}
+
 	public SpellCardActor createSpellCardActor() {
-		if (true) { // todo Girl should have a method that checks the cooldown or something
-			// maybe some direction based on the girl's direction
-			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
+		if (girl != null && girl.isSpellCardReady()) {
+			SpellCard spellCard = girl.createSpellCard();
+			if (spellCard != null) {
+				girl.resetSpellCardCooldownTimer();
+				return new SpellCardActor(spellCard, getCenterX(), getCenterY());
+			}
 		}
 		return null;
 	}
@@ -112,6 +140,9 @@ public class GirlActor extends RenderableActor {
 	@Override
 	public void act(float delta) {
 		if (active) {
+			if (girl.getSpellCardCooldownTimer() > 0) {
+				girl.decrementSpellCardCooldownTimer();
+			}
 			if (girl.getCooldown() == 0) {
 				boolean attacked = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getMap().getBloonManager().attackBloonIfInRange(this);
 				if (attacked) {
