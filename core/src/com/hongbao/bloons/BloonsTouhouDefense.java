@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -23,6 +25,8 @@ import com.badlogic.gdx.utils.Align;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.actors.RenderableTable;
+import com.hongbao.bloons.actors.RenderableTextButton;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
@@ -49,6 +53,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private RenderableTable mapSelectionModal;
 	
 	
 	@Override
@@ -211,6 +216,16 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		});
 		healthLabel.addAction(Actions.repeat(RepeatAction.FOREVER, healthLabelAction));
 		stage.addActor(new RenderableLabel(healthLabel, ZIndex.MENU_ITEM_Z_INDEX));
+
+		TextButton mapSelectBtn = new TextButton("SELECT MAP", skin);
+		mapSelectBtn.setBounds(1510, 725, 280, 30);
+		mapSelectBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				showMapSelectionMenu();
+			}
+		});
+		stage.addActor(new RenderableTextButton(mapSelectBtn, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseReimu = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/reimu_box.png")))));
 		purchaseReimu.setPosition(1504, 676);
@@ -422,21 +437,137 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	}
 	
 	public void createMap() {
+		createMap(MapStorage.getSelectedMapKey());
+	}
+
+	public void createMap(String mapKey) {
 		stage.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if (event.getStage() != null) {
+				if (event.getStage() != null && map != null) {
 					map.setSelectedGirl(null);
 				}
 			}
 		});
 		
-		map = MapFactory.createHeaterMap(stage);
+		String keyToUse = MapStorage.getSelectedMapKey();
+		if (mapKey != null && !mapKey.trim().isEmpty()) {
+			keyToUse = mapKey;
+		}
+		MapStorage.setSelectedMapKey(keyToUse);
+
+		map = MapFactory.createMap(keyToUse, stage);
 		
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
 		ImageButton backgroundMap = new ImageButton(drawable);
 		backgroundMap.setPosition(0, 0);
 		stage.addActor(backgroundMap);
+	}
+
+	public void showMapSelectionMenu() {
+		if (mapSelectionModal != null) {
+			mapSelectionModal.remove();
+			mapSelectionModal = null;
+		}
+
+		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
+		Table table = new Table(skin);
+		table.setSize(1000, 600);
+		table.setPosition(250, 150);
+		table.background(skin.getDrawable("dialogDim"));
+
+		Label header = new Label("MAP SELECTION MENU", skin);
+		header.setFontScale(1.8f);
+		header.setColor(Color.GOLD);
+		table.add(header).colspan(3).pad(20).row();
+
+		List<String> keys = MapFactory.getRegisteredMapKeys();
+		String activeKey = MapStorage.getSelectedMapKey();
+
+		Table cardsTable = new Table(skin);
+
+		for (String key : keys) {
+			String displayName = MapFactory.getMapDisplayName(key);
+			int highestLevel = MapStorage.getHighestLevel(key);
+
+			Table card = new Table(skin);
+			card.pad(15);
+
+			Label mapName = new Label(displayName, skin);
+			mapName.setFontScale(1.4f);
+			mapName.setColor(Color.WHITE);
+			card.add(mapName).padBottom(10).row();
+
+			Label progressLabel = new Label("Highest Level: " + highestLevel, skin);
+			progressLabel.setFontScale(1.1f);
+			progressLabel.setColor(Color.LIGHT_GRAY);
+			card.add(progressLabel).padBottom(15).row();
+
+			boolean isCurrent = key.equalsIgnoreCase(activeKey);
+			TextButton btn = new TextButton(isCurrent ? "ACTIVE MAP" : "SELECT MAP", skin);
+			if (isCurrent) {
+				btn.setColor(Color.GREEN);
+			}
+			final String selectedKey = key;
+			btn.addListener(new ClickListener() {
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					selectMapAndRestartSession(selectedKey);
+				}
+			});
+			card.add(btn).width(140).height(40).row();
+
+			cardsTable.add(card).pad(20);
+		}
+
+		table.add(cardsTable).colspan(3).pad(10).row();
+
+		TextButton closeBtn = new TextButton("CLOSE", skin);
+		closeBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (mapSelectionModal != null) {
+					mapSelectionModal.remove();
+					mapSelectionModal = null;
+				}
+			}
+		});
+		table.add(closeBtn).colspan(3).width(150).height(40).pad(20);
+
+		mapSelectionModal = new RenderableTable(table, ZIndex.MENU_ITEM_Z_INDEX + 100);
+		stage.addActor(mapSelectionModal);
+	}
+
+	public void selectMapAndRestartSession(String mapKey) {
+		if (mapSelectionModal != null) {
+			mapSelectionModal.remove();
+			mapSelectionModal = null;
+		}
+		MapStorage.setSelectedMapKey(mapKey);
+		restartSession();
+	}
+
+	public void restartSession() {
+		paused = false;
+		tripleSpeed = false;
+		autoContinue = false;
+		stage.clear();
+		player = new Player(MONEY, HEALTH);
+		instructions = new ArrayList<>();
+
+		final RunnableAction bloonCreationAction = new RunnableAction();
+		bloonCreationAction.setRunnable(() -> {
+			if (map != null) {
+				map.getBloonManager().createBloons();
+			}
+		});
+		stage.addAction(Actions.repeat(RepeatAction.FOREVER, bloonCreationAction));
+
+		Gdx.input.setInputProcessor(stage);
+
+		createMap();
+		createMenu();
+		createInstructions();
 	}
 	
 	public Map getMap() {
@@ -526,6 +657,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
 				autoContinue = !autoContinue;
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+				showMapSelectionMenu();
 			}
 			
 			if (girl != null) {

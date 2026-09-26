@@ -4,13 +4,72 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.Map;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MapFactory {
+
+	@FunctionalInterface
+	public interface MapCreator {
+		Map create(Stage stage);
+	}
 	
 	public static final float ROOT_2_OVER_2 = 0.7071f;
+	public static final String DEFAULT_MAP_KEY = "heater";
+
+	private static final java.util.Map<String, MapCreator> registry = new HashMap<>();
+	private static final java.util.Map<String, String> displayNames = new HashMap<>();
+	private static final List<String> registeredKeys = new ArrayList<>();
+
+	static {
+		registerMap("basic", "Basic Map", MapFactory::createBasicMap);
+		registerMap("map_with_turn", "Map With Turn", MapFactory::createMapWithTurn);
+		registerMap("heater", "Heater Map", MapFactory::createHeaterMap);
+	}
+
+	public static void registerMap(String key, String displayName, MapCreator creator) {
+		if (key == null || creator == null) return;
+		String normalizedKey = key.toLowerCase().trim();
+		if (!registry.containsKey(normalizedKey)) {
+			registeredKeys.add(normalizedKey);
+		}
+		registry.put(normalizedKey, creator);
+		displayNames.put(normalizedKey, displayName != null ? displayName : normalizedKey);
+	}
+
+	public static Map createMap(String key, Stage stage) {
+		if (key == null || key.trim().isEmpty()) {
+			key = DEFAULT_MAP_KEY;
+		}
+		String normalizedKey = key.toLowerCase().trim();
+		if (normalizedKey.equals("basic_map")) {
+			normalizedKey = "basic";
+		}
+		MapCreator creator = registry.get(normalizedKey);
+		if (creator == null) {
+			creator = registry.get(DEFAULT_MAP_KEY);
+			normalizedKey = DEFAULT_MAP_KEY;
+		}
+		Map map = creator.create(stage);
+		map.setKey(normalizedKey);
+		return map;
+	}
+
+	public static List<String> getRegisteredMapKeys() {
+		return new ArrayList<>(registeredKeys);
+	}
+
+	public static String getMapDisplayName(String key) {
+		if (key == null) return "";
+		String normalizedKey = key.toLowerCase().trim();
+		if (normalizedKey.equals("basic_map")) normalizedKey = "basic";
+		return displayNames.getOrDefault(normalizedKey, key);
+	}
 	
 	public static Map createBasicMap(Stage stage) {
 		Map map = new Map("basic_map.png", stage);
+		map.setKey("basic");
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		for (int x = 0; x < 32; x++) {
@@ -23,6 +82,7 @@ public class MapFactory {
 	
 	public static Map createMapWithTurn(Stage stage) {
 		Map map = new Map("map_with_turn.png", stage);
+		map.setKey("map_with_turn");
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		directions[0][8] = new Pair<>(1f, 0f);
 		directions[1][8] = new Pair<>(1f, 0f);
@@ -43,6 +103,7 @@ public class MapFactory {
 	
 	public static Map createHeaterMap(Stage stage) {
 		Map map = new Map("heater.png", stage);
+		map.setKey("heater");
 		Pair<Float, Float>[][] directions = initializeEmptyDirections();
 		
 		directions[0][8] = new Pair<>(1f, 0f);

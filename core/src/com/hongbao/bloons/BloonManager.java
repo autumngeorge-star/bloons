@@ -35,6 +35,7 @@ public class BloonManager {
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
+			MapStorage.updateHighestLevel(map.getKey(), bloonQueue.getLevel());
 			bloonQueue.nextLevel();
 			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
 			if (map.getBloonManager().getLevel() == 1) {
@@ -46,7 +47,11 @@ public class BloonManager {
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean can = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		if (can && bloonQueue.getLevel() > 0) {
+			MapStorage.updateHighestLevel(map.getKey(), bloonQueue.getLevel());
+		}
+		return can;
 	}
 
 	public int getLevel() {
@@ -54,7 +59,11 @@ public class BloonManager {
 	}
 
 	public boolean hasWonGame() {
-		return !bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean won = !bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		if (won && bloonQueue.getLevel() > 0) {
+			MapStorage.updateHighestLevel(map.getKey(), bloonQueue.getLevel());
+		}
+		return won;
 	}
 	
 	public void createBloons() {
