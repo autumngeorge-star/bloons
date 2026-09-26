@@ -46,6 +46,16 @@ public class BulletActor extends RenderableActor {
 		);
 		
 		damagedBloons = new HashSet<>(bullet.getPierce());
+		updateDynamicZIndex();
+	}
+	
+	public void updateDynamicZIndex() {
+		setZIndex(ZIndex.calculateDynamicZIndex(
+			ZIndex.BULLET_Z_INDEX,
+			getCenterY(),
+			bullet != null ? bullet.getDistanceTraveled() : 0f,
+			hashCode()
+		));
 	}
 	
 	public Bullet getBullet() {
@@ -142,6 +152,7 @@ public class BulletActor extends RenderableActor {
 		}
 		
 		bloonManager.checkCollision(this);
+		updateDynamicZIndex();
 	}
 	
 	private void setDirectionIfApplicable(BloonManager bloonManager) {

@@ -41,6 +41,16 @@ public class BloonActor extends RenderableActor {
 			parentBloonIds = new HashSet<>();
 		}
 		bloonId = RANDOM.nextLong();
+		updateDynamicZIndex();
+	}
+
+	public void updateDynamicZIndex() {
+		setZIndex(ZIndex.calculateDynamicZIndex(
+			ZIndex.BLOON_Z_INDEX,
+			getCenterY(),
+			bloon != null ? bloon.getDistanceTravelled() : 0,
+			bloonId != null ? bloonId : hashCode()
+		));
 	}
 
 	public Bloon getBloon() {
@@ -139,5 +149,6 @@ public class BloonActor extends RenderableActor {
 			System.out.println(direction.getFirst());
 		}
 		move(direction);
+		updateDynamicZIndex();
 	}
 }

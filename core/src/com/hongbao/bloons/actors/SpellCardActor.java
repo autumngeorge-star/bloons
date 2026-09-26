@@ -30,6 +30,16 @@ public class SpellCardActor extends RenderableActor {
 		 textureRegion.getTexture().getWidth(),
 		 textureRegion.getTexture().getHeight()
 		);
+		updateDynamicZIndex();
+	}
+	
+	public void updateDynamicZIndex() {
+		setZIndex(ZIndex.calculateDynamicZIndex(
+			ZIndex.SPELL_CARD_Z_INDEX,
+			getCenterY(),
+			0f,
+			hashCode()
+		));
 	}
 	
 	public SpellCard getSpellCard() {
@@ -75,6 +85,7 @@ public class SpellCardActor extends RenderableActor {
 				}
 			}
 		}
+		updateDynamicZIndex();
 	}
 	
 }

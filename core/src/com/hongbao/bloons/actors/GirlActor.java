@@ -33,6 +33,16 @@ public class GirlActor extends RenderableActor {
 		 textureRegion.getTexture().getWidth(),
 		 textureRegion.getTexture().getHeight()
 		);
+		updateDynamicZIndex();
+	}
+	
+	public void updateDynamicZIndex() {
+		setZIndex(ZIndex.calculateDynamicZIndex(
+			ZIndex.GIRL_Z_INDEX,
+			getCenterY(),
+			0f,
+			hashCode()
+		));
 	}
 	
 	public Girl getGirl() {
@@ -122,6 +132,7 @@ public class GirlActor extends RenderableActor {
 				girl.decrementCooldown();
 			}
 		}
+		updateDynamicZIndex();
 	}
 	
 }
