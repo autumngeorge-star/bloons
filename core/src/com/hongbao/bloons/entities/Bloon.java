@@ -93,6 +93,9 @@ public class Bloon {
 	private int distanceTravelled;
 	private boolean camo;
 	private boolean regen;
+	private boolean frozen;
+	private boolean slowed;
+	private boolean burned;
 
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
@@ -161,6 +164,36 @@ public class Bloon {
 
 	public void setRegen(boolean regen) {
 		this.regen = regen;
+	}
+
+	public boolean isFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(boolean frozen) {
+		this.frozen = frozen;
+	}
+
+	public boolean isSlowed() {
+		return slowed;
+	}
+
+	public void setSlowed(boolean slowed) {
+		this.slowed = slowed;
+	}
+
+	public boolean isBurned() {
+		return burned;
+	}
+
+	public void setBurned(boolean burned) {
+		this.burned = burned;
+	}
+
+	public void clearStatusEffects() {
+		this.frozen = false;
+		this.slowed = false;
+		this.burned = false;
 	}
 	
 	public boolean willPopBloon(int damage) {
