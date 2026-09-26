@@ -132,7 +132,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		instructions.add(new RenderableImageButton(instructions5, ZIndex.MENU_ITEM_Z_INDEX));
 		instructions.add(new RenderableImageButton(instructions6, ZIndex.MENU_ITEM_Z_INDEX));
 		
-		stage.addActor(instructions.get(0));
+		SortByZIndex.addActorInOrder(stage, instructions.get(0));
 	}
 	
 	private void updateInstructions() {
@@ -140,7 +140,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		instructions.remove(0);
 
 		if (instructions.size() != 0) {
-			stage.addActor(instructions.get(0));
+			SortByZIndex.addActorInOrder(stage, instructions.get(0));
 		}
 	}
 	
@@ -149,7 +149,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 		ImageButton background = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/header.png")))));
 		background.setPosition(1500, 0);
-		stage.addActor(new RenderableImageButton(background, ZIndex.MENU_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableImageButton(background, ZIndex.MENU_Z_INDEX));
 
 		Label title = new Label("Bloons Touhou Defense\nLevel 1", skin);
 		title.setPosition(1600, 820);
@@ -187,7 +187,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			}
 		});
 		title.addAction(Actions.repeat(RepeatAction.FOREVER, titleAction));
-		stage.addActor(new RenderableLabel(title, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(title, ZIndex.MENU_ITEM_Z_INDEX));
 
 
 		Label moneyLabel = new Label(String.valueOf(player.getMoney()), skin);
@@ -196,7 +196,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		final RunnableAction moneyLabelAction = new RunnableAction();
 		moneyLabelAction.setRunnable(() -> ((Label)moneyLabelAction.getActor()).setText(String.valueOf(player.getMoney())));
 		moneyLabel.addAction(Actions.repeat(RepeatAction.FOREVER, moneyLabelAction));
-		stage.addActor(new RenderableLabel(moneyLabel, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(moneyLabel, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		Label healthLabel = new Label(String.valueOf(player.getHealth()), skin);
 		healthLabel.setPosition(1540, 765);
@@ -210,7 +210,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			}
 		});
 		healthLabel.addAction(Actions.repeat(RepeatAction.FOREVER, healthLabelAction));
-		stage.addActor(new RenderableLabel(healthLabel, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(healthLabel, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseReimu = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/reimu_box.png")))));
 		purchaseReimu.setPosition(1504, 676);
@@ -223,18 +223,18 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					if (player.canPurchaseGirl(girl)) {
 						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 						map.setSelectedGirl(girlActor);
-						stage.addActor(girlActor);
+						SortByZIndex.addActorInOrder(stage, girlActor);
 					}
 				}
 			}
 		});
-		stage.addActor(new RenderableImageButton(purchaseReimu, ZIndex.MENU_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableImageButton(purchaseReimu, ZIndex.MENU_Z_INDEX));
 		
 		Label reimuCost = new Label(String.valueOf(GirlFactory.createReimu().getCost()), skin);
 		reimuCost.setPosition(1680, 700);
 		reimuCost.setFontScale(1.5f,1.5f);
 		reimuCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
-		stage.addActor(new RenderableLabel(reimuCost, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(reimuCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseYukari = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/yukari_box.png")))));
 		purchaseYukari.setPosition(1504, 604);
@@ -247,18 +247,18 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					if (player.canPurchaseGirl(girl)) {
 						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 						map.setSelectedGirl(girlActor);
-						stage.addActor(girlActor);
+						SortByZIndex.addActorInOrder(stage, girlActor);
 					}
 				}
 			}
 		});
-		stage.addActor(new RenderableImageButton(purchaseYukari, ZIndex.MENU_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableImageButton(purchaseYukari, ZIndex.MENU_Z_INDEX));
 		
 		Label yukariCost = new Label(String.valueOf(GirlFactory.createYukari().getCost()), skin);
 		yukariCost.setPosition(1680, 628);
 		yukariCost.setFontScale(1.5f,1.5f);
 		yukariCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
-		stage.addActor(new RenderableLabel(yukariCost, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(yukariCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseMarisa = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/marisa_box.png")))));
 		purchaseMarisa.setPosition(1504, 532);
@@ -271,18 +271,18 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					if (player.canPurchaseGirl(girl)) {
 						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 						map.setSelectedGirl(girlActor);
-						stage.addActor(girlActor);
+						SortByZIndex.addActorInOrder(stage, girlActor);
 					}
 				}
 			}
 		});
-		stage.addActor(new RenderableImageButton(purchaseMarisa, ZIndex.MENU_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableImageButton(purchaseMarisa, ZIndex.MENU_Z_INDEX));
 		
 		Label marisaCost = new Label(String.valueOf(GirlFactory.createMarisa().getCost()), skin);
 		marisaCost.setPosition(1680, 556);
 		marisaCost.setFontScale(1.5f,1.5f);
 		marisaCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
-		stage.addActor(new RenderableLabel(marisaCost, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(marisaCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseAlice = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/alice_box.png")))));
 		purchaseAlice.setPosition(1504, 460);
@@ -295,18 +295,18 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					if (player.canPurchaseGirl(girl)) {
 						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 						map.setSelectedGirl(girlActor);
-						stage.addActor(girlActor);
+						SortByZIndex.addActorInOrder(stage, girlActor);
 					}
 				}
 			}
 		});
-		stage.addActor(new RenderableImageButton(purchaseAlice, ZIndex.MENU_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableImageButton(purchaseAlice, ZIndex.MENU_Z_INDEX));
 		
 		Label aliceCost = new Label(String.valueOf(GirlFactory.createAlice().getCost()), skin);
 		aliceCost.setPosition(1680, 484);
 		aliceCost.setFontScale(1.5f,1.5f);
 		aliceCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
-		stage.addActor(new RenderableLabel(aliceCost, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(aliceCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseSakuya = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/sakuya_box.png")))));
 		purchaseSakuya.setPosition(1504, 388);
@@ -319,18 +319,18 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					if (player.canPurchaseGirl(girl)) {
 						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 						map.setSelectedGirl(girlActor);
-						stage.addActor(girlActor);
+						SortByZIndex.addActorInOrder(stage, girlActor);
 					}
 				}
 			}
 		});
-		stage.addActor(new RenderableImageButton(purchaseSakuya, ZIndex.MENU_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableImageButton(purchaseSakuya, ZIndex.MENU_Z_INDEX));
 		
 		Label sakuyaCost = new Label(String.valueOf(GirlFactory.createSakuya().getCost()), skin);
 		sakuyaCost.setPosition(1680, 412);
 		sakuyaCost.setFontScale(1.5f,1.5f);
 		sakuyaCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
-		stage.addActor(new RenderableLabel(sakuyaCost, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(sakuyaCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseRemilia = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/remilia_box.png")))));
 		purchaseRemilia.setPosition(1504, 316);
@@ -343,18 +343,18 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					if (player.canPurchaseGirl(girl)) {
 						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 						map.setSelectedGirl(girlActor);
-						stage.addActor(girlActor);
+						SortByZIndex.addActorInOrder(stage, girlActor);
 					}
 				}
 			}
 		});
-		stage.addActor(new RenderableImageButton(purchaseRemilia, ZIndex.MENU_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableImageButton(purchaseRemilia, ZIndex.MENU_Z_INDEX));
 		
 		Label remiliaCost = new Label(String.valueOf(GirlFactory.createRemilia().getCost()), skin);
 		remiliaCost.setPosition(1680, 340);
 		remiliaCost.setFontScale(1.5f,1.5f);
 		remiliaCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
-		stage.addActor(new RenderableLabel(remiliaCost, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(remiliaCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseYoumu = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/youmu_box.png")))));
 		purchaseYoumu.setPosition(1504, 244);
@@ -367,18 +367,18 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					if (player.canPurchaseGirl(girl)) {
 						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 						map.setSelectedGirl(girlActor);
-						stage.addActor(girlActor);
+						SortByZIndex.addActorInOrder(stage, girlActor);
 					}
 				}
 			}
 		});
-		stage.addActor(new RenderableImageButton(purchaseYoumu, ZIndex.MENU_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableImageButton(purchaseYoumu, ZIndex.MENU_Z_INDEX));
 		
 		Label youmuCost = new Label(String.valueOf(GirlFactory.createYoumu().getCost()), skin);
 		youmuCost.setPosition(1680, 268);
 		youmuCost.setFontScale(1.5f,1.5f);
 		youmuCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
-		stage.addActor(new RenderableLabel(youmuCost, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(youmuCost, ZIndex.MENU_ITEM_Z_INDEX));
 		
 		ImageButton purchaseYuyuko = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/yuyuko_box.png")))));
 		purchaseYuyuko.setPosition(1504, 172);
@@ -391,18 +391,18 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					if (player.canPurchaseGirl(girl)) {
 						GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 						map.setSelectedGirl(girlActor);
-						stage.addActor(girlActor);
+						SortByZIndex.addActorInOrder(stage, girlActor);
 					}
 				}
 			}
 		});
-		stage.addActor(new RenderableImageButton(purchaseYuyuko, ZIndex.MENU_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableImageButton(purchaseYuyuko, ZIndex.MENU_Z_INDEX));
 		
 		Label yuyukoCost = new Label(String.valueOf(GirlFactory.createYuyuko().getCost()), skin);
 		yuyukoCost.setPosition(1680, 196);
 		yuyukoCost.setFontScale(1.5f,1.5f);
 		yuyukoCost.addAction(Actions.repeat(RepeatAction.FOREVER, createNewCostLabelAction()));
-		stage.addActor(new RenderableLabel(yuyukoCost, ZIndex.MENU_ITEM_Z_INDEX));
+		SortByZIndex.addActorInOrder(stage, new RenderableLabel(yuyukoCost, ZIndex.MENU_ITEM_Z_INDEX));
 	}
 	
 	private RunnableAction createNewCostLabelAction() {
@@ -436,7 +436,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
 		ImageButton backgroundMap = new ImageButton(drawable);
 		backgroundMap.setPosition(0, 0);
-		stage.addActor(backgroundMap);
+		SortByZIndex.addActorInOrder(stage, backgroundMap);
 	}
 	
 	public Map getMap() {
@@ -532,11 +532,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				if (player.canPurchaseGirl(girl)) {
 					GirlActor girlActor = new GirlActor(girl, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 					map.setSelectedGirl(girlActor);
-					stage.addActor(girlActor);
+					SortByZIndex.addActorInOrder(stage, girlActor);
 				}
 			}
-			
-			stage.getActors().sort(new SortByZIndex());
 		}
 		stage.draw();
 		

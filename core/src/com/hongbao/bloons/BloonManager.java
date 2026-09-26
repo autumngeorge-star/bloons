@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
+import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
@@ -62,7 +63,7 @@ public class BloonManager {
 		
 		for (Bloon bloon : bloonsToBeCreated) {
 			BloonActor actor = new BloonActor(bloon, -25, 425, null); // todo make these numbers an attribute in map or something
-			stage.addActor(actor);
+			SortByZIndex.addActorInOrder(stage, actor);
 			onstageBloons.add(actor);
 		}
 	}
@@ -112,7 +113,7 @@ public class BloonManager {
 					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
 					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
 				}
-				stage.addActor(generatedBloonActor);
+				SortByZIndex.addActorInOrder(stage, generatedBloonActor);
 				onstageBloons.add(generatedBloonActor);
 				previousBloonActor = generatedBloonActor;
 			}
@@ -126,7 +127,7 @@ public class BloonManager {
 	}
 	
 	public void addBulletToStage(BulletActor bulletActor) {
-		stage.addActor(bulletActor);
+		SortByZIndex.addActorInOrder(stage, bulletActor);
 	}
 	
 	public boolean attackBloonIfInRange(GirlActor girlActor) {
@@ -152,7 +153,7 @@ public class BloonManager {
 			}
 			
 			BulletActor bulletActor = girlActor.createBulletActor(bloonActor);
-			stage.addActor(bulletActor);
+			SortByZIndex.addActorInOrder(stage, bulletActor);
 			return true;
 		}
 	}
