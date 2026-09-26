@@ -145,38 +145,84 @@ public class BulletActor extends RenderableActor {
 	}
 	
 	private void setDirectionIfApplicable(BloonManager bloonManager) {
+		Pair<Float, Float> patternDirection = null;
 		if (spellCardOverride != null) {
-			Pair<Float, Float> overrideDirection = null;
 			if (spellCardOverride.equals("Reimu")) {
-				overrideDirection = reimuSpellCardOverride();
+				patternDirection = reimuSpellCardOverride();
 			} else if (spellCardOverride.equals("Yuyuko")) {
-				overrideDirection = yuyukoSpellCardOverride();
-			}
-
-			if (overrideDirection != null) {
-				dx = overrideDirection.getFirst();
-				dy = overrideDirection.getSecond();
-				calculateRotationAngle();
-				return;
+				patternDirection = yuyukoSpellCardOverride();
 			}
 		}
-		
+
+		Pair<Float, Float> homingDirection = null;
+		float distanceToTarget = 0.0f;
+
 		if (bullet.isHoming()) {
 			if (!bloonManager.containsBloon(target)) {
 				target = bloonManager.getNewHomingTarget(this);
 			}
-			
+
 			if (target != null) {
-				dx = target.getCenterX() - getCenterX();
-				dy = target.getCenterY() - getCenterY();
-				
-				// make it a unit vector
-				float distance = (float) Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-				dx /= distance;
-				dy /= distance;
+				float targetDx = target.getCenterX() - getCenterX();
+				float targetDy = target.getCenterY() - getCenterY();
+				distanceToTarget = (float) Math.sqrt(targetDx * targetDx + targetDy * targetDy);
+				if (distanceToTarget > 1e-5f) {
+					homingDirection = new Pair<>(targetDx / distanceToTarget, targetDy / distanceToTarget);
+				}
 			}
+		}
+
+		if (patternDirection != null && homingDirection != null) {
+			float alpha = computeAlpha(distanceToTarget, frames);
+			Pair<Float, Float> blended = blendVectors(
+				patternDirection.getFirst(), patternDirection.getSecond(),
+				homingDirection.getFirst(), homingDirection.getSecond(),
+				alpha
+			);
+			dx = blended.getFirst();
+			dy = blended.getSecond();
+			calculateRotationAngle();
+		} else if (patternDirection != null) {
+			dx = patternDirection.getFirst();
+			dy = patternDirection.getSecond();
+			calculateRotationAngle();
+		} else if (homingDirection != null) {
+			dx = homingDirection.getFirst();
+			dy = homingDirection.getSecond();
 			calculateRotationAngle();
 		}
+	}
+
+	public static float computeAlpha(float distanceToTarget, int frames) {
+		float maxDist = 300.0f;
+		float fDist = Math.max(0.0f, Math.min(1.0f, 1.0f - distanceToTarget / maxDist));
+		float fTime = Math.max(0.0f, Math.min(1.0f, frames / 200.0f));
+		float progress = Math.max(fDist, fTime);
+		float alpha = 0.4f + 0.6f * progress;
+		return Math.max(0.0f, Math.min(1.0f, alpha));
+	}
+
+	public static Pair<Float, Float> blendVectors(float dxPattern, float dyPattern, float dxHoming, float dyHoming, float alpha) {
+		float clampedAlpha = Math.max(0.0f, Math.min(1.0f, alpha));
+		float finalDx = (1.0f - clampedAlpha) * dxPattern + clampedAlpha * dxHoming;
+		float finalDy = (1.0f - clampedAlpha) * dyPattern + clampedAlpha * dyHoming;
+
+		float len = (float) Math.sqrt(finalDx * finalDx + finalDy * finalDy);
+		if (len > 1e-5f) {
+			return new Pair<>(finalDx / len, finalDy / len);
+		}
+
+		float homingLen = (float) Math.sqrt(dxHoming * dxHoming + dyHoming * dyHoming);
+		if (homingLen > 1e-5f) {
+			return new Pair<>(dxHoming / homingLen, dyHoming / homingLen);
+		}
+
+		float patternLen = (float) Math.sqrt(dxPattern * dxPattern + dyPattern * dyPattern);
+		if (patternLen > 1e-5f) {
+			return new Pair<>(dxPattern / patternLen, dyPattern / patternLen);
+		}
+
+		return new Pair<>(0.0f, 0.0f);
 	}
 	
 	// I don't like how this code is but I couldn't think of any better ways for the time being
