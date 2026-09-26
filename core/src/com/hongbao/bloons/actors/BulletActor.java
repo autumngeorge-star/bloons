@@ -56,6 +56,14 @@ public class BulletActor extends RenderableActor {
 		this.bullet = bullet;
 	}
 	
+	public float getDx() {
+		return dx;
+	}
+	
+	public float getDy() {
+		return dy;
+	}
+	
 	private void calculateRotationAngle() {
 		rotationAngle = (float)(Math.atan2(dx, dy) / Math.PI * 180);
 	}
