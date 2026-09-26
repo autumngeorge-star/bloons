@@ -1,6 +1,7 @@
 package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
@@ -16,6 +17,9 @@ import java.util.Set;
 
 
 public class BloonManager {
+
+	private static final String PREF_KEY_HIGHEST_LEVEL = "highestUnlockedLevel";
+	private static final String PREF_NAME = "bloons_preferences";
 	
 	private Stage stage;
 	private Map map;
@@ -24,6 +28,9 @@ public class BloonManager {
 	private Set<BloonActor> onstageBloons;
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private int highestUnlockedLevel;
+	private int selectedLevel;
+	private boolean levelActive;
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
@@ -31,22 +38,67 @@ public class BloonManager {
 		onstageBloons = new HashSet<>();
 		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
+
+		Preferences prefs = Gdx.app.getPreferences(PREF_NAME);
+		int savedHighest = prefs.getInteger(PREF_KEY_HIGHEST_LEVEL, 1);
+		int maxAvailable = bloonQueue.getMaxLevel();
+		if (savedHighest < 1) {
+			savedHighest = 1;
+		} else if (savedHighest > maxAvailable) {
+			savedHighest = maxAvailable;
+		}
+		this.highestUnlockedLevel = savedHighest;
+		this.selectedLevel = savedHighest;
+		this.levelActive = false;
+	}
+
+	public int getHighestUnlockedLevel() {
+		return highestUnlockedLevel;
+	}
+
+	public int getSelectedLevel() {
+		return selectedLevel;
+	}
+
+	public void setSelectedLevel(int level) {
+		if (level >= 1 && level <= highestUnlockedLevel) {
+			this.selectedLevel = level;
+		}
+	}
+
+	public void incrementSelectedLevel() {
+		if (selectedLevel < highestUnlockedLevel) {
+			selectedLevel++;
+		}
+	}
+
+	public void decrementSelectedLevel() {
+		if (selectedLevel > 1) {
+			selectedLevel--;
+		}
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
-			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			bloonQueue.setLevel(selectedLevel);
+			levelActive = true;
+			if (Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+				MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
+				if (map.getBloonManager().getLevel() == 1) {
+					musicPlayer.playStageMusic();
+				} else if (map.getBloonManager().getLevel() == 40) {
+					musicPlayer.playFinalBossMusic();
+				}
 			}
 		}
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean instructionsEmpty = true;
+		if (Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			instructionsEmpty = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).instructions.isEmpty();
+		}
+		return instructionsEmpty && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 
 	public int getLevel() {
@@ -62,8 +114,33 @@ public class BloonManager {
 		
 		for (Bloon bloon : bloonsToBeCreated) {
 			BloonActor actor = new BloonActor(bloon, -25, 425, null); // todo make these numbers an attribute in map or something
-			stage.addActor(actor);
+			if (stage != null) {
+				stage.addActor(actor);
+			}
 			onstageBloons.add(actor);
+		}
+
+		checkLevelCompletion();
+	}
+
+	private void checkLevelCompletion() {
+		if (levelActive && bloonQueue.isEmpty() && onstageBloons.isEmpty()) {
+			levelActive = false;
+			int completedLevel = bloonQueue.getLevel();
+			if (completedLevel >= 1) {
+				int nextUnlocked = completedLevel + 1;
+				int maxAvailable = bloonQueue.getMaxLevel();
+				if (nextUnlocked > maxAvailable) {
+					nextUnlocked = maxAvailable;
+				}
+				if (nextUnlocked > highestUnlockedLevel) {
+					highestUnlockedLevel = nextUnlocked;
+					Preferences prefs = Gdx.app.getPreferences(PREF_NAME);
+					prefs.putInteger(PREF_KEY_HIGHEST_LEVEL, highestUnlockedLevel);
+					prefs.flush();
+				}
+				selectedLevel = Math.min(nextUnlocked, highestUnlockedLevel);
+			}
 		}
 	}
 	

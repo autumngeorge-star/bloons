@@ -49,6 +49,18 @@ public class BloonQueue {
 		clock = 0;
 	}
 
+	public void setLevel(int level) {
+		if (level >= 0 && level < bloons.size()) {
+			this.currentLevel = level;
+			this.currentIndex = 0;
+			this.clock = 0;
+		}
+	}
+
+	public int getMaxLevel() {
+		return bloons.size() - 1;
+	}
+
 	public boolean hasNextLevel() {
 		return currentLevel != bloons.size() - 1;
 	}
