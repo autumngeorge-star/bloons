@@ -2,7 +2,9 @@ package com.hongbao.bloons.entities;
 
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.hongbao.bloons.entities.Bloon.Color.BFB;
@@ -21,6 +23,38 @@ import static com.hongbao.bloons.entities.Bloon.Color.ZOMG;
 
 
 public class Bloon {
+
+	public static class ActiveStatusEffect {
+		private final StatusEffectPayload payload;
+		private float remainingDuration;
+		private float tickTimer;
+
+		public ActiveStatusEffect(StatusEffectPayload payload, float duration) {
+			this.payload = payload;
+			this.remainingDuration = duration;
+			this.tickTimer = 0f;
+		}
+
+		public StatusEffectPayload getPayload() {
+			return payload;
+		}
+
+		public float getRemainingDuration() {
+			return remainingDuration;
+		}
+
+		public void setRemainingDuration(float remainingDuration) {
+			this.remainingDuration = remainingDuration;
+		}
+
+		public float getTickTimer() {
+			return tickTimer;
+		}
+
+		public void setTickTimer(float tickTimer) {
+			this.tickTimer = tickTimer;
+		}
+	}
 
 	public enum Color {
 
@@ -53,6 +87,9 @@ public class Bloon {
 	public static final String CAMO_BLOON_DENOTATION = "_camo";
 	public static final String REGROWTH_BLOON_DENOTATION = "_regrowth";
 	public static final String IMAGE_FILE_EXTENSION = ".png";
+
+	public static final int MAX_STACKS_PER_TYPE = 3;
+	public static final float MAX_TOTAL_DURATION = 15.0f;
 
 	private static final Map<Integer, Color> HEALTH_TO_COLOR = new HashMap<Integer, Color>() {
 		{
@@ -93,6 +130,7 @@ public class Bloon {
 	private int distanceTravelled;
 	private boolean camo;
 	private boolean regen;
+	private List<ActiveStatusEffect> activeStatusEffects = new ArrayList<>();
 
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
@@ -128,6 +166,39 @@ public class Bloon {
 	}
 	
 	public int getSpeed() {
+		if (activeStatusEffects.isEmpty()) {
+			return speed;
+		}
+
+		boolean frozen = false;
+		float maxSlowPotency = 0f;
+
+		for (ActiveStatusEffect effect : activeStatusEffects) {
+			if (effect.getRemainingDuration() > 0) {
+				if (effect.getPayload().getType() == StatusEffectPayload.Type.FREEZE) {
+					frozen = true;
+					break;
+				} else if (effect.getPayload().getType() == StatusEffectPayload.Type.SLOW) {
+					if (effect.getPayload().getPotency() > maxSlowPotency) {
+						maxSlowPotency = effect.getPayload().getPotency();
+					}
+				}
+			}
+		}
+
+		if (frozen) {
+			return 0;
+		}
+
+		if (maxSlowPotency > 0f) {
+			int effective = (int) Math.round(speed * (1.0f - maxSlowPotency));
+			return Math.max(0, effective);
+		}
+
+		return speed;
+	}
+
+	public int getBaseSpeed() {
 		return speed;
 	}
 	
@@ -144,7 +215,75 @@ public class Bloon {
 	}
 	
 	public void incrementDistanceTravelled() {
-		distanceTravelled += speed;
+		distanceTravelled += getSpeed();
+	}
+
+	public List<ActiveStatusEffect> getActiveStatusEffects() {
+		return activeStatusEffects;
+	}
+
+	public void applyStatusEffect(StatusEffectPayload payload) {
+		if (payload == null || payload.getType() == null) {
+			return;
+		}
+
+		List<ActiveStatusEffect> sameTypeEffects = new ArrayList<>();
+		for (ActiveStatusEffect effect : activeStatusEffects) {
+			if (effect.getPayload().getType() == payload.getType()) {
+				sameTypeEffects.add(effect);
+			}
+		}
+
+		if (sameTypeEffects.size() >= MAX_STACKS_PER_TYPE) {
+			ActiveStatusEffect shortest = sameTypeEffects.get(0);
+			for (ActiveStatusEffect effect : sameTypeEffects) {
+				if (effect.getRemainingDuration() < shortest.getRemainingDuration()) {
+					shortest = effect;
+				}
+			}
+			float newDuration = Math.min(MAX_TOTAL_DURATION, Math.max(shortest.getRemainingDuration(), payload.getDuration()));
+			shortest.setRemainingDuration(newDuration);
+		} else {
+			float duration = Math.min(MAX_TOTAL_DURATION, payload.getDuration());
+			activeStatusEffects.add(new ActiveStatusEffect(payload, duration));
+		}
+	}
+
+	public void applyStatusEffects(List<StatusEffectPayload> payloads) {
+		if (payloads == null) return;
+		for (StatusEffectPayload payload : payloads) {
+			applyStatusEffect(payload);
+		}
+	}
+
+	public int updateStatusEffects(float delta) {
+		int accumulatedTickDamage = 0;
+		List<ActiveStatusEffect> expired = new ArrayList<>();
+
+		for (ActiveStatusEffect effect : activeStatusEffects) {
+			effect.setRemainingDuration(effect.getRemainingDuration() - delta);
+			if (effect.getRemainingDuration() <= 0) {
+				expired.add(effect);
+				continue;
+			}
+
+			float tickInterval = effect.getPayload().getTickInterval();
+			if (tickInterval > 0) {
+				effect.setTickTimer(effect.getTickTimer() + delta);
+				if (effect.getTickTimer() >= tickInterval) {
+					int dmg = (int) Math.max(1, effect.getPayload().getPotency());
+					accumulatedTickDamage += dmg;
+					effect.setTickTimer(effect.getTickTimer() - tickInterval);
+				}
+			}
+		}
+
+		activeStatusEffects.removeAll(expired);
+		return accumulatedTickDamage;
+	}
+
+	public void clearStatusEffects() {
+		activeStatusEffects.clear();
 	}
 	
 	public boolean isCamo() {

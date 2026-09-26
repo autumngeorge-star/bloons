@@ -1,5 +1,6 @@
 package com.hongbao.bloons.entities;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -23,9 +24,14 @@ public class Girl {
 	private List<Integer> upgradeCost;
 	private int level;
 	private int totalInvestment;
+	private List<List<StatusEffectPayload>> statusEffectPayloads;
 	
 	
 	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+		this(name, attackDelay, bulletSpeed, damage, pierce, range, visualRange, homing, imageFileName, bulletFileName, cost, upgradeCost, null);
+	}
+
+	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost, List<List<StatusEffectPayload>> statusEffectPayloads) {
 		this.name = name;
 		this.attackDelay = attackDelay;
 		this.cooldown = attackDelay.get(0);
@@ -39,6 +45,7 @@ public class Girl {
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
 		this.upgradeCost = upgradeCost;
+		this.statusEffectPayloads = statusEffectPayloads;
 		level = 0;
 		totalInvestment = cost;
 	}
@@ -111,8 +118,28 @@ public class Girl {
 		return level;
 	}
 
+	public List<StatusEffectPayload> getStatusEffectPayloads() {
+		return getStatusEffectPayloads(level);
+	}
+
+	public List<StatusEffectPayload> getStatusEffectPayloads(int lvl) {
+		if (statusEffectPayloads != null && lvl >= 0 && lvl < statusEffectPayloads.size()) {
+			List<StatusEffectPayload> payloads = statusEffectPayloads.get(lvl);
+			return payloads != null ? payloads : Collections.emptyList();
+		}
+		return Collections.emptyList();
+	}
+
+	public List<List<StatusEffectPayload>> getStatusEffectPayloadsPerLevel() {
+		return statusEffectPayloads;
+	}
+
+	public List<List<StatusEffectPayload>> getStatusEffects() {
+		return statusEffectPayloads;
+	}
+
 	public Bullet createBullet() {
-		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
+		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName, getStatusEffectPayloads());
 	}
 	
 	public SpellCard createSpellCard() {
@@ -153,7 +180,8 @@ public class Girl {
 			 imageFileName,
 			 bulletFileName,
 			 cost,
-			 upgradeCost
+			 upgradeCost,
+			 statusEffectPayloads
 			);
 			upgradedGirl.level = level + 1;
 			return upgradedGirl;

@@ -1,8 +1,10 @@
 package com.hongbao.bloons.factories;
 
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.entities.StatusEffectPayload;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static com.hongbao.bloons.entities.Girl.NO_UPGRADES_AVAILABLE;
 
@@ -22,7 +24,12 @@ public class GirlFactory {
 				"reimu.png",
 				"red_spell_card.png",
 				325,
-				Arrays.asList(200, 280, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(200, 280, NO_UPGRADES_AVAILABLE),
+				Arrays.asList(
+						Collections.emptyList(),
+						Collections.emptyList(),
+						Collections.emptyList()
+				)
 		);
 	}
 
@@ -38,7 +45,12 @@ public class GirlFactory {
 				"yukari.png",
 				"purple_energy.png",
 				2500,
-				Arrays.asList(2500, 4500, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(2500, 4500, NO_UPGRADES_AVAILABLE),
+				Arrays.asList(
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.SLOW, 2.0f, 0.3f)),
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.SLOW, 3.0f, 0.5f)),
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.FREEZE, 1.5f, 1.0f))
+				)
 		);
 	}
 
@@ -55,7 +67,12 @@ public class GirlFactory {
 				"marisa.png",
 				"blue_magic_missile.png",
 				200,
-				Arrays.asList(140, 220, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(140, 220, NO_UPGRADES_AVAILABLE),
+				Arrays.asList(
+						Collections.emptyList(),
+						Collections.emptyList(),
+						Collections.emptyList()
+				)
 		);
 	}
 
@@ -72,7 +89,12 @@ public class GirlFactory {
 				"alice.png",
 				"magic_spike.png",
 				450,
-				Arrays.asList(150, 600, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(150, 600, NO_UPGRADES_AVAILABLE),
+				Arrays.asList(
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.POISON, 3.0f, 1.0f, 1.0f)),
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.POISON, 4.0f, 1.0f, 1.0f)),
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.POISON, 5.0f, 2.0f, 0.8f))
+				)
 		);
 	}
 
@@ -89,7 +111,12 @@ public class GirlFactory {
 				"sakuya.png",
 				"blue_knives.png",
 				500,
-				Arrays.asList(300, 350, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(300, 350, NO_UPGRADES_AVAILABLE),
+				Arrays.asList(
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.SLOW, 2.0f, 0.5f)),
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.SLOW, 3.0f, 0.6f)),
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.FREEZE, 2.0f, 1.0f))
+				)
 		);
 	}
 
@@ -106,7 +133,12 @@ public class GirlFactory {
 				"remilia.png",
 				"bat.png",
 				2500,
-				Arrays.asList(4000, 5000, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(4000, 5000, NO_UPGRADES_AVAILABLE),
+				Arrays.asList(
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.BURN, 2.0f, 1.0f, 0.5f)),
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.BURN, 3.0f, 1.0f, 0.5f)),
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.BURN, 4.0f, 2.0f, 0.5f))
+				)
 		);
 	}
 
@@ -123,7 +155,12 @@ public class GirlFactory {
 				"youmu.png",
 				"sword_slash.png",
 				600,
-				Arrays.asList(400, 800, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(400, 800, NO_UPGRADES_AVAILABLE),
+				Arrays.asList(
+						Collections.emptyList(),
+						Collections.emptyList(),
+						Collections.emptyList()
+				)
 		);
 	}
 
@@ -140,7 +177,12 @@ public class GirlFactory {
 				"yuyuko.png",
 				"pink_butterfly.png",
 				2000,
-				Arrays.asList(500, 1500, NO_UPGRADES_AVAILABLE)
+				Arrays.asList(500, 1500, NO_UPGRADES_AVAILABLE),
+				Arrays.asList(
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.SLOW, 3.0f, 0.4f)),
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.SLOW, 4.0f, 0.5f)),
+						Arrays.asList(new StatusEffectPayload(StatusEffectPayload.Type.SLOW, 5.0f, 0.6f))
+				)
 		);
 	}
 

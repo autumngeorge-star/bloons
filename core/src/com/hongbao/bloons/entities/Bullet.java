@@ -1,5 +1,8 @@
 package com.hongbao.bloons.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Bullet {
 	
 	public static final String IMAGE_FOLDER = "img/projectiles/";
@@ -18,6 +21,8 @@ public class Bullet {
 
 	private float initialDXOverride;
 	private float initialDYOverride;
+
+	private List<StatusEffectPayload> statusEffectPayloads;
 	
 	public Bullet() {
 		speed = 20f;
@@ -27,9 +32,14 @@ public class Bullet {
 		distanceTraveled = 0;
 		homing = false;
 		imageFileName = IMAGE_FOLDER + "red_spell_card.png";
+		statusEffectPayloads = new ArrayList<>();
 	}
 	
 	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName) {
+		this(speed, damage, pierce, maxRange, homing, imageFileName, null);
+	}
+
+	public Bullet(float speed, int damage, int pierce, float maxRange, boolean homing, String imageFileName, List<StatusEffectPayload> statusEffectPayloads) {
 		this.speed = speed;
 		this.damage = damage;
 		this.pierce = pierce;
@@ -37,6 +47,7 @@ public class Bullet {
 		this.imageFileName = IMAGE_FOLDER + imageFileName;
 		distanceTraveled = 0;
 		this.homing = homing;
+		this.statusEffectPayloads = statusEffectPayloads != null ? new ArrayList<>(statusEffectPayloads) : new ArrayList<>();
 	}
 	
 	public float getSpeed() {
@@ -125,5 +136,26 @@ public class Bullet {
 	
 	public void setInitialDYOverride(float initialDYOverride) {
 		this.initialDYOverride = initialDYOverride;
+	}
+
+	public List<StatusEffectPayload> getStatusEffectPayloads() {
+		return statusEffectPayloads;
+	}
+
+	public List<StatusEffectPayload> getStatusEffects() {
+		return statusEffectPayloads;
+	}
+
+	public void setStatusEffectPayloads(List<StatusEffectPayload> statusEffectPayloads) {
+		this.statusEffectPayloads = statusEffectPayloads != null ? new ArrayList<>(statusEffectPayloads) : new ArrayList<>();
+	}
+
+	public void addStatusEffectPayload(StatusEffectPayload payload) {
+		if (payload != null) {
+			if (this.statusEffectPayloads == null) {
+				this.statusEffectPayloads = new ArrayList<>();
+			}
+			this.statusEffectPayloads.add(payload);
+		}
 	}
 }
