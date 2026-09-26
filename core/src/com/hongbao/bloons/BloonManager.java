@@ -190,24 +190,65 @@ public class BloonManager {
 	}
 	
 	public BloonActor getNewHomingTarget(BulletActor bulletActor) {
-		// Gets the closest bloon to the current bullet
 		if (onstageBloons.isEmpty()) {
 			return null;
 		}
-		
-		BloonActor bloonActor = null;
-		
+
+		BloonActor bestForwardBloon = null;
+		int bestForwardProgress = -1;
+		float bestForwardDistSq = Float.MAX_VALUE;
+
+		BloonActor closestFallbackBloon = null;
+		float closestFallbackDistSq = Float.MAX_VALUE;
+
+		float bulletDx = bulletActor.getDx();
+		float bulletDy = bulletActor.getDy();
+		float bulletX = bulletActor.getCenterX();
+		float bulletY = bulletActor.getCenterY();
+
 		for (BloonActor actor : onstageBloons) {
 			if (!bulletActor.hasDamagedBloon(actor)) {
-				if (bloonActor == null) {
-					bloonActor = actor;
-				} else if (Map.distanceBetweenActors(actor, bulletActor) < Map.distanceBetweenActors(bloonActor, bulletActor)) {
-					bloonActor = actor;
+				float bx = actor.getCenterX() - bulletX;
+				float by = actor.getCenterY() - bulletY;
+				float distSq = bx * bx + by * by;
+
+				if (closestFallbackBloon == null || distSq < closestFallbackDistSq) {
+					closestFallbackBloon = actor;
+					closestFallbackDistSq = distSq;
+				}
+
+				if (distSq > 0) {
+					float dist = (float) Math.sqrt(distSq);
+					float cosTheta = (bulletDx * bx + bulletDy * by) / dist;
+
+					if (cosTheta > 1.0f) cosTheta = 1.0f;
+					if (cosTheta < -1.0f) cosTheta = -1.0f;
+
+					float angleInDegrees = (float) Math.toDegrees(Math.acos(cosTheta));
+
+					// 120-degree forward cone means angle <= 60 degrees relative to heading vector
+					if (angleInDegrees <= 60.0f) {
+						int trackProgress = actor.getBloon().getDistanceTravelled();
+						if (bestForwardBloon == null || trackProgress > bestForwardProgress ||
+								(trackProgress == bestForwardProgress && distSq < bestForwardDistSq)) {
+							bestForwardBloon = actor;
+							bestForwardProgress = trackProgress;
+							bestForwardDistSq = distSq;
+						}
+					}
 				}
 			}
 		}
-		
-		return bloonActor;
+
+		if (bestForwardBloon != null) {
+			return bestForwardBloon;
+		}
+
+		return closestFallbackBloon;
+	}
+
+	public void addBloonToOnstageForTesting(BloonActor actor) {
+		onstageBloons.add(actor);
 	}
 	
 }
