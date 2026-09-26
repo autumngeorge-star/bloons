@@ -25,12 +25,23 @@ public class BloonManager {
 	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
 	
-	public BloonManager(Stage stage, Map map) {
+	public BloonManager(Stage stage, Map map, AudioManager audioManager) {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		if (audioManager != null) {
+			popSound = audioManager.getSound("music/pop.mp3");
+		} else if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			AudioManager appAudioManager = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getAudioManager();
+			if (appAudioManager != null) {
+				popSound = appAudioManager.getSound("music/pop.mp3");
+			}
+		}
 		bloonQueue = BloonFactory.createBloonQueue();
+	}
+
+	public BloonManager(Stage stage, Map map) {
+		this(stage, map, null);
 	}
 
 	public void nextLevel() {
@@ -117,7 +128,9 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			if (popSound != null) {
+				popSound.play(0.5f);
+			}
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);
