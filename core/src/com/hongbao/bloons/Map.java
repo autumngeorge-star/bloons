@@ -2,6 +2,7 @@ package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.RepeatAction;
 import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -20,6 +22,7 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.actors.RenderableProgressBar;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -45,6 +48,8 @@ public class Map {
 	private RenderableLabel rightDataActor;
 	private RenderableLabel upgradeActor;
 	private RenderableLabel sellActor;
+	private RenderableProgressBar spellCardProgressBarActor;
+	private RenderableLabel spellCardProgressLabelActor;
 	private boolean hoveringOverUpgrade;
 
 	public Map(String backgroundImage, Stage stage) {
@@ -178,6 +183,52 @@ public class Map {
         });
         sellBackground.addAction(Actions.repeat(RepeatAction.FOREVER, sellLabelAction));
 		sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
+
+		Pixmap bgPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+		bgPixmap.setColor(Color.DARK_GRAY);
+		bgPixmap.fill();
+		TextureRegionDrawable bgDrawable = new TextureRegionDrawable(new TextureRegion(new Texture(bgPixmap)));
+		bgPixmap.dispose();
+
+		Pixmap fillPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+		fillPixmap.setColor(Color.WHITE);
+		fillPixmap.fill();
+		TextureRegionDrawable knobBeforeDrawable = new TextureRegionDrawable(new TextureRegion(new Texture(fillPixmap)));
+		fillPixmap.dispose();
+
+		ProgressBar.ProgressBarStyle progressBarStyle = new ProgressBar.ProgressBarStyle(bgDrawable, null);
+		progressBarStyle.knobBefore = knobBeforeDrawable;
+
+		ProgressBar progressBar = new ProgressBar(0f, 1f, 0.001f, false, progressBarStyle);
+		progressBar.setBounds(1510, 56, 280, 16);
+		progressBar.setValue(0f);
+
+		Label progressLabel = new Label("CHARGING...", skin);
+		progressLabel.setBounds(1510, 56, 280, 16);
+		progressLabel.setAlignment(Align.center);
+		progressLabel.setColor(Color.BLACK);
+
+		final RunnableAction progressBarAction = new RunnableAction();
+		progressBarAction.setRunnable(() -> {
+			if (getSelectedGirl() != null && getSelectedGirl().getGirl() != null) {
+				Girl girl = getSelectedGirl().getGirl();
+				if (girl.hasSpellCard()) {
+					float percent = girl.getSpellCardCooldownPercent();
+					progressBar.setValue(percent);
+					if (girl.isSpellCardReady()) {
+						progressBar.setColor(Color.LIME);
+						progressLabel.setText("X READY");
+					} else {
+						progressBar.setColor(Color.ORANGE);
+						progressLabel.setText("CHARGING " + (int)(percent * 100) + "%");
+					}
+				}
+			}
+		});
+		progressBar.addAction(Actions.repeat(RepeatAction.FOREVER, progressBarAction));
+
+		spellCardProgressBarActor = new RenderableProgressBar(progressBar, ZIndex.MENU_ITEM_Z_INDEX);
+		spellCardProgressLabelActor = new RenderableLabel(progressLabel, ZIndex.MENU_ITEM_Z_INDEX);
 	}
 
 	public void setDirections(Pair<Float, Float>[][] directions) {
@@ -315,6 +366,10 @@ public class Map {
 		stage.addActor(rightDataActor);
 		stage.addActor(upgradeActor);
 		stage.addActor(sellActor);
+		if (girl.hasSpellCard()) {
+			stage.addActor(spellCardProgressBarActor);
+			stage.addActor(spellCardProgressLabelActor);
+		}
 	}
 
 	public void hideGirlDetailsModule() {
@@ -323,6 +378,8 @@ public class Map {
 		rightDataActor.remove();
 		upgradeActor.remove();
 		sellActor.remove();
+		spellCardProgressBarActor.remove();
+		spellCardProgressLabelActor.remove();
 	}
 
 	public void upgradeSelectedGirl() {
