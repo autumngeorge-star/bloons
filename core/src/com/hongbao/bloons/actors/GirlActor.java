@@ -1,7 +1,6 @@
 package com.hongbao.bloons.actors;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonsTouhouDefense;
@@ -21,7 +20,7 @@ public class GirlActor extends RenderableActor {
 	
 	public GirlActor(Girl girl, float x, float y) {
 		this.girl = girl;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(girl.getImageFileName())));
+		textureRegion = new TextureRegion(((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getTexture(girl.getImageFileName()));
 		rotationAngle = 0;
 		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
 		active = false;

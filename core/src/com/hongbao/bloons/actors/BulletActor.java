@@ -1,7 +1,6 @@
 package com.hongbao.bloons.actors;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonManager;
@@ -28,7 +27,7 @@ public class BulletActor extends RenderableActor {
 	
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		textureRegion = new TextureRegion(((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getTexture(bullet.getImageFileName()));
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
