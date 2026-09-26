@@ -9,6 +9,7 @@ import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.strategies.SpellCardTrajectoryStrategy;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class BulletActor extends RenderableActor {
 	private int frames;
 	private BloonActor target;
 	private Set<Long> damagedBloons;
-	private String spellCardOverride; // todo could be an enum
+	private SpellCardTrajectoryStrategy trajectoryStrategy;
 	
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
@@ -68,10 +69,26 @@ public class BulletActor extends RenderableActor {
 		this.collisionRadius = collisionRadius;
 	}
 	
-	public void setSpellCardOverride(String spellCardOverride) {
-		this.spellCardOverride = spellCardOverride;
+	public SpellCardTrajectoryStrategy getTrajectoryStrategy() {
+		return trajectoryStrategy;
+	}
+
+	public void setTrajectoryStrategy(SpellCardTrajectoryStrategy trajectoryStrategy) {
+		this.trajectoryStrategy = trajectoryStrategy;
 	}
 	
+	public int getFrames() {
+		return frames;
+	}
+
+	public float getDx() {
+		return dx;
+	}
+
+	public float getDy() {
+		return dy;
+	}
+
 	public void decrementPierce() {
 		bullet.decrementPierce();
 		if (bullet.getPierce() == 0) {
@@ -145,14 +162,8 @@ public class BulletActor extends RenderableActor {
 	}
 	
 	private void setDirectionIfApplicable(BloonManager bloonManager) {
-		if (spellCardOverride != null) {
-			Pair<Float, Float> overrideDirection = null;
-			if (spellCardOverride.equals("Reimu")) {
-				overrideDirection = reimuSpellCardOverride();
-			} else if (spellCardOverride.equals("Yuyuko")) {
-				overrideDirection = yuyukoSpellCardOverride();
-			}
-
+		if (trajectoryStrategy != null) {
+			Pair<Float, Float> overrideDirection = trajectoryStrategy.calculateDirection(frames, dx, dy);
 			if (overrideDirection != null) {
 				dx = overrideDirection.getFirst();
 				dy = overrideDirection.getSecond();
@@ -176,41 +187,6 @@ public class BulletActor extends RenderableActor {
 				dy /= distance;
 			}
 			calculateRotationAngle();
-		}
-	}
-	
-	// I don't like how this code is but I couldn't think of any better ways for the time being
-	// spell card directional overrides
-	// they return null if they no longer override the direction of the bullet
-	
-	private Pair<Float, Float> reimuSpellCardOverride() {
-		if (frames > 200) {
-			// Beyond 200 frames, use the default bullet behavior (homing)
-			return null;
-		} else if (frames < 20) {
-			// For the first few frames, go in a straight line (direction unchanged)
-			return new Pair<>(dx, dy);
-		} else {
-			// For the middle frames, start going in a circle
-			double currentAngle = Math.atan2(dy, dx);
-			double desiredAngle = currentAngle + (2 * Math.PI / 120);
-
-			return new Pair<>((float) Math.cos(desiredAngle), (float) Math.sin(desiredAngle));
-		}
-	}
-
-	private Pair<Float, Float> yuyukoSpellCardOverride() {
-		// Alternate between turning left and right
-		if (frames % 150 < 75) {
-			double currentAngle = Math.atan2(dy, dx);
-			double desiredAngle = currentAngle - (2 * Math.PI / 300);
-
-			return new Pair<>((float) Math.cos(desiredAngle), (float) Math.sin(desiredAngle));
-		} else {
-			double currentAngle = Math.atan2(dy, dx);
-			double desiredAngle = currentAngle + (2 * Math.PI / 300);
-
-			return new Pair<>((float) Math.cos(desiredAngle), (float) Math.sin(desiredAngle));
 		}
 	}
 

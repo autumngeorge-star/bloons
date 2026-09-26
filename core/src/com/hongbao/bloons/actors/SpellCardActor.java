@@ -70,7 +70,7 @@ public class SpellCardActor extends RenderableActor {
 					 bullet.getInitialDXOverride(),
 					 bullet.getInitialDYOverride()
 					); // todo the spell needs a direction maybe
-					bulletActor.setSpellCardOverride(spellCard.getOverrideName());
+					bulletActor.setTrajectoryStrategy(spellCard.getTrajectoryStrategy());
 					bloonManager.addBulletToStage(bulletActor);
 				}
 			}
