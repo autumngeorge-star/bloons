@@ -29,8 +29,12 @@ public class BloonManager {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
-		bloonQueue = BloonFactory.createBloonQueue();
+		if (stage != null && Gdx.files != null && Gdx.files.internal("music/pop.mp3").exists()) {
+			popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
+		}
+		if (Gdx.files != null && Gdx.files.internal("bloon_queues/default.txt").exists()) {
+			bloonQueue = BloonFactory.createBloonQueue();
+		}
 	}
 
 	public void nextLevel() {
