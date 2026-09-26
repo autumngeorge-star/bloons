@@ -1,6 +1,7 @@
 package com.hongbao.bloons.entities;
 
 import java.util.List;
+import java.util.Locale;
 
 
 public class Girl {
@@ -23,9 +24,15 @@ public class Girl {
 	private List<Integer> upgradeCost;
 	private int level;
 	private int totalInvestment;
+	private float spellCardCooldownTimer;
+	private float spellCardMaxCooldown;
 	
 	
 	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost) {
+		this(name, attackDelay, bulletSpeed, damage, pierce, range, visualRange, homing, imageFileName, bulletFileName, cost, upgradeCost, 0f);
+	}
+
+	public Girl(String name, List<Integer> attackDelay, List<Float> bulletSpeed, List<Integer> damage, List<Integer> pierce, List<Float> range, List<Float> visualRange, List<Boolean> homing, String imageFileName, String bulletFileName, int cost, List<Integer> upgradeCost, float spellCardMaxCooldown) {
 		this.name = name;
 		this.attackDelay = attackDelay;
 		this.cooldown = attackDelay.get(0);
@@ -35,10 +42,12 @@ public class Girl {
 		this.range = range;
 		this.visualRange = visualRange;
 		this.homing = homing;
-		this.imageFileName = IMAGE_FOLDER + imageFileName;
+		this.imageFileName = imageFileName.startsWith(IMAGE_FOLDER) ? imageFileName : IMAGE_FOLDER + imageFileName;
 		this.bulletFileName = bulletFileName;
 		this.cost = cost;
 		this.upgradeCost = upgradeCost;
+		this.spellCardMaxCooldown = spellCardMaxCooldown;
+		this.spellCardCooldownTimer = 0f;
 		level = 0;
 		totalInvestment = cost;
 	}
@@ -61,6 +70,57 @@ public class Girl {
 	
 	public void resetCooldown() {
 		cooldown = attackDelay.get(level);
+	}
+
+	public float getSpellCardCooldownTimer() {
+		return spellCardCooldownTimer;
+	}
+
+	public void setSpellCardCooldownTimer(float spellCardCooldownTimer) {
+		this.spellCardCooldownTimer = spellCardCooldownTimer;
+	}
+
+	public float getSpellCardMaxCooldown() {
+		return spellCardMaxCooldown;
+	}
+
+	public void setSpellCardMaxCooldown(float spellCardMaxCooldown) {
+		this.spellCardMaxCooldown = spellCardMaxCooldown;
+	}
+
+	public boolean hasSpellCard() {
+		return spellCardMaxCooldown > 0 && createSpellCard() != null;
+	}
+
+	public boolean isSpellCardReady() {
+		return hasSpellCard() && spellCardCooldownTimer <= 0;
+	}
+
+	public void decrementSpellCardCooldownTimer(float delta) {
+		if (spellCardCooldownTimer > 0) {
+			spellCardCooldownTimer -= delta;
+			if (spellCardCooldownTimer < 0) {
+				spellCardCooldownTimer = 0;
+			}
+		}
+	}
+
+	public void decrementSpellCardCooldown(float delta) {
+		decrementSpellCardCooldownTimer(delta);
+	}
+
+	public void resetSpellCardCooldown() {
+		spellCardCooldownTimer = spellCardMaxCooldown;
+	}
+
+	public String getSpellCardStatusString() {
+		if (!hasSpellCard()) {
+			return "Spell Card: N/A";
+		}
+		if (isSpellCardReady()) {
+			return "Spell Card: READY [X]";
+		}
+		return String.format(Locale.US, "Spell Card: %.1fs", spellCardCooldownTimer);
 	}
 	
 	public int getDamage() {
@@ -153,9 +213,11 @@ public class Girl {
 			 imageFileName,
 			 bulletFileName,
 			 cost,
-			 upgradeCost
+			 upgradeCost,
+			 spellCardMaxCooldown
 			);
 			upgradedGirl.level = level + 1;
+			upgradedGirl.spellCardCooldownTimer = spellCardCooldownTimer;
 			return upgradedGirl;
 		} else {
 			return null;
