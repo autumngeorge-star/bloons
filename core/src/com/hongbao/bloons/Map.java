@@ -23,6 +23,7 @@ import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.helpers.StageLayers;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +41,7 @@ public class Map {
 	private Set<GirlActor> onStageGirls;
 	private GirlActor selectedGirl;
 	private Stage stage;
+	private StageLayers stageLayers;
 	private RenderableImageButton infoBackground;
 	private RenderableLabel leftDataActor;
 	private RenderableLabel rightDataActor;
@@ -48,8 +50,13 @@ public class Map {
 	private boolean hoveringOverUpgrade;
 
 	public Map(String backgroundImage, Stage stage) {
+		this(backgroundImage, stage, new StageLayers(stage));
+	}
+
+	public Map(String backgroundImage, Stage stage, StageLayers stageLayers) {
 		this.backgroundImage = backgroundImage;
-		this.bloonManager = new BloonManager(stage, this);
+		this.stageLayers = (stageLayers != null) ? stageLayers : new StageLayers(stage);
+		this.bloonManager = new BloonManager(stage, this.stageLayers, this);
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;
@@ -180,6 +187,10 @@ public class Map {
 		sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
 	}
 
+	public StageLayers getStageLayers() {
+		return stageLayers;
+	}
+
 	public void setDirections(Pair<Float, Float>[][] directions) {
 		this.directions = directions;
 	}
@@ -261,7 +272,7 @@ public class Map {
 	public void placeGirl(GirlActor girlActor) {
 		girlActor.setActive(true);
 		onStageGirls.add(girlActor);
-		stage.addActor(girlActor);
+		stageLayers.addTowerActor(girlActor);
 		selectedGirl = girlActor;
 		girlActor.addListener(new ClickListener() {
 			@Override
@@ -274,7 +285,7 @@ public class Map {
 	
 	public void placeSpellCard() {
 		if (selectedGirl != null) {
-			stage.addActor(selectedGirl.createSpellCardActor());
+			stageLayers.addSpellCardActor(selectedGirl.createSpellCardActor());
 		}
 	}
 	
@@ -310,11 +321,11 @@ public class Map {
 				" \n" +
 				" "
 		);
-		stage.addActor(infoBackground);
-		stage.addActor(leftDataActor);
-		stage.addActor(rightDataActor);
-		stage.addActor(upgradeActor);
-		stage.addActor(sellActor);
+		stageLayers.addUiActor(infoBackground);
+		stageLayers.addUiActor(leftDataActor);
+		stageLayers.addUiActor(rightDataActor);
+		stageLayers.addUiActor(upgradeActor);
+		stageLayers.addUiActor(sellActor);
 	}
 
 	public void hideGirlDetailsModule() {
