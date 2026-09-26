@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Disposable;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
@@ -28,7 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class Map {
+public class Map implements Disposable {
 
 	public static final String BACKGROUND_MAPS_FOLDER = "img/maps/";
 	public static final int TILE_LENGTH = 50;
@@ -355,6 +356,13 @@ public class Map {
 		onStageGirls.remove(selectedGirl);
 		selectedGirl.remove();
 		setSelectedGirl(null);
+	}
+
+	@Override
+	public void dispose() {
+		if (bloonManager != null) {
+			bloonManager.dispose();
+		}
 	}
 	
 }
