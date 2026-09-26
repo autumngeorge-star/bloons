@@ -1,6 +1,7 @@
 package com.hongbao.bloons.entities;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public class Girl {
@@ -115,14 +116,18 @@ public class Girl {
 		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
 	}
 	
-	public SpellCard createSpellCard() {
+	public boolean hasSpellCardCapability() {
+		return name.equals("Reimu") || name.equals("Yuyuko");
+	}
+
+	public Optional<SpellCard> createSpellCard() {
 		if (name.equals("Reimu")) {
-			return SpellCard.createReimuSpellCard();
+			return Optional.of(SpellCard.createReimuSpellCard());
 		}
 		if (name.equals("Yuyuko")) {
-			return SpellCard.createYuyukoSpellCard();
+			return Optional.of(SpellCard.createYuyukoSpellCard());
 		}
-		return null;
+		return Optional.empty();
 	}
 	
 	public int upgrade() {

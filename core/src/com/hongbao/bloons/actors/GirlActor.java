@@ -9,6 +9,8 @@ import com.hongbao.bloons.entities.Bullet;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 
+import java.util.Optional;
+
 
 public class GirlActor extends RenderableActor {
 	
@@ -85,12 +87,12 @@ public class GirlActor extends RenderableActor {
 		rotationAngle = (float)(Math.atan2(dx, dy) / Math.PI * 180);
 	}
 	
-	public SpellCardActor createSpellCardActor() {
-		if (true) { // todo Girl should have a method that checks the cooldown or something
-			// maybe some direction based on the girl's direction
-			return new SpellCardActor(girl.createSpellCard(), getCenterX(), getCenterY());
+	public Optional<SpellCardActor> createSpellCardActor() {
+		if (!isActive()) {
+			return Optional.empty();
 		}
-		return null;
+		return girl.createSpellCard()
+				.map(spellCard -> new SpellCardActor(spellCard, getCenterX(), getCenterY()));
 	}
 	
 	@Override
