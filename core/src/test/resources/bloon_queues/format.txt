@@ -1,0 +1,7 @@
+(number of set of bloons) (delay after each bloon in frames, the game is 60 fps so each frame is 16 or 17 milliseconds) (bloon type(s) separated by commas)
+
+Example: 5 red bloons with a delay of 500ms after each one
+5 30 red
+
+Example: red bloon, blue bloon, red bloon, blue bloon, with a delay of 1 second after each bloon
+2 60 red,blue
