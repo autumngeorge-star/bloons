@@ -25,9 +25,13 @@ import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.events.GameOverEvent;
+import com.hongbao.bloons.events.GameplayEvent;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.scores.LeaderboardEntry;
+import com.hongbao.bloons.scores.ScoreManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +52,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Map map;
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
+	private ScoreManager scoreManager;
 	public List<RenderableImageButton> instructions;
 	
 	
@@ -61,6 +66,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		player = new Player(MONEY, HEALTH);
 		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
+		scoreManager = new ScoreManager();
 		instructions = new ArrayList<>();
 
 		final RunnableAction bloonCreationAction = new RunnableAction();
@@ -159,7 +165,14 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		title.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				map.getBloonManager().nextLevel();
+				if (player.getHealth() == 0) {
+					scoreManager.resetSession();
+					player = new Player(MONEY, HEALTH);
+					createMap();
+					paused = false;
+				} else {
+					map.getBloonManager().nextLevel();
+				}
 			}
 		});
 		final RunnableAction titleAction = new RunnableAction();
@@ -180,6 +193,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				if (map.getBloonManager().hasWonGame()) {
 					titleActor.setText("YOU WIN!");
 					titleActor.setColor(Color.GOLD);
+					scoreManager.onGameplayEvent(new GameOverEvent(true, map.getBloonManager().getLevel()));
 				} else {
 					titleActor.setText("Bloons Touhou Defense\nLevel " + (map.getBloonManager().getLevel()));
 					titleActor.setColor(Color.WHITE);
@@ -206,11 +220,58 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			((Label)healthLabelAction.getActor()).setText(String.valueOf(player.getHealth()));
 			
 			if (player.getHealth() == 0) {
+				scoreManager.onGameplayEvent(new GameOverEvent(false, map != null ? map.getBloonManager().getLevel() : 0));
 				pause();
 			}
 		});
 		healthLabel.addAction(Actions.repeat(RepeatAction.FOREVER, healthLabelAction));
 		stage.addActor(new RenderableLabel(healthLabel, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label scoreLabel = new Label("Score: 0", skin);
+		scoreLabel.setPosition(1510, 735);
+		scoreLabel.setFontScale(1.2f, 1.2f);
+		stage.addActor(new RenderableLabel(scoreLabel, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label rankLabel = new Label("Rank: #1", skin);
+		rankLabel.setPosition(1670, 735);
+		rankLabel.setFontScale(1.2f, 1.2f);
+		stage.addActor(new RenderableLabel(rankLabel, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label leaderboardTitle = new Label("TOP LEADERBOARD", skin);
+		leaderboardTitle.setPosition(1510, 135);
+		leaderboardTitle.setFontScale(1.1f, 1.1f);
+		leaderboardTitle.setColor(Color.GOLD);
+		stage.addActor(new RenderableLabel(leaderboardTitle, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Label leaderboardList = new Label("", skin);
+		leaderboardList.setPosition(1510, 20);
+		leaderboardList.setFontScale(0.9f, 0.9f);
+		stage.addActor(new RenderableLabel(leaderboardList, ZIndex.MENU_ITEM_Z_INDEX));
+
+		Runnable updateLeaderboardDisplay = () -> {
+			List<LeaderboardEntry> topEntries = scoreManager.getTopEntries(5);
+			if (topEntries.isEmpty()) {
+				leaderboardList.setText("No saved records yet");
+			} else {
+				StringBuilder sb = new StringBuilder();
+				int r = 1;
+				for (LeaderboardEntry entry : topEntries) {
+					sb.append("#").append(r++).append(" ").append(entry.getScore()).append(" pts (Lvl ").append(entry.getLevel()).append(")\n");
+				}
+				leaderboardList.setText(sb.toString().trim());
+			}
+		};
+		updateLeaderboardDisplay.run();
+
+		scoreManager.addListener((currentScore, comboCount, rank) -> {
+			if (comboCount > 1) {
+				scoreLabel.setText("Score: " + currentScore + " (" + comboCount + "x)");
+			} else {
+				scoreLabel.setText("Score: " + currentScore);
+			}
+			rankLabel.setText("Rank: #" + rank);
+			updateLeaderboardDisplay.run();
+		});
 		
 		ImageButton purchaseReimu = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/reimu_box.png")))));
 		purchaseReimu.setPosition(1504, 676);
@@ -449,6 +510,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
+	}
+
+	public ScoreManager getScoreManager() {
+		return scoreManager;
 	}
 	
 	@Override
