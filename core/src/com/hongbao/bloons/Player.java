@@ -7,15 +7,24 @@ public class Player {
 	
 	private int money;
 	private int health;
+	private int score;
 	
 	public Player() {
 		money = 200;
 		health = 200;
+		score = 0;
 	}
 	
 	public Player(int money, int health) {
 		this.money = money;
 		this.health = health;
+		this.score = 0;
+	}
+
+	public Player(int money, int health, int score) {
+		this.money = money;
+		this.health = health;
+		this.score = score;
 	}
 	
 	public int getMoney() {
@@ -24,6 +33,15 @@ public class Player {
 	
 	public void earnMoney(int money) {
 		this.money += money;
+		this.score += money;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
 	}
 	
 	public boolean spendMoney(int money) {
