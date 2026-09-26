@@ -23,8 +23,15 @@ import com.badlogic.gdx.utils.Align;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.audio.AudioManager;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.events.DefaultGameEventBus;
+import com.hongbao.bloons.events.GameEventBus;
+import com.hongbao.bloons.events.GamePausedEvent;
+import com.hongbao.bloons.events.GameResumedEvent;
+import com.hongbao.bloons.events.LevelChangedEvent;
+import com.hongbao.bloons.events.MusicToggleRequestedEvent;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
@@ -46,7 +53,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Stage stage;
 	private Player player;
 	private Map map;
-	private MusicPlayer musicPlayer;
+	private GameEventBus eventBus;
+	private AudioManager audioManager;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
 	
@@ -58,8 +66,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		tripleSpeed = false;
 		autoContinue = false;
 		stage = new Stage();
+		eventBus = new DefaultGameEventBus();
+		audioManager = new AudioManager(eventBus);
 		player = new Player(MONEY, HEALTH);
-		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -72,7 +81,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMap();
 		createMenu();
 		createInstructions();
-		musicPlayer.playTitleMusic();
+		eventBus.publish(new LevelChangedEvent(0));
 	}
 
 	private void createInstructions() {
@@ -431,7 +440,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			}
 		});
 		
-		map = MapFactory.createHeaterMap(stage);
+		map = MapFactory.createHeaterMap(stage, eventBus, player, () -> instructions.isEmpty());
 		
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
 		ImageButton backgroundMap = new ImageButton(drawable);
@@ -447,8 +456,12 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		return player;
 	}
 
-	public MusicPlayer getMusicPlayer() {
-		return musicPlayer;
+	public GameEventBus getEventBus() {
+		return eventBus;
+	}
+
+	public AudioManager getAudioManager() {
+		return audioManager;
 	}
 	
 	@Override
@@ -521,7 +534,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					updateInstructions();
 				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.V)) {
-				musicPlayer.toggleMusic();
+				if (eventBus != null) {
+					eventBus.publish(new MusicToggleRequestedEvent());
+				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
@@ -562,18 +577,25 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void pause() {
 		paused = true;
-		musicPlayer.pause();
+		if (eventBus != null) {
+			eventBus.publish(new GamePausedEvent());
+		}
 	}
 
 	@Override
 	public void resume() {
 		paused = false;
-		musicPlayer.resume();
+		if (eventBus != null) {
+			eventBus.publish(new GameResumedEvent());
+		}
 	}
 
 	@Override
 	public void dispose() {
 		stage.dispose();
+		if (audioManager != null) {
+			audioManager.dispose();
+		}
 	}
 
 }

@@ -21,11 +21,14 @@ import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.entities.Girl;
-import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.events.DefaultGameEventBus;
+import com.hongbao.bloons.events.GameEventBus;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.helpers.ZIndex;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 
 public class Map {
@@ -40,6 +43,7 @@ public class Map {
 	private Set<GirlActor> onStageGirls;
 	private GirlActor selectedGirl;
 	private Stage stage;
+	private Player player;
 	private RenderableImageButton infoBackground;
 	private RenderableLabel leftDataActor;
 	private RenderableLabel rightDataActor;
@@ -47,9 +51,18 @@ public class Map {
 	private RenderableLabel sellActor;
 	private boolean hoveringOverUpgrade;
 
+	public Map(String backgroundImage, Stage stage, GameEventBus eventBus) {
+		this(backgroundImage, stage, eventBus, null, () -> true);
+	}
+
 	public Map(String backgroundImage, Stage stage) {
+		this(backgroundImage, stage, new DefaultGameEventBus(), null, () -> true);
+	}
+
+	public Map(String backgroundImage, Stage stage, GameEventBus eventBus, Player player, BooleanSupplier instructionsSupplier) {
 		this.backgroundImage = backgroundImage;
-		this.bloonManager = new BloonManager(stage, this);
+		this.player = player;
+		this.bloonManager = new BloonManager(stage, this, eventBus, player, instructionsSupplier);
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;
@@ -145,9 +158,9 @@ public class Map {
 				upgradeBackground.setText("FULLY UPGRADED");
 				upgradeBackground.setColor(Color.GRAY);
 			} else {
-				Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+				Player p = getPlayer();
 				upgradeBackground.setText("UPGRADE");
-				if (player.getMoney() >= getSelectedGirl().getGirl().getUpgradeCost()) {
+				if (p != null && p.getMoney() >= getSelectedGirl().getGirl().getUpgradeCost()) {
 					upgradeBackground.setColor(Color.BLUE);
 				} else {
 					upgradeBackground.setColor(Color.RED);
@@ -325,18 +338,28 @@ public class Map {
 		sellActor.remove();
 	}
 
+	public Player getPlayer() {
+		if (player != null) {
+			return player;
+		}
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			return ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getPlayer();
+		}
+		return null;
+	}
+
 	public void upgradeSelectedGirl() {
         if (getSelectedGirl() != null && !getSelectedGirl().isActive()) {
             // We're in the middle of placing a girl, so we shouldn't be able to set it yet.
             return;
         }
 
-		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+		Player p = getPlayer();
 		GirlActor selectedGirl = getSelectedGirl();
 		
-		if (selectedGirl.getGirl().canUpgrade(player.getMoney())) {
+		if (p != null && selectedGirl.getGirl().canUpgrade(p.getMoney())) {
 			int cost = selectedGirl.getGirl().upgrade();
-			player.spendMoney(cost);
+			p.spendMoney(cost);
 			showGirlDetailsModule();
 		}
 	}
@@ -347,10 +370,12 @@ public class Map {
             return;
         }
 
-        Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+        Player p = getPlayer();
         GirlActor selectedGirl = getSelectedGirl();
 
-		player.earnMoney(selectedGirl.getGirl().getSellPrice());
+        if (p != null) {
+			p.earnMoney(selectedGirl.getGirl().getSellPrice());
+		}
 		hideGirlDetailsModule();
 		onStageGirls.remove(selectedGirl);
 		selectedGirl.remove();
