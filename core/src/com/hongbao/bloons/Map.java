@@ -23,6 +23,8 @@ import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.listeners.BloonEventListener;
+import com.hongbao.bloons.listeners.LevelEventListener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -55,129 +57,131 @@ public class Map {
 		this.stage = stage;
 		hoveringOverUpgrade = false;
 
-		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
+		if (Gdx.files != null) {
+			Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
 
-		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
-		infoBackground.setPosition(1504, 4);
-		this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
+			ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
+			infoBackground.setPosition(1504, 4);
+			this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
-		Label leftDataBackground = new Label("DATA", skin);
-		leftDataBackground.setBounds(1510, 56, 292, 110);
-		leftDataBackground.setColor(Color.BLACK);
-		final RunnableAction leftDataLabelAction = new RunnableAction();
-		leftDataLabelAction.setRunnable(() -> {
-			Girl girl = getSelectedGirl().getGirl();
-			Girl upgradedStats = girl.getUpgradedStats();
-			if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
-				leftDataActor.getActor().setText(
-				 girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
-				  "Damage: " + girl.getDamage() + " (" + upgradedStats.getDamage() + ")\n" +
-				  "Pierce: " + girl.getPierce() + " (" + upgradedStats.getPierce() + ")\n" +
-				  "Cooldown: " + girl.getAttackDelay() + " (" + upgradedStats.getAttackDelay() + ")\n" +
-				  "Sight: " + (int)girl.getVisualRange() + " (" + (int)upgradedStats.getVisualRange() + ")"
-				);
-			} else {
-				leftDataActor.getActor().setText(
-				 girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
-				  "Damage: " + girl.getDamage() + "\n" +
-				  "Pierce: " + girl.getPierce() +"\n" +
-				  "Cooldown: " + girl.getAttackDelay() +"\n" +
-				  "Sight: " + (int)girl.getVisualRange()
-				);
-			}
-		});
-		leftDataBackground.addAction(Actions.repeat(RepeatAction.FOREVER, leftDataLabelAction));
-		leftDataActor = new RenderableLabel(leftDataBackground, ZIndex.MENU_ITEM_Z_INDEX);
-
-		Label rightDataBackground = new Label("DATA", skin);
-		rightDataBackground.setBounds(1658, 56, 292, 110);
-		rightDataBackground.setColor(Color.BLACK);
-		final RunnableAction rightDataLabelAction = new RunnableAction();
-		rightDataLabelAction.setRunnable(() -> {
-			Girl girl = getSelectedGirl().getGirl();
-			Girl upgradedStats = girl.getUpgradedStats();
-			if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
-				rightDataActor.getActor().setText(
-				  "Range: " + (int)girl.getRange() + " (" + (int)upgradedStats.getRange() + ")\n" +
-				  "Upgrade: " + girl.getUpgradeCostString() + " (" + upgradedStats.getUpgradeCostString() + ")\n" +
-				  "Sell: $" + girl.getSellPrice() + "\n" +
-				  " \n" +
-				  " "
-				);
-			} else {
-				rightDataActor.getActor().setText(
-				 "Range: " + (int)girl.getRange() +"\n" +
-				  "Upgrade: " + girl.getUpgradeCostString() + "\n" +
-				  "Sell: $" + girl.getSellPrice() + "\n" +
-				  " \n" +
-				  " "
-				);
-			}
-		});
-		rightDataBackground.addAction(Actions.repeat(RepeatAction.FOREVER, rightDataLabelAction));
-		rightDataActor = new RenderableLabel(rightDataBackground, ZIndex.MENU_ITEM_Z_INDEX);
-
-		Label upgradeBackground = new Label("UPGRADE", skin);
-		upgradeBackground.setBounds(1504, 4, 144, 50);
-		upgradeBackground.setAlignment(Align.center);
-		upgradeBackground.setColor(Color.BLUE);
-		upgradeBackground.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				upgradeSelectedGirl();
-			}
-
-			@Override
-			public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-				hoveringOverUpgrade = true;
-			}
-
-			@Override
-			public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-				hoveringOverUpgrade = false;
-			}
-		});
-		final RunnableAction upgradeLabelAction = new RunnableAction();
-		upgradeLabelAction.setRunnable(() -> {
-            if (getSelectedGirl() != null && !getSelectedGirl().isActive()) {
-                upgradeBackground.setColor(Color.GRAY);
-            } else if (getSelectedGirl().getGirl().getUpgradeCost() == Girl.NO_UPGRADES_AVAILABLE) {
-				upgradeBackground.setText("FULLY UPGRADED");
-				upgradeBackground.setColor(Color.GRAY);
-			} else {
-				Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
-				upgradeBackground.setText("UPGRADE");
-				if (player.getMoney() >= getSelectedGirl().getGirl().getUpgradeCost()) {
-					upgradeBackground.setColor(Color.BLUE);
+			Label leftDataBackground = new Label("DATA", skin);
+			leftDataBackground.setBounds(1510, 56, 292, 110);
+			leftDataBackground.setColor(Color.BLACK);
+			final RunnableAction leftDataLabelAction = new RunnableAction();
+			leftDataLabelAction.setRunnable(() -> {
+				Girl girl = getSelectedGirl().getGirl();
+				Girl upgradedStats = girl.getUpgradedStats();
+				if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
+					leftDataActor.getActor().setText(
+					 girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
+					  "Damage: " + girl.getDamage() + " (" + upgradedStats.getDamage() + ")\n" +
+					  "Pierce: " + girl.getPierce() + " (" + upgradedStats.getPierce() + ")\n" +
+					  "Cooldown: " + girl.getAttackDelay() + " (" + upgradedStats.getAttackDelay() + ")\n" +
+					  "Sight: " + (int)girl.getVisualRange() + " (" + (int)upgradedStats.getVisualRange() + ")"
+					);
 				} else {
-					upgradeBackground.setColor(Color.RED);
+					leftDataActor.getActor().setText(
+					 girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
+					  "Damage: " + girl.getDamage() + "\n" +
+					  "Pierce: " + girl.getPierce() +"\n" +
+					  "Cooldown: " + girl.getAttackDelay() +"\n" +
+					  "Sight: " + (int)girl.getVisualRange()
+					);
 				}
-			}
-		});
-		upgradeBackground.addAction(Actions.repeat(RepeatAction.FOREVER, upgradeLabelAction));
-		upgradeActor = new RenderableLabel(upgradeBackground, ZIndex.MENU_ITEM_Z_INDEX);
+			});
+			leftDataBackground.addAction(Actions.repeat(RepeatAction.FOREVER, leftDataLabelAction));
+			leftDataActor = new RenderableLabel(leftDataBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
-		Label sellBackground = new Label("SELL", skin);
-		sellBackground.setBounds(1652, 4, 144, 50);
-		sellBackground.setAlignment(Align.center);
-		sellBackground.setColor(Color.RED);
-		sellBackground.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				sellSelectedGirl();
-			}
-		});
+			Label rightDataBackground = new Label("DATA", skin);
+			rightDataBackground.setBounds(1658, 56, 292, 110);
+			rightDataBackground.setColor(Color.BLACK);
+			final RunnableAction rightDataLabelAction = new RunnableAction();
+			rightDataLabelAction.setRunnable(() -> {
+				Girl girl = getSelectedGirl().getGirl();
+				Girl upgradedStats = girl.getUpgradedStats();
+				if (hoveringOverUpgrade && girl.getUpgradeCost() != Girl.NO_UPGRADES_AVAILABLE) {
+					rightDataActor.getActor().setText(
+					  "Range: " + (int)girl.getRange() + " (" + (int)upgradedStats.getRange() + ")\n" +
+					  "Upgrade: " + girl.getUpgradeCostString() + " (" + upgradedStats.getUpgradeCostString() + ")\n" +
+					  "Sell: $" + girl.getSellPrice() + "\n" +
+					  " \n" +
+					  " "
+					);
+				} else {
+					rightDataActor.getActor().setText(
+					 "Range: " + (int)girl.getRange() +"\n" +
+					  "Upgrade: " + girl.getUpgradeCostString() + "\n" +
+					  "Sell: $" + girl.getSellPrice() + "\n" +
+					  " \n" +
+					  " "
+					);
+				}
+			});
+			rightDataBackground.addAction(Actions.repeat(RepeatAction.FOREVER, rightDataLabelAction));
+			rightDataActor = new RenderableLabel(rightDataBackground, ZIndex.MENU_ITEM_Z_INDEX);
 
-		final RunnableAction sellLabelAction = new RunnableAction();
-		sellLabelAction.setRunnable(() -> {
-			if (getSelectedGirl() != null && !getSelectedGirl().isActive()) {
-				sellBackground.setColor(Color.GRAY);
-			} else {
-				sellBackground.setColor(Color.RED);
-			}
-        });
-        sellBackground.addAction(Actions.repeat(RepeatAction.FOREVER, sellLabelAction));
-		sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
+			Label upgradeBackground = new Label("UPGRADE", skin);
+			upgradeBackground.setBounds(1504, 4, 144, 50);
+			upgradeBackground.setAlignment(Align.center);
+			upgradeBackground.setColor(Color.BLUE);
+			upgradeBackground.addListener(new ClickListener() {
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					upgradeSelectedGirl();
+				}
+
+				@Override
+				public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+					hoveringOverUpgrade = true;
+				}
+
+				@Override
+				public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+					hoveringOverUpgrade = false;
+				}
+			});
+			final RunnableAction upgradeLabelAction = new RunnableAction();
+			upgradeLabelAction.setRunnable(() -> {
+				if (getSelectedGirl() != null && !getSelectedGirl().isActive()) {
+					upgradeBackground.setColor(Color.GRAY);
+				} else if (getSelectedGirl().getGirl().getUpgradeCost() == Girl.NO_UPGRADES_AVAILABLE) {
+					upgradeBackground.setText("FULLY UPGRADED");
+					upgradeBackground.setColor(Color.GRAY);
+				} else {
+					Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+					upgradeBackground.setText("UPGRADE");
+					if (player.getMoney() >= getSelectedGirl().getGirl().getUpgradeCost()) {
+						upgradeBackground.setColor(Color.BLUE);
+					} else {
+						upgradeBackground.setColor(Color.RED);
+					}
+				}
+			});
+			upgradeBackground.addAction(Actions.repeat(RepeatAction.FOREVER, upgradeLabelAction));
+			upgradeActor = new RenderableLabel(upgradeBackground, ZIndex.MENU_ITEM_Z_INDEX);
+
+			Label sellBackground = new Label("SELL", skin);
+			sellBackground.setBounds(1652, 4, 144, 50);
+			sellBackground.setAlignment(Align.center);
+			sellBackground.setColor(Color.RED);
+			sellBackground.addListener(new ClickListener() {
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					sellSelectedGirl();
+				}
+			});
+
+			final RunnableAction sellLabelAction = new RunnableAction();
+			sellLabelAction.setRunnable(() -> {
+				if (getSelectedGirl() != null && !getSelectedGirl().isActive()) {
+					sellBackground.setColor(Color.GRAY);
+				} else {
+					sellBackground.setColor(Color.RED);
+				}
+			});
+			sellBackground.addAction(Actions.repeat(RepeatAction.FOREVER, sellLabelAction));
+			sellActor = new RenderableLabel(sellBackground, ZIndex.MENU_ITEM_Z_INDEX);
+		}
 	}
 
 	public void setDirections(Pair<Float, Float>[][] directions) {
@@ -223,6 +227,42 @@ public class Map {
 
 	public BloonManager getBloonManager() {
 		return bloonManager;
+	}
+
+	public void addBloonEventListener(BloonEventListener listener) {
+		if (bloonManager != null) {
+			bloonManager.addBloonEventListener(listener);
+		}
+	}
+
+	public void removeBloonEventListener(BloonEventListener listener) {
+		if (bloonManager != null) {
+			bloonManager.removeBloonEventListener(listener);
+		}
+	}
+
+	public void addLevelEventListener(LevelEventListener listener) {
+		if (bloonManager != null) {
+			bloonManager.addLevelEventListener(listener);
+		}
+	}
+
+	public void removeLevelEventListener(LevelEventListener listener) {
+		if (bloonManager != null) {
+			bloonManager.removeLevelEventListener(listener);
+		}
+	}
+
+	public void addObserver(Object observer) {
+		if (bloonManager != null) {
+			bloonManager.addObserver(observer);
+		}
+	}
+
+	public void removeObserver(Object observer) {
+		if (bloonManager != null) {
+			bloonManager.removeObserver(observer);
+		}
 	}
 
 	public boolean canPlaceGirl(GirlActor girlActor) {
@@ -294,35 +334,37 @@ public class Map {
 	public void showGirlDetailsModule() {
 		hideGirlDetailsModule();
 
-		Girl girl = getSelectedGirl().getGirl();
+		if (leftDataActor != null && rightDataActor != null && stage != null) {
+			Girl girl = getSelectedGirl().getGirl();
 
-		leftDataActor.getActor().setText(
-		 		girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
-				"Damage: " + girl.getDamage() + "\n" +
-				"Pierce: " + girl.getPierce() +"\n" +
-				"Cooldown: " + girl.getAttackDelay() +"\n" +
-				"Sight: " + (int)girl.getVisualRange()
-		);
-		rightDataActor.getActor().setText(
-				"Range: " + (int)girl.getRange() +"\n" +
-				"Upgrade: " + girl.getUpgradeCostString() + "\n" +
-				"Sell: $" + girl.getSellPrice() + "\n" +
-				" \n" +
-				" "
-		);
-		stage.addActor(infoBackground);
-		stage.addActor(leftDataActor);
-		stage.addActor(rightDataActor);
-		stage.addActor(upgradeActor);
-		stage.addActor(sellActor);
+			leftDataActor.getActor().setText(
+			 		girl.getName() + " " + (girl.getLevel() + 1) + "\n" +
+					"Damage: " + girl.getDamage() + "\n" +
+					"Pierce: " + girl.getPierce() +"\n" +
+					"Cooldown: " + girl.getAttackDelay() +"\n" +
+					"Sight: " + (int)girl.getVisualRange()
+			);
+			rightDataActor.getActor().setText(
+					"Range: " + (int)girl.getRange() +"\n" +
+					"Upgrade: " + girl.getUpgradeCostString() + "\n" +
+					"Sell: $" + girl.getSellPrice() + "\n" +
+					" \n" +
+					" "
+			);
+			stage.addActor(infoBackground);
+			stage.addActor(leftDataActor);
+			stage.addActor(rightDataActor);
+			stage.addActor(upgradeActor);
+			stage.addActor(sellActor);
+		}
 	}
 
 	public void hideGirlDetailsModule() {
-		infoBackground.remove();
-		leftDataActor.remove();
-		rightDataActor.remove();
-		upgradeActor.remove();
-		sellActor.remove();
+		if (infoBackground != null) infoBackground.remove();
+		if (leftDataActor != null) leftDataActor.remove();
+		if (rightDataActor != null) rightDataActor.remove();
+		if (upgradeActor != null) upgradeActor.remove();
+		if (sellActor != null) sellActor.remove();
 	}
 
 	public void upgradeSelectedGirl() {
