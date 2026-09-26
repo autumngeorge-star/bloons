@@ -20,6 +20,9 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.audio.LibGdxSoundService;
+import com.hongbao.bloons.audio.MusicService;
+import com.hongbao.bloons.audio.SoundService;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -48,8 +51,12 @@ public class Map {
 	private boolean hoveringOverUpgrade;
 
 	public Map(String backgroundImage, Stage stage) {
+		this(backgroundImage, stage, new LibGdxSoundService(), new MusicPlayer());
+	}
+
+	public Map(String backgroundImage, Stage stage, SoundService soundService, MusicService musicService) {
 		this.backgroundImage = backgroundImage;
-		this.bloonManager = new BloonManager(stage, this);
+		this.bloonManager = new BloonManager(stage, this, soundService, musicService);
 		onStageGirls = new HashSet<>();
 		selectedGirl = null;
 		this.stage = stage;

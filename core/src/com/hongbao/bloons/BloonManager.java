@@ -1,11 +1,15 @@
 package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
 import com.hongbao.bloons.actors.GirlActor;
+import com.hongbao.bloons.audio.LibGdxSoundService;
+import com.hongbao.bloons.audio.MusicService;
+import com.hongbao.bloons.audio.NoOpMusicService;
+import com.hongbao.bloons.audio.NoOpSoundService;
+import com.hongbao.bloons.audio.SoundService;
 import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
@@ -22,31 +26,40 @@ public class BloonManager {
 	// A dedicated collection of onstage bloons is maintained to (probably) speed up collision checking
 	// especially when there are a lot of bullets on screen.
 	private Set<BloonActor> onstageBloons;
-	private Sound popSound; // todo another sound for damaging bloons
+	private SoundService soundService;
+	private MusicService musicService;
 	private BloonQueue bloonQueue;
 	
-	public BloonManager(Stage stage, Map map) {
+	public BloonManager(Stage stage, Map map, SoundService soundService, MusicService musicService) {
 		this.stage = stage;
 		this.map = map;
-		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
-		bloonQueue = BloonFactory.createBloonQueue();
+		this.soundService = soundService != null ? soundService : new NoOpSoundService();
+		this.musicService = musicService != null ? musicService : new NoOpMusicService();
+		this.onstageBloons = new HashSet<>();
+		this.bloonQueue = BloonFactory.createBloonQueue();
+	}
+
+	public BloonManager(Stage stage, Map map) {
+		this(stage, map, new LibGdxSoundService(), new MusicPlayer());
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
+			if (getLevel() == 1) {
+				musicService.playStageMusic();
+			} else if (getLevel() == 40) {
+				musicService.playFinalBossMusic();
 			}
 		}
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean instructionsEmpty = true;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			instructionsEmpty = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).instructions.isEmpty();
+		}
+		return instructionsEmpty && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 
 	public int getLevel() {
@@ -96,12 +109,17 @@ public class BloonManager {
 	}
 	
 	public void popBloon(BloonActor bloonActor, int damage) {
-		Player player = ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer();
+		Player player = null;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			player = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getPlayer();
+		}
 		
 		if (bloonActor.getBloon().willPopBloon(damage)) {
 			onstageBloons.remove(bloonActor);
 			BloonPoppedResult result = bloonActor.pop(damage);
-			player.earnMoney(result.getCashGenerated());
+			if (player != null) {
+				player.earnMoney(result.getCashGenerated());
+			}
 			
 			BloonActor previousBloonActor = null;
 			for (Bloon bloon : result.getBloonsGenerated()) {
@@ -109,18 +127,22 @@ public class BloonManager {
 				if (previousBloonActor == null) {
 					 generatedBloonActor = new BloonActor(bloon, bloonActor.getCenterX(), bloonActor.getCenterY(), bloonActor);
 				} else {
-					Pair<Float, Float> direction = map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY());
+					Pair<Float, Float> direction = map != null ? map.getDirection(previousBloonActor.getCenterX(), previousBloonActor.getCenterY()) : new Pair<>(0f, 0f);
 					generatedBloonActor = new BloonActor(bloon, previousBloonActor.getCenterX() - direction.getFirst(), previousBloonActor.getCenterY() - direction.getSecond(), bloonActor);
 				}
-				stage.addActor(generatedBloonActor);
+				if (stage != null) {
+					stage.addActor(generatedBloonActor);
+				}
 				onstageBloons.add(generatedBloonActor);
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			soundService.playPopSound();
 		} else {
 			bloonActor.damage(damage);
-			player.earnMoney(damage);
+			if (player != null) {
+				player.earnMoney(damage);
+			}
 			// todo play some other sound I guess
 		}
 	}
