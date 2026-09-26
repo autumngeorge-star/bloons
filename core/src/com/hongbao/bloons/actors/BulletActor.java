@@ -94,6 +94,10 @@ public class BulletActor extends RenderableActor {
 		return false;
 	}
 	
+	public boolean hasDirectlyDamagedBloon(BloonActor bloonActor) {
+		return damagedBloons.contains(bloonActor.getBloonId());
+	}
+	
 	public void damageBloon(BloonActor bloonActor) {
 		damagedBloons.add(bloonActor.getBloonId());
 	}

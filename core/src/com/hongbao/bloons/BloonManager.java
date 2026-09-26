@@ -198,7 +198,7 @@ public class BloonManager {
 		BloonActor bloonActor = null;
 		
 		for (BloonActor actor : onstageBloons) {
-			if (!bulletActor.hasDamagedBloon(actor)) {
+			if (!bulletActor.hasDirectlyDamagedBloon(actor)) {
 				if (bloonActor == null) {
 					bloonActor = actor;
 				} else if (Map.distanceBetweenActors(actor, bulletActor) < Map.distanceBetweenActors(bloonActor, bulletActor)) {
