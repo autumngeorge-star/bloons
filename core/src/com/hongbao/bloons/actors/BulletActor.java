@@ -28,21 +28,22 @@ public class BulletActor extends RenderableActor {
 	
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+		textureRegion = app.getAtlasRegion(bullet.getImageFileName());
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
 		this.dy = dy;
 		calculateRotationAngle();
-		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
+		collisionRadius = textureRegion.getRegionWidth() / 2f;
 		target = null; // this'll get automatically set as the bullet moves
 		
 		setZIndex(ZIndex.BULLET_Z_INDEX);
 		setBounds(
-		 x - textureRegion.getTexture().getWidth() / 2f,
-		 y - textureRegion.getTexture().getHeight() / 2f,
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight()
+		 x - textureRegion.getRegionWidth() / 2f,
+		 y - textureRegion.getRegionHeight() / 2f,
+		 textureRegion.getRegionWidth(),
+		 textureRegion.getRegionHeight()
 		);
 		
 		damagedBloons = new HashSet<>(bullet.getPierce());
@@ -114,8 +115,8 @@ public class BulletActor extends RenderableActor {
 		 getY(),
 		 getCenterX() - getX(),
 		 getCenterY() - getY(),
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight(),
+		 textureRegion.getRegionWidth(),
+		 textureRegion.getRegionHeight(),
 		 1f,
 		 1f,
 		 -rotationAngle

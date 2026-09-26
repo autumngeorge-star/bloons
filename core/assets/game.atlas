@@ -1,0 +1,615 @@
+
+game.png
+size: 4096,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+bloons/bfb_bloon
+  rotate: false
+  xy: 2648, 60
+  size: 219, 310
+  orig: 219, 310
+  offset: 0, 0
+  index: -1
+bloons/black_bloon
+  rotate: false
+  xy: 4057, 1355
+  size: 37, 47
+  orig: 37, 47
+  offset: 0, 0
+  index: -1
+bloons/black_camo_bloon
+  rotate: false
+  xy: 4057, 1306
+  size: 37, 47
+  orig: 37, 47
+  offset: 0, 0
+  index: -1
+bloons/black_camo_regrowth_bloon
+  rotate: false
+  xy: 2, 14
+  size: 51, 47
+  orig: 51, 47
+  offset: 0, 0
+  index: -1
+bloons/black_regrowth_bloon
+  rotate: false
+  xy: 2247, 41
+  size: 51, 47
+  orig: 51, 47
+  offset: 0, 0
+  index: -1
+bloons/blue_bloon
+  rotate: false
+  xy: 3232, 218
+  size: 53, 68
+  orig: 53, 68
+  offset: 0, 0
+  index: -1
+bloons/blue_camo_bloon
+  rotate: false
+  xy: 2090, 20
+  size: 53, 68
+  orig: 53, 68
+  offset: 0, 0
+  index: -1
+bloons/blue_camo_regrowth_bloon
+  rotate: false
+  xy: 3157, 218
+  size: 73, 68
+  orig: 73, 68
+  offset: 0, 0
+  index: -1
+bloons/blue_regrowth_bloon
+  rotate: false
+  xy: 3607, 370
+  size: 73, 68
+  orig: 73, 68
+  offset: 0, 0
+  index: -1
+bloons/ceramic_bloon
+  rotate: false
+  xy: 1428, 162
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+bloons/ceramic_camo_bloon
+  rotate: false
+  xy: 1428, 80
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+bloons/ceramic_camo_regrowth_bloon
+  rotate: false
+  xy: 1340, 163
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+bloons/ceramic_regrowth_bloon
+  rotate: false
+  xy: 3069, 291
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+bloons/green_bloon
+  rotate: false
+  xy: 1856, 16
+  size: 57, 72
+  orig: 57, 72
+  offset: 0, 0
+  index: -1
+bloons/green_camo_bloon
+  rotate: false
+  xy: 1915, 16
+  size: 57, 72
+  orig: 57, 72
+  offset: 0, 0
+  index: -1
+bloons/green_camo_regrowth_bloon
+  rotate: false
+  xy: 3806, 603
+  size: 77, 71
+  orig: 77, 71
+  offset: 0, 0
+  index: -1
+bloons/green_regrowth_bloon
+  rotate: false
+  xy: 3695, 452
+  size: 77, 71
+  orig: 77, 71
+  offset: 0, 0
+  index: -1
+bloons/lead_bloon
+  rotate: false
+  xy: 1411, 2
+  size: 59, 76
+  orig: 59, 76
+  offset: 0, 0
+  index: -1
+bloons/lead_camo_bloon
+  rotate: false
+  xy: 1472, 2
+  size: 59, 76
+  orig: 59, 76
+  offset: 0, 0
+  index: -1
+bloons/lead_camo_regrowth_bloon
+  rotate: false
+  xy: 3966, 977
+  size: 82, 75
+  orig: 82, 75
+  offset: 0, 0
+  index: -1
+bloons/lead_regrowth_bloon
+  rotate: false
+  xy: 3695, 525
+  size: 82, 75
+  orig: 82, 75
+  offset: 0, 0
+  index: -1
+bloons/moab_bloon
+  rotate: false
+  xy: 3161, 370
+  size: 150, 230
+  orig: 150, 230
+  offset: 0, 0
+  index: -1
+bloons/pink_bloon
+  rotate: false
+  xy: 3157, 288
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+bloons/pink_camo_bloon
+  rotate: false
+  xy: 3222, 288
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+bloons/pink_camo_regrowth_bloon
+  rotate: false
+  xy: 3607, 521
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+bloons/pink_regrowth_bloon
+  rotate: false
+  xy: 1340, 82
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+bloons/rainbow_bloon
+  rotate: false
+  xy: 1533, 8
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+bloons/rainbow_camo_bloon
+  rotate: false
+  xy: 1598, 8
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+bloons/rainbow_camo_regrowth_bloon
+  rotate: false
+  xy: 3069, 210
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+bloons/rainbow_regrowth_bloon
+  rotate: false
+  xy: 3607, 440
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+bloons/red_bloon
+  rotate: false
+  xy: 2145, 25
+  size: 49, 63
+  orig: 49, 63
+  offset: 0, 0
+  index: -1
+bloons/red_camo_bloon
+  rotate: false
+  xy: 2196, 25
+  size: 49, 63
+  orig: 49, 63
+  offset: 0, 0
+  index: -1
+bloons/red_camo_regrowth_bloon
+  rotate: false
+  xy: 1340, 17
+  size: 69, 63
+  orig: 69, 63
+  offset: 0, 0
+  index: -1
+bloons/red_regrowth_bloon
+  rotate: false
+  xy: 1785, 25
+  size: 69, 63
+  orig: 69, 63
+  offset: 0, 0
+  index: -1
+bloons/white_bloon
+  rotate: false
+  xy: 4058, 1669
+  size: 36, 47
+  orig: 36, 47
+  offset: 0, 0
+  index: -1
+bloons/white_camo_bloon
+  rotate: false
+  xy: 4058, 1620
+  size: 36, 47
+  orig: 36, 47
+  offset: 0, 0
+  index: -1
+bloons/white_camo_regrowth_bloon
+  rotate: false
+  xy: 55, 14
+  size: 51, 47
+  orig: 51, 47
+  offset: 0, 0
+  index: -1
+bloons/white_regrowth_bloon
+  rotate: false
+  xy: 2300, 41
+  size: 51, 47
+  orig: 51, 47
+  offset: 0, 0
+  index: -1
+bloons/yellow_bloon
+  rotate: false
+  xy: 1663, 12
+  size: 59, 76
+  orig: 59, 76
+  offset: 0, 0
+  index: -1
+bloons/yellow_camo_bloon
+  rotate: false
+  xy: 1724, 12
+  size: 59, 76
+  orig: 59, 76
+  offset: 0, 0
+  index: -1
+bloons/yellow_camo_regrowth_bloon
+  rotate: false
+  xy: 3069, 133
+  size: 82, 75
+  orig: 82, 75
+  offset: 0, 0
+  index: -1
+bloons/yellow_regrowth_bloon
+  rotate: false
+  xy: 3966, 900
+  size: 82, 75
+  orig: 82, 75
+  offset: 0, 0
+  index: -1
+bloons/zebra_bloon
+  rotate: false
+  xy: 1974, 16
+  size: 56, 72
+  orig: 56, 72
+  offset: 0, 0
+  index: -1
+bloons/zebra_camo_bloon
+  rotate: false
+  xy: 2032, 16
+  size: 56, 72
+  orig: 56, 72
+  offset: 0, 0
+  index: -1
+bloons/zebra_camo_regrowth_bloon
+  rotate: false
+  xy: 3069, 60
+  size: 77, 71
+  orig: 77, 71
+  offset: 0, 0
+  index: -1
+bloons/zebra_regrowth_bloon
+  rotate: false
+  xy: 3885, 603
+  size: 77, 71
+  orig: 77, 71
+  offset: 0, 0
+  index: -1
+bloons/zomg_bloon
+  rotate: false
+  xy: 2869, 60
+  size: 198, 310
+  orig: 198, 310
+  offset: 0, 0
+  index: -1
+characters/alice
+  rotate: false
+  xy: 4062, 1916
+  size: 29, 39
+  orig: 29, 39
+  offset: 0, 0
+  index: -1
+characters/characters
+  rotate: false
+  xy: 1504, 634
+  size: 1712, 510
+  orig: 1712, 510
+  offset: 0, 0
+  index: -1
+characters/marisa
+  rotate: false
+  xy: 4062, 2006
+  size: 32, 40
+  orig: 32, 40
+  offset: 0, 0
+  index: -1
+characters/reimu
+  rotate: false
+  xy: 2353, 43
+  size: 28, 45
+  orig: 28, 45
+  offset: 0, 0
+  index: -1
+characters/remilia
+  rotate: false
+  xy: 3966, 862
+  size: 44, 36
+  orig: 44, 36
+  offset: 0, 0
+  index: -1
+characters/sakuya
+  rotate: false
+  xy: 4058, 1569
+  size: 23, 49
+  orig: 23, 49
+  offset: 0, 0
+  index: -1
+characters/youmu
+  rotate: false
+  xy: 4057, 1261
+  size: 27, 43
+  orig: 27, 43
+  offset: 0, 0
+  index: -1
+characters/yukari
+  rotate: false
+  xy: 4062, 1957
+  size: 30, 47
+  orig: 30, 47
+  offset: 0, 0
+  index: -1
+characters/yuyuko
+  rotate: false
+  xy: 108, 15
+  size: 28, 46
+  orig: 28, 46
+  offset: 0, 0
+  index: -1
+instructions/blimps
+  rotate: false
+  xy: 3308, 1404
+  size: 748, 312
+  orig: 748, 312
+  offset: 0, 0
+  index: -1
+instructions/bloons
+  rotate: false
+  xy: 3308, 1718
+  size: 752, 328
+  orig: 752, 328
+  offset: 0, 0
+  index: -1
+instructions/girls
+  rotate: false
+  xy: 3218, 853
+  size: 746, 285
+  orig: 746, 285
+  offset: 0, 0
+  index: -1
+instructions/objective
+  rotate: false
+  xy: 3308, 1140
+  size: 747, 262
+  orig: 747, 262
+  offset: 0, 0
+  index: -1
+instructions/shortcuts
+  rotate: false
+  xy: 2, 63
+  size: 748, 179
+  orig: 748, 179
+  offset: 0, 0
+  index: -1
+instructions/title
+  rotate: false
+  xy: 3218, 676
+  size: 752, 175
+  orig: 752, 175
+  offset: 0, 0
+  index: -1
+maps/basic_map
+  rotate: false
+  xy: 2, 1146
+  size: 1500, 900
+  orig: 1500, 900
+  offset: 0, 0
+  index: -1
+maps/heater
+  rotate: false
+  xy: 2, 244
+  size: 1500, 900
+  orig: 1500, 900
+  offset: 0, 0
+  index: -1
+maps/map_with_turn
+  rotate: false
+  xy: 1504, 1146
+  size: 1500, 900
+  orig: 1500, 900
+  offset: 0, 0
+  index: -1
+projectiles/bat
+  rotate: false
+  xy: 4012, 879
+  size: 29, 19
+  orig: 29, 19
+  offset: 0, 0
+  index: -1
+projectiles/black_spell_card
+  rotate: false
+  xy: 2247, 25
+  size: 12, 14
+  orig: 12, 14
+  offset: 0, 0
+  index: -1
+projectiles/blue_knives
+  rotate: false
+  xy: 2383, 59
+  size: 15, 29
+  orig: 15, 29
+  offset: 0, 0
+  index: -1
+projectiles/blue_magic_missile
+  rotate: false
+  xy: 3287, 311
+  size: 15, 57
+  orig: 15, 57
+  offset: 0, 0
+  index: -1
+projectiles/magic_spike
+  rotate: false
+  xy: 3287, 262
+  size: 15, 47
+  orig: 15, 47
+  offset: 0, 0
+  index: -1
+projectiles/pink_butterfly
+  rotate: false
+  xy: 3161, 608
+  size: 28, 24
+  orig: 28, 24
+  offset: 0, 0
+  index: -1
+projectiles/projectiles
+  rotate: false
+  xy: 1504, 90
+  size: 1142, 542
+  orig: 1142, 542
+  offset: 0, 0
+  index: -1
+projectiles/purple_energy
+  rotate: false
+  xy: 3779, 533
+  size: 15, 67
+  orig: 15, 67
+  offset: 0, 0
+  index: -1
+projectiles/red_spell_card
+  rotate: false
+  xy: 4058, 1553
+  size: 12, 14
+  orig: 12, 14
+  offset: 0, 0
+  index: -1
+projectiles/sword_slash
+  rotate: false
+  xy: 138, 19
+  size: 16, 42
+  orig: 16, 42
+  offset: 0, 0
+  index: -1
+spellcards/reimu_spell
+  rotate: false
+  xy: 3966, 1054
+  size: 84, 84
+  orig: 84, 84
+  offset: 0, 0
+  index: -1
+spellcards/yuyuko_fan
+  rotate: false
+  xy: 2648, 372
+  size: 511, 260
+  orig: 511, 260
+  offset: 0, 0
+  index: -1
+ui/alice_box
+  rotate: false
+  xy: 1046, 170
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+ui/girl_details_template
+  rotate: false
+  xy: 752, 74
+  size: 292, 168
+  orig: 292, 168
+  offset: 0, 0
+  index: -1
+ui/header
+  rotate: false
+  xy: 3006, 1146
+  size: 300, 900
+  orig: 300, 900
+  offset: 0, 0
+  index: -1
+ui/marisa_box
+  rotate: false
+  xy: 1046, 96
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+ui/reimu_box
+  rotate: false
+  xy: 3218, 602
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+ui/remilia_box
+  rotate: false
+  xy: 3512, 602
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+ui/sakuya_box
+  rotate: false
+  xy: 3313, 528
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+ui/youmu_box
+  rotate: false
+  xy: 3313, 454
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+ui/yukari_box
+  rotate: false
+  xy: 3313, 380
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+ui/yuyuko_box
+  rotate: false
+  xy: 1046, 22
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
