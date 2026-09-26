@@ -50,38 +50,52 @@ public class SpellCard {
 		return scale;
 	}
 	
+	private static void applyFacingAngle(Bullet bullet, float unrotatedDX, float unrotatedDY, float unrotatedXOffset, float unrotatedYOffset, float facingAngle) {
+		double rad = Math.toRadians(facingAngle);
+		double cos = Math.cos(rad);
+		double sin = Math.sin(rad);
+
+		float dx = (float) (unrotatedDX * cos + unrotatedDY * sin);
+		float dy = (float) (-unrotatedDX * sin + unrotatedDY * cos);
+		float xOffset = (float) (unrotatedXOffset * cos + unrotatedYOffset * sin);
+		float yOffset = (float) (-unrotatedXOffset * sin + unrotatedYOffset * cos);
+
+		bullet.setInitialDXOverride(dx);
+		bullet.setInitialDYOverride(dy);
+		bullet.setInitialXOffset(xOffset);
+		bullet.setInitialYOffset(yOffset);
+	}
+
 	public static SpellCard createReimuSpellCard() {
+		return createReimuSpellCard(0f);
+	}
+
+	public static SpellCard createReimuSpellCard(float facingAngle) {
 		Map<Integer, List<Bullet>> bulletsToCreate = new HashMap<>();
 		for (int x = 0; x < 1000; x += 25) {
 			Bullet bullet1 = GirlFactory.createReimu().createBullet();
 			bullet1.setMaxRange(5000);
-			bullet1.setInitialDXOverride(0);
-			bullet1.setInitialDYOverride(1);
+			applyFacingAngle(bullet1, 0f, 1f, 0f, 0f, facingAngle);
 			
 			Bullet bullet2 = GirlFactory.createReimu().createBullet();
 			bullet2.setMaxRange(5000);
-			bullet2.setInitialDXOverride((float)(Math.sqrt(3) / 2));
-			bullet2.setInitialDYOverride(0.5f);
+			applyFacingAngle(bullet2, (float)(Math.sqrt(3) / 2), 0.5f, 0f, 0f, facingAngle);
 			
 			Bullet bullet3 = GirlFactory.createReimu().createBullet();
 			bullet3.setMaxRange(5000);
-			bullet3.setInitialDXOverride((float)(-Math.sqrt(3) / 2));
-			bullet3.setInitialDYOverride(0.5f);
+			applyFacingAngle(bullet3, (float)(-Math.sqrt(3) / 2), 0.5f, 0f, 0f, facingAngle);
 			
 			Bullet bullet4 = GirlFactory.createReimu().createBullet();
 			bullet4.setMaxRange(5000);
-			bullet4.setInitialDXOverride(0);
-			bullet4.setInitialDYOverride(-1);
+			applyFacingAngle(bullet4, 0f, -1f, 0f, 0f, facingAngle);
 			
 			Bullet bullet5 = GirlFactory.createReimu().createBullet();
 			bullet5.setMaxRange(5000);
-			bullet5.setInitialDXOverride((float)(Math.sqrt(3) / 2));
-			bullet5.setInitialDYOverride(-0.5f);
+			applyFacingAngle(bullet5, (float)(Math.sqrt(3) / 2), -0.5f, 0f, 0f, facingAngle);
 			
 			Bullet bullet6 = GirlFactory.createReimu().createBullet();
 			bullet6.setMaxRange(5000);
-			bullet6.setInitialDXOverride((float)(-Math.sqrt(3) / 2));
-			bullet6.setInitialDYOverride(-0.5f);
+			applyFacingAngle(bullet6, (float)(-Math.sqrt(3) / 2), -0.5f, 0f, 0f, facingAngle);
 			
 			bulletsToCreate.put(x, Arrays.asList(bullet1, bullet2, bullet3, bullet4, bullet5, bullet6));
 		}
@@ -89,6 +103,10 @@ public class SpellCard {
 	}
 
 	public static SpellCard createYuyukoSpellCard() {
+		return createYuyukoSpellCard(0f);
+	}
+
+	public static SpellCard createYuyukoSpellCard(float facingAngle) {
 		Map<Integer, List<Bullet>> bulletsToCreate = new HashMap<>();
 		Girl yuyuko = GirlFactory.createYuyuko();
 
@@ -115,9 +133,7 @@ public class SpellCard {
 				bullet.setMaxRange(5000);
 				double currentAngle = offset * i;
 				double desiredAngle = currentAngle + (x * Math.PI / 500);
-				bullet.setInitialXOffset(-125);
-				bullet.setInitialDXOverride((float) Math.cos(desiredAngle));
-				bullet.setInitialDYOverride((float) Math.sin(desiredAngle));
+				applyFacingAngle(bullet, (float) Math.cos(desiredAngle), (float) Math.sin(desiredAngle), -125f, 0f, facingAngle);
 
 				bulletsForCurrentFrame.add(bullet);
 			}
@@ -128,9 +144,7 @@ public class SpellCard {
 				bullet.setMaxRange(5000);
 				double currentAngle = offset * i;
 				double desiredAngle = currentAngle - (x * Math.PI / 500);
-				bullet.setInitialXOffset(125);
-				bullet.setInitialDXOverride((float) Math.cos(desiredAngle));
-				bullet.setInitialDYOverride((float) Math.sin(desiredAngle));
+				applyFacingAngle(bullet, (float) Math.cos(desiredAngle), (float) Math.sin(desiredAngle), 125f, 0f, facingAngle);
 
 				bulletsForCurrentFrame.add(bullet);
 			}

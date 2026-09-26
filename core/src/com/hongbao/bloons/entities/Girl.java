@@ -115,14 +115,18 @@ public class Girl {
 		return new Bullet(bulletSpeed.get(level), getDamage(), getPierce(), getRange(), isHoming(), bulletFileName);
 	}
 	
-	public SpellCard createSpellCard() {
+	public SpellCard createSpellCard(float facingAngle) {
 		if (name.equals("Reimu")) {
-			return SpellCard.createReimuSpellCard();
+			return SpellCard.createReimuSpellCard(facingAngle);
 		}
 		if (name.equals("Yuyuko")) {
-			return SpellCard.createYuyukoSpellCard();
+			return SpellCard.createYuyukoSpellCard(facingAngle);
 		}
 		return null;
+	}
+
+	public SpellCard createSpellCard() {
+		return createSpellCard(0f);
 	}
 	
 	public int upgrade() {
