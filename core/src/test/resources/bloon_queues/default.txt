@@ -1,0 +1,141 @@
+END
+20 30 red
+END
+35 30 red
+END
+25 20 red
+5 30 blue
+END
+35 20 red
+18 30 blue
+END
+5 20 red
+27 20 blue
+END
+15 20 red
+15 20 blue
+4 20 green
+END
+20 20 red
+20 20 blue
+5 20 green
+END
+10 20 red
+20 20 blue
+14 20 green
+END
+30 20 green
+END
+102 15 blue
+END
+6 10 red
+12 20 blue
+12 20 green
+3 20 yellow
+END
+15 20 blue
+10 20 green
+5 20 yellow
+END
+50 20 blue
+23 20 green
+END
+49 20 red
+15 20 blue
+10 20 green
+9 20 yellow
+END
+20 20 red
+15 20 blue
+12 20 green
+10 20 yellow
+4 20 pink
+END
+40 20 green
+8 20 yellow
+END
+12 20 pink
+END
+80 20 green
+END
+10 20 green
+4 20 yellow
+20 20 pink
+END
+6 20 black
+END
+40 20 yellow
+14 20 pink
+END
+16 20 black
+END
+7 20 zebra
+END
+20 20 blue
+1 20 rainbow
+END
+25 20 pink
+10 20 black
+END
+23 20 pink
+4 20 zebra
+END
+100 20 pink
+60 5 blue
+45 5 green
+45 5 yellow
+END
+6 20 lead
+END
+50 20 yellow
+50 20 pink
+END
+9 20 lead
+END
+16 20 black
+8 20 zebra
+2 20 rainbow
+END
+10 20 pink
+45 15 black
+END
+20 20 black
+13 50 rainbow
+END
+26 20 yellow,yellow,yellow,yellow,yellow,zebra
+4 20 yellow
+END
+35 20 pink
+5 20 black
+25 20 zebra
+5 20 rainbow
+END
+20 20 pink,pink,pink,pink,pink,rainbow
+END
+57 20 black
+10 20 zebra
+15 20 lead
+END
+42 20 pink
+17 20 black
+10 20 zebra
+14 20 lead
+2 20 ceramic
+END
+20 10 black
+20 20 zebra
+18 20 rainbow
+2 20 ceramic
+END
+1 1 moab
+END
+1 1 bfb
+END
+1 1 zomg
+END
+2 20 zomg
+END
+3 20 zomg
+END
+4 20 zomg
+END
