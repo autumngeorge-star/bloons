@@ -28,6 +28,7 @@ import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.services.PreferencesSaveService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,16 +50,22 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private PreferencesSaveService saveService;
 	
 	
 	@Override
 	public void create() {
 		Gdx.graphics.setWindowedMode(1800, 900);
+		saveService = new PreferencesSaveService();
 		paused = false;
-		tripleSpeed = false;
-		autoContinue = false;
+		tripleSpeed = saveService.getTripleSpeed(false);
+		autoContinue = saveService.getAutoContinue(false);
+
 		stage = new Stage();
-		player = new Player(MONEY, HEALTH);
+		int initialMoney = saveService.hasActiveSession() ? saveService.getMoney(MONEY) : MONEY;
+		int initialHealth = saveService.hasActiveSession() ? saveService.getHealth(HEALTH) : HEALTH;
+		int initialScore = saveService.getTotalScore();
+		player = new Player(initialMoney, initialHealth, initialScore);
 		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
@@ -70,6 +77,12 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		Gdx.input.setInputProcessor(stage);
 		
 		createMap();
+
+		int startLevel = saveService.hasActiveSession() ? saveService.getCurrentLevel(0) : saveService.getUnlockedLevelIndex();
+		if (startLevel > 0) {
+			map.getBloonManager().setCurrentLevel(startLevel);
+		}
+
 		createMenu();
 		createInstructions();
 		musicPlayer.playTitleMusic();
@@ -207,6 +220,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			
 			if (player.getHealth() == 0) {
 				pause();
+				if (saveService != null) {
+					saveService.resetActiveSession();
+				}
 			}
 		});
 		healthLabel.addAction(Actions.repeat(RepeatAction.FOREVER, healthLabelAction));
@@ -559,10 +575,32 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		}
 	}
 
+	public void onWaveCompleted(int completedLevel) {
+		if (saveService != null) {
+			saveService.saveWaveCompletion(
+				completedLevel,
+				player.getScore(),
+				tripleSpeed,
+				autoContinue,
+				true,
+				player.getMoney(),
+				player.getHealth()
+			);
+		}
+	}
+
+	public PreferencesSaveService getSaveService() {
+		return saveService;
+	}
+
 	@Override
 	public void pause() {
 		paused = true;
 		musicPlayer.pause();
+		if (saveService != null) {
+			saveService.saveSettings(tripleSpeed, autoContinue, true);
+			saveService.flush();
+		}
 	}
 
 	@Override
@@ -573,6 +611,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		if (saveService != null) {
+			saveService.flush();
+		}
 		stage.dispose();
 	}
 
