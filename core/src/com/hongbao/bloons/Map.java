@@ -20,6 +20,7 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -261,7 +262,7 @@ public class Map {
 	public void placeGirl(GirlActor girlActor) {
 		girlActor.setActive(true);
 		onStageGirls.add(girlActor);
-		stage.addActor(girlActor);
+		SortByZIndex.addActorInOrder(stage, girlActor);
 		selectedGirl = girlActor;
 		girlActor.addListener(new ClickListener() {
 			@Override
@@ -274,7 +275,7 @@ public class Map {
 	
 	public void placeSpellCard() {
 		if (selectedGirl != null) {
-			stage.addActor(selectedGirl.createSpellCardActor());
+			SortByZIndex.addActorInOrder(stage, selectedGirl.createSpellCardActor());
 		}
 	}
 	
@@ -310,11 +311,11 @@ public class Map {
 				" \n" +
 				" "
 		);
-		stage.addActor(infoBackground);
-		stage.addActor(leftDataActor);
-		stage.addActor(rightDataActor);
-		stage.addActor(upgradeActor);
-		stage.addActor(sellActor);
+		SortByZIndex.addActorInOrder(stage, infoBackground);
+		SortByZIndex.addActorInOrder(stage, leftDataActor);
+		SortByZIndex.addActorInOrder(stage, rightDataActor);
+		SortByZIndex.addActorInOrder(stage, upgradeActor);
+		SortByZIndex.addActorInOrder(stage, sellActor);
 	}
 
 	public void hideGirlDetailsModule() {
