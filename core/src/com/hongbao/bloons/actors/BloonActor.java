@@ -27,12 +27,13 @@ public class BloonActor extends RenderableActor {
 	
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
-
-		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
-		
-		setZIndex(ZIndex.BLOON_Z_INDEX);
-		setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
+		if (Gdx.files != null) {
+			textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+			collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
+			setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
+		} else {
+			collisionRadius = 15f;
+		}
 		
 		if (parent != null) {
 			parentBloonIds = new HashSet(parent.getParentBloonIds());
@@ -85,14 +86,20 @@ public class BloonActor extends RenderableActor {
 	// Please avoid calling this method directly, instead use the BloonManager pop()
 	public BloonPoppedResult pop(int damage) {
 		BloonPoppedResult bloonPoppedResult = bloon.pop(damage);
-		textureRegion.getTexture().dispose();
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
 		return bloonPoppedResult;
 	}
 	
 	public void release() {
-		((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
-		textureRegion.getTexture().dispose();
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
+		}
+		if (textureRegion != null && textureRegion.getTexture() != null) {
+			textureRegion.getTexture().dispose();
+		}
 		remove();
 	}
 	

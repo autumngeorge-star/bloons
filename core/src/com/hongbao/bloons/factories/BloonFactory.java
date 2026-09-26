@@ -294,6 +294,15 @@ public class BloonFactory {
 	}
 	
 	public static BloonQueue createBloonQueueFromFile(String fileName) {
+		if (Gdx.files == null) {
+			List<List<Bloon>> bloonLevels = new ArrayList<>();
+			List<List<Long>> intervalLevels = new ArrayList<>();
+			bloonLevels.add(new ArrayList<>());
+			bloonLevels.add(new ArrayList<>());
+			intervalLevels.add(new ArrayList<>());
+			intervalLevels.add(new ArrayList<>());
+			return new BloonQueue(bloonLevels, intervalLevels);
+		}
 		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
 		String fileContents = file.readString();
 		String[] lines = fileContents.split("\n");

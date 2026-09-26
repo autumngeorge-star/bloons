@@ -23,6 +23,9 @@ import com.badlogic.gdx.utils.Align;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.audio.LibGdxSoundService;
+import com.hongbao.bloons.audio.MusicService;
+import com.hongbao.bloons.audio.SoundService;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
@@ -46,6 +49,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Stage stage;
 	private Player player;
 	private Map map;
+	private SoundService soundService;
+	private MusicService musicService;
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
@@ -59,7 +64,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		autoContinue = false;
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
+		soundService = new LibGdxSoundService();
 		musicPlayer = new MusicPlayer();
+		musicService = musicPlayer;
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -72,7 +79,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMap();
 		createMenu();
 		createInstructions();
-		musicPlayer.playTitleMusic();
+		musicService.playTitleMusic();
 	}
 
 	private void createInstructions() {
@@ -431,7 +438,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			}
 		});
 		
-		map = MapFactory.createHeaterMap(stage);
+		map = MapFactory.createHeaterMap(stage, soundService, musicService);
 		
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
 		ImageButton backgroundMap = new ImageButton(drawable);
@@ -449,6 +456,14 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
+	}
+
+	public SoundService getSoundService() {
+		return soundService;
+	}
+
+	public MusicService getMusicService() {
+		return musicService;
 	}
 	
 	@Override
