@@ -51,37 +51,39 @@ public class SpellCard {
 	}
 	
 	public static SpellCard createReimuSpellCard() {
+		return createReimuSpellCard(0f);
+	}
+
+	public static SpellCard createReimuSpellCard(float rotationAngle) {
 		Map<Integer, List<Bullet>> bulletsToCreate = new HashMap<>();
+		double rad = Math.toRadians(rotationAngle);
+		float cos = (float) Math.cos(rad);
+		float sin = (float) Math.sin(rad);
+
 		for (int x = 0; x < 1000; x += 25) {
 			Bullet bullet1 = GirlFactory.createReimu().createBullet();
 			bullet1.setMaxRange(5000);
-			bullet1.setInitialDXOverride(0);
-			bullet1.setInitialDYOverride(1);
+			applyRotation(bullet1, 0f, 0f, 0f, 1f, cos, sin);
 			
 			Bullet bullet2 = GirlFactory.createReimu().createBullet();
 			bullet2.setMaxRange(5000);
-			bullet2.setInitialDXOverride((float)(Math.sqrt(3) / 2));
-			bullet2.setInitialDYOverride(0.5f);
+			applyRotation(bullet2, 0f, 0f, (float)(Math.sqrt(3) / 2), 0.5f, cos, sin);
 			
 			Bullet bullet3 = GirlFactory.createReimu().createBullet();
 			bullet3.setMaxRange(5000);
-			bullet3.setInitialDXOverride((float)(-Math.sqrt(3) / 2));
-			bullet3.setInitialDYOverride(0.5f);
+			applyRotation(bullet3, 0f, 0f, (float)(-Math.sqrt(3) / 2), 0.5f, cos, sin);
 			
 			Bullet bullet4 = GirlFactory.createReimu().createBullet();
 			bullet4.setMaxRange(5000);
-			bullet4.setInitialDXOverride(0);
-			bullet4.setInitialDYOverride(-1);
+			applyRotation(bullet4, 0f, 0f, 0f, -1f, cos, sin);
 			
 			Bullet bullet5 = GirlFactory.createReimu().createBullet();
 			bullet5.setMaxRange(5000);
-			bullet5.setInitialDXOverride((float)(Math.sqrt(3) / 2));
-			bullet5.setInitialDYOverride(-0.5f);
+			applyRotation(bullet5, 0f, 0f, (float)(Math.sqrt(3) / 2), -0.5f, cos, sin);
 			
 			Bullet bullet6 = GirlFactory.createReimu().createBullet();
 			bullet6.setMaxRange(5000);
-			bullet6.setInitialDXOverride((float)(-Math.sqrt(3) / 2));
-			bullet6.setInitialDYOverride(-0.5f);
+			applyRotation(bullet6, 0f, 0f, (float)(-Math.sqrt(3) / 2), -0.5f, cos, sin);
 			
 			bulletsToCreate.put(x, Arrays.asList(bullet1, bullet2, bullet3, bullet4, bullet5, bullet6));
 		}
@@ -89,8 +91,15 @@ public class SpellCard {
 	}
 
 	public static SpellCard createYuyukoSpellCard() {
+		return createYuyukoSpellCard(0f);
+	}
+
+	public static SpellCard createYuyukoSpellCard(float rotationAngle) {
 		Map<Integer, List<Bullet>> bulletsToCreate = new HashMap<>();
 		Girl yuyuko = GirlFactory.createYuyuko();
+		double rad = Math.toRadians(rotationAngle);
+		float cos = (float) Math.cos(rad);
+		float sin = (float) Math.sin(rad);
 
 		for (int x = 0; x < 1500; x += 25) {
 			List<Bullet> bulletsForCurrentFrame = new ArrayList<>();
@@ -115,9 +124,7 @@ public class SpellCard {
 				bullet.setMaxRange(5000);
 				double currentAngle = offset * i;
 				double desiredAngle = currentAngle + (x * Math.PI / 500);
-				bullet.setInitialXOffset(-125);
-				bullet.setInitialDXOverride((float) Math.cos(desiredAngle));
-				bullet.setInitialDYOverride((float) Math.sin(desiredAngle));
+				applyRotation(bullet, -125f, 0f, (float) Math.cos(desiredAngle), (float) Math.sin(desiredAngle), cos, sin);
 
 				bulletsForCurrentFrame.add(bullet);
 			}
@@ -128,9 +135,7 @@ public class SpellCard {
 				bullet.setMaxRange(5000);
 				double currentAngle = offset * i;
 				double desiredAngle = currentAngle - (x * Math.PI / 500);
-				bullet.setInitialXOffset(125);
-				bullet.setInitialDXOverride((float) Math.cos(desiredAngle));
-				bullet.setInitialDYOverride((float) Math.sin(desiredAngle));
+				applyRotation(bullet, 125f, 0f, (float) Math.cos(desiredAngle), (float) Math.sin(desiredAngle), cos, sin);
 
 				bulletsForCurrentFrame.add(bullet);
 			}
@@ -138,6 +143,18 @@ public class SpellCard {
 			bulletsToCreate.put(x, bulletsForCurrentFrame);
 		}
 		return new SpellCard("Yuyuko", bulletsToCreate, "yuyuko_fan.png", 1.0f);
+	}
+
+	private static void applyRotation(Bullet bullet, float unrotatedXOffset, float unrotatedYOffset, float unrotatedDX, float unrotatedDY, float cos, float sin) {
+		float rotatedXOffset = unrotatedXOffset * cos + unrotatedYOffset * sin;
+		float rotatedYOffset = -unrotatedXOffset * sin + unrotatedYOffset * cos;
+		bullet.setInitialXOffset(rotatedXOffset);
+		bullet.setInitialYOffset(rotatedYOffset);
+
+		float rotatedDX = unrotatedDX * cos + unrotatedDY * sin;
+		float rotatedDY = -unrotatedDX * sin + unrotatedDY * cos;
+		bullet.setInitialDXOverride(rotatedDX);
+		bullet.setInitialDYOverride(rotatedDY);
 	}
 
 }

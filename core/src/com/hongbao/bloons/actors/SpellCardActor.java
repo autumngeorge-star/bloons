@@ -18,10 +18,10 @@ public class SpellCardActor extends RenderableActor {
 	private SpellCard spellCard;
 	private float rotationAngle;
 	
-	public SpellCardActor(SpellCard spellCard, float x, float y) {
+	public SpellCardActor(SpellCard spellCard, float x, float y, float rotationAngle) {
 		this.spellCard = spellCard;
 		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(spellCard.getImageFileName())));
-		rotationAngle = 0;
+		this.rotationAngle = rotationAngle;
 		
 		setZIndex(ZIndex.SPELL_CARD_Z_INDEX);
 		setBounds(
@@ -31,9 +31,21 @@ public class SpellCardActor extends RenderableActor {
 		 textureRegion.getTexture().getHeight()
 		);
 	}
+
+	public SpellCardActor(SpellCard spellCard, float x, float y) {
+		this(spellCard, x, y, 0f);
+	}
 	
 	public SpellCard getSpellCard() {
 		return spellCard;
+	}
+
+	public float getRotationAngle() {
+		return rotationAngle;
+	}
+
+	public void setRotationAngle(float rotationAngle) {
+		this.rotationAngle = rotationAngle;
 	}
 	
 	@Override
