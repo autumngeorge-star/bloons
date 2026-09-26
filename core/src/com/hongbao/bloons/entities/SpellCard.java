@@ -1,6 +1,9 @@
 package com.hongbao.bloons.entities;
 
 import com.hongbao.bloons.factories.GirlFactory;
+import com.hongbao.bloons.strategies.ReimuTrajectoryStrategy;
+import com.hongbao.bloons.strategies.SpellCardTrajectoryStrategy;
+import com.hongbao.bloons.strategies.YuyukoTrajectoryStrategy;
 
 import java.util.*;
 
@@ -10,14 +13,14 @@ public class SpellCard {
 	public static final String IMAGE_FOLDER = "img/spellcards/";
 	
 	private Map<Integer, List<Bullet>> bulletsToCreate;
-	private String overrideName;
+	private SpellCardTrajectoryStrategy trajectoryStrategy;
 	private String imageFileName;
 	private int frame;
 	private int lastFrame;
 	private float scale;
 	
-	public SpellCard(String overrideName, Map<Integer, List<Bullet>> bulletsToCreate, String imageFileName, float scale) {
-		this.overrideName = overrideName;
+	public SpellCard(SpellCardTrajectoryStrategy trajectoryStrategy, Map<Integer, List<Bullet>> bulletsToCreate, String imageFileName, float scale) {
+		this.trajectoryStrategy = trajectoryStrategy;
 		this.bulletsToCreate = bulletsToCreate;
 		this.imageFileName = IMAGE_FOLDER + imageFileName;
 		this.scale = scale;
@@ -28,8 +31,8 @@ public class SpellCard {
 		 .orElse(Integer.MAX_VALUE);
 	}
 	
-	public String getOverrideName() {
-		return overrideName;
+	public SpellCardTrajectoryStrategy getTrajectoryStrategy() {
+		return trajectoryStrategy;
 	}
 	
 	public String getImageFileName() {
@@ -85,7 +88,7 @@ public class SpellCard {
 			
 			bulletsToCreate.put(x, Arrays.asList(bullet1, bullet2, bullet3, bullet4, bullet5, bullet6));
 		}
-		return new SpellCard("Reimu", bulletsToCreate, "reimu_spell.png", 5.0f);
+		return new SpellCard(new ReimuTrajectoryStrategy(), bulletsToCreate, "reimu_spell.png", 5.0f);
 	}
 
 	public static SpellCard createYuyukoSpellCard() {
@@ -137,7 +140,7 @@ public class SpellCard {
 
 			bulletsToCreate.put(x, bulletsForCurrentFrame);
 		}
-		return new SpellCard("Yuyuko", bulletsToCreate, "yuyuko_fan.png", 1.0f);
+		return new SpellCard(new YuyukoTrajectoryStrategy(), bulletsToCreate, "yuyuko_fan.png", 1.0f);
 	}
 
 }
