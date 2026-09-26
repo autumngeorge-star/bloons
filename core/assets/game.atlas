@@ -1,0 +1,552 @@
+
+game.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+bfb_bloon
+  rotate: false
+  xy: 1716, 1722
+  size: 219, 310
+  orig: 219, 310
+  offset: 0, 0
+  index: -1
+black_bloon
+  rotate: false
+  xy: 517, 568
+  size: 37, 47
+  orig: 37, 47
+  offset: 0, 0
+  index: -1
+black_camo_bloon
+  rotate: false
+  xy: 1153, 929
+  size: 37, 47
+  orig: 37, 47
+  offset: 0, 0
+  index: -1
+black_camo_regrowth_bloon
+  rotate: false
+  xy: 568, 633
+  size: 51, 47
+  orig: 51, 47
+  offset: 0, 0
+  index: -1
+black_regrowth_bloon
+  rotate: false
+  xy: 621, 633
+  size: 51, 47
+  orig: 51, 47
+  offset: 0, 0
+  index: -1
+blue_bloon
+  rotate: false
+  xy: 1612, 1190
+  size: 53, 68
+  orig: 53, 68
+  offset: 0, 0
+  index: -1
+blue_camo_bloon
+  rotate: false
+  xy: 1091, 752
+  size: 53, 68
+  orig: 53, 68
+  offset: 0, 0
+  index: -1
+blue_camo_regrowth_bloon
+  rotate: false
+  xy: 965, 760
+  size: 73, 68
+  orig: 73, 68
+  offset: 0, 0
+  index: -1
+blue_regrowth_bloon
+  rotate: false
+  xy: 1937, 1729
+  size: 73, 68
+  orig: 73, 68
+  offset: 0, 0
+  index: -1
+ceramic_bloon
+  rotate: false
+  xy: 304, 121
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+ceramic_camo_bloon
+  rotate: false
+  xy: 392, 352
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+ceramic_camo_regrowth_bloon
+  rotate: false
+  xy: 1937, 1953
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+ceramic_regrowth_bloon
+  rotate: false
+  xy: 1440, 1179
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+green_bloon
+  rotate: false
+  xy: 456, 436
+  size: 57, 72
+  orig: 57, 72
+  offset: 0, 0
+  index: -1
+green_camo_bloon
+  rotate: false
+  xy: 457, 362
+  size: 57, 72
+  orig: 57, 72
+  offset: 0, 0
+  index: -1
+green_camo_regrowth_bloon
+  rotate: false
+  xy: 886, 757
+  size: 77, 71
+  orig: 77, 71
+  offset: 0, 0
+  index: -1
+green_regrowth_bloon
+  rotate: false
+  xy: 1937, 1799
+  size: 77, 71
+  orig: 77, 71
+  offset: 0, 0
+  index: -1
+lead_bloon
+  rotate: false
+  xy: 1092, 900
+  size: 59, 76
+  orig: 59, 76
+  offset: 0, 0
+  index: -1
+lead_camo_bloon
+  rotate: false
+  xy: 1092, 822
+  size: 59, 76
+  orig: 59, 76
+  offset: 0, 0
+  index: -1
+lead_camo_regrowth_bloon
+  rotate: false
+  xy: 1716, 1559
+  size: 82, 75
+  orig: 82, 75
+  offset: 0, 0
+  index: -1
+lead_regrowth_bloon
+  rotate: false
+  xy: 1440, 1102
+  size: 82, 75
+  orig: 82, 75
+  offset: 0, 0
+  index: -1
+moab_bloon
+  rotate: false
+  xy: 304, 434
+  size: 150, 230
+  orig: 150, 230
+  offset: 0, 0
+  index: -1
+pink_bloon
+  rotate: false
+  xy: 1659, 1440
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+pink_camo_bloon
+  rotate: false
+  xy: 1659, 1358
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+pink_camo_regrowth_bloon
+  rotate: false
+  xy: 304, 353
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+pink_regrowth_bloon
+  rotate: false
+  xy: 798, 749
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+rainbow_bloon
+  rotate: false
+  xy: 1659, 1276
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+rainbow_camo_bloon
+  rotate: false
+  xy: 388, 270
+  size: 63, 80
+  orig: 63, 80
+  offset: 0, 0
+  index: -1
+rainbow_camo_regrowth_bloon
+  rotate: false
+  xy: 1802, 1641
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+rainbow_regrowth_bloon
+  rotate: false
+  xy: 1937, 1872
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+red_bloon
+  rotate: false
+  xy: 1040, 765
+  size: 49, 63
+  orig: 49, 63
+  offset: 0, 0
+  index: -1
+red_camo_bloon
+  rotate: false
+  xy: 517, 617
+  size: 49, 63
+  orig: 49, 63
+  offset: 0, 0
+  index: -1
+red_camo_regrowth_bloon
+  rotate: false
+  xy: 798, 684
+  size: 69, 63
+  orig: 69, 63
+  offset: 0, 0
+  index: -1
+red_regrowth_bloon
+  rotate: false
+  xy: 383, 205
+  size: 69, 63
+  orig: 69, 63
+  offset: 0, 0
+  index: -1
+white_bloon
+  rotate: false
+  xy: 1192, 967
+  size: 36, 47
+  orig: 36, 47
+  offset: 0, 0
+  index: -1
+white_camo_bloon
+  rotate: false
+  xy: 517, 519
+  size: 36, 47
+  orig: 36, 47
+  offset: 0, 0
+  index: -1
+white_camo_regrowth_bloon
+  rotate: false
+  xy: 674, 633
+  size: 51, 47
+  orig: 51, 47
+  offset: 0, 0
+  index: -1
+white_regrowth_bloon
+  rotate: false
+  xy: 727, 633
+  size: 51, 47
+  orig: 51, 47
+  offset: 0, 0
+  index: -1
+yellow_bloon
+  rotate: false
+  xy: 456, 588
+  size: 59, 76
+  orig: 59, 76
+  offset: 0, 0
+  index: -1
+yellow_camo_bloon
+  rotate: false
+  xy: 456, 510
+  size: 59, 76
+  orig: 59, 76
+  offset: 0, 0
+  index: -1
+yellow_camo_regrowth_bloon
+  rotate: false
+  xy: 1528, 1183
+  size: 82, 75
+  orig: 82, 75
+  offset: 0, 0
+  index: -1
+yellow_regrowth_bloon
+  rotate: false
+  xy: 304, 276
+  size: 82, 75
+  orig: 82, 75
+  offset: 0, 0
+  index: -1
+zebra_bloon
+  rotate: false
+  xy: 1890, 1648
+  size: 56, 72
+  orig: 56, 72
+  offset: 0, 0
+  index: -1
+zebra_camo_bloon
+  rotate: false
+  xy: 1948, 1655
+  size: 56, 72
+  orig: 56, 72
+  offset: 0, 0
+  index: -1
+zebra_camo_regrowth_bloon
+  rotate: false
+  xy: 1440, 1029
+  size: 77, 71
+  orig: 77, 71
+  offset: 0, 0
+  index: -1
+zebra_regrowth_bloon
+  rotate: false
+  xy: 304, 203
+  size: 77, 71
+  orig: 77, 71
+  offset: 0, 0
+  index: -1
+zomg_bloon
+  rotate: false
+  xy: 304, 666
+  size: 198, 310
+  orig: 198, 310
+  offset: 0, 0
+  index: -1
+alice
+  rotate: false
+  xy: 1260, 975
+  size: 29, 39
+  orig: 29, 39
+  offset: 0, 0
+  index: -1
+characters
+  rotate: false
+  xy: 2, 1522
+  size: 1712, 510
+  orig: 1712, 510
+  offset: 0, 0
+  index: -1
+marisa
+  rotate: false
+  xy: 304, 79
+  size: 32, 40
+  orig: 32, 40
+  offset: 0, 0
+  index: -1
+reimu
+  rotate: false
+  xy: 1230, 969
+  size: 28, 45
+  orig: 28, 45
+  offset: 0, 0
+  index: -1
+remilia
+  rotate: false
+  xy: 1146, 978
+  size: 44, 36
+  orig: 44, 36
+  offset: 0, 0
+  index: -1
+sakuya
+  rotate: false
+  xy: 886, 706
+  size: 23, 49
+  orig: 23, 49
+  offset: 0, 0
+  index: -1
+youmu
+  rotate: false
+  xy: 1153, 836
+  size: 27, 43
+  orig: 27, 43
+  offset: 0, 0
+  index: -1
+yukari
+  rotate: false
+  xy: 2016, 1823
+  size: 30, 47
+  orig: 30, 47
+  offset: 0, 0
+  index: -1
+yuyuko
+  rotate: false
+  xy: 1153, 881
+  size: 28, 46
+  orig: 28, 46
+  offset: 0, 0
+  index: -1
+bat
+  rotate: false
+  xy: 2016, 1802
+  size: 29, 19
+  orig: 29, 19
+  offset: 0, 0
+  index: -1
+black_spell_card
+  rotate: false
+  xy: 1659, 1260
+  size: 12, 14
+  orig: 12, 14
+  offset: 0, 0
+  index: -1
+blue_knives
+  rotate: false
+  xy: 1192, 936
+  size: 15, 29
+  orig: 15, 29
+  offset: 0, 0
+  index: -1
+blue_magic_missile
+  rotate: false
+  xy: 869, 690
+  size: 15, 57
+  orig: 15, 57
+  offset: 0, 0
+  index: -1
+magic_spike
+  rotate: false
+  xy: 780, 633
+  size: 15, 47
+  orig: 15, 47
+  offset: 0, 0
+  index: -1
+pink_butterfly
+  rotate: false
+  xy: 1716, 1533
+  size: 28, 24
+  orig: 28, 24
+  offset: 0, 0
+  index: -1
+projectiles
+  rotate: false
+  xy: 2, 978
+  size: 1142, 542
+  orig: 1142, 542
+  offset: 0, 0
+  index: -1
+purple_energy
+  rotate: false
+  xy: 2025, 1965
+  size: 15, 67
+  orig: 15, 67
+  offset: 0, 0
+  index: -1
+red_spell_card
+  rotate: false
+  xy: 369, 187
+  size: 12, 14
+  orig: 12, 14
+  offset: 0, 0
+  index: -1
+sword_slash
+  rotate: false
+  xy: 911, 713
+  size: 16, 42
+  orig: 16, 42
+  offset: 0, 0
+  index: -1
+reimu_spell
+  rotate: false
+  xy: 1716, 1636
+  size: 84, 84
+  orig: 84, 84
+  offset: 0, 0
+  index: -1
+yuyuko_fan
+  rotate: false
+  xy: 1146, 1260
+  size: 511, 260
+  orig: 511, 260
+  offset: 0, 0
+  index: -1
+alice_box
+  rotate: false
+  xy: 2, 2
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+girl_details_template
+  rotate: false
+  xy: 1146, 1090
+  size: 292, 168
+  orig: 292, 168
+  offset: 0, 0
+  index: -1
+header
+  rotate: false
+  xy: 2, 76
+  size: 300, 900
+  orig: 300, 900
+  offset: 0, 0
+  index: -1
+marisa_box
+  rotate: false
+  xy: 504, 904
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+reimu_box
+  rotate: false
+  xy: 1146, 1016
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+remilia_box
+  rotate: false
+  xy: 504, 830
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+sakuya_box
+  rotate: false
+  xy: 798, 904
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+youmu_box
+  rotate: false
+  xy: 504, 756
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+yukari_box
+  rotate: false
+  xy: 798, 830
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
+yuyuko_box
+  rotate: false
+  xy: 504, 682
+  size: 292, 72
+  orig: 292, 72
+  offset: 0, 0
+  index: -1
