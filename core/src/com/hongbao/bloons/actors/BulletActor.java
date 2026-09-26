@@ -7,10 +7,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hongbao.bloons.BloonManager;
 import com.hongbao.bloons.BloonsTouhouDefense;
 import com.hongbao.bloons.entities.Bullet;
+import com.hongbao.bloons.entities.StatusEffectPayload;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -28,28 +31,41 @@ public class BulletActor extends RenderableActor {
 	
 	public BulletActor(Bullet bullet, float x, float y, float dx, float dy) {
 		this.bullet = bullet;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+		if (Gdx.files != null) {
+			textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bullet.getImageFileName())));
+			collisionRadius = textureRegion.getTexture().getWidth() / 2f;
+			setBounds(
+			 x - textureRegion.getTexture().getWidth() / 2f,
+			 y - textureRegion.getTexture().getHeight() / 2f,
+			 textureRegion.getTexture().getWidth(),
+			 textureRegion.getTexture().getHeight()
+			);
+		} else {
+			collisionRadius = 10f;
+			setBounds(x - 10f, y - 10f, 20f, 20f);
+		}
 		x += bullet.getInitialXOffset();
 		y += bullet.getInitialYOffset();
 		this.dx = dx;
 		this.dy = dy;
 		calculateRotationAngle();
-		collisionRadius = textureRegion.getTexture().getWidth() / 2f;
 		target = null; // this'll get automatically set as the bullet moves
 		
 		setZIndex(ZIndex.BULLET_Z_INDEX);
-		setBounds(
-		 x - textureRegion.getTexture().getWidth() / 2f,
-		 y - textureRegion.getTexture().getHeight() / 2f,
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight()
-		);
 		
 		damagedBloons = new HashSet<>(bullet.getPierce());
 	}
 	
 	public Bullet getBullet() {
 		return bullet;
+	}
+	
+	public List<StatusEffectPayload> getStatusEffectPayloads() {
+		return bullet != null ? bullet.getStatusEffectPayloads() : Collections.emptyList();
+	}
+
+	public List<StatusEffectPayload> getStatusEffects() {
+		return getStatusEffectPayloads();
 	}
 	
 	public void setBullet(Bullet bullet) {
