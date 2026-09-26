@@ -34,6 +34,7 @@ public class Map {
 	public static final int TILE_LENGTH = 50;
 	public static final int TILE_HEIGHT = 50;
 
+	private String key;
 	private String backgroundImage;
 	private BloonManager bloonManager;
 	private Pair<Float, Float>[][] directions;
@@ -355,6 +356,14 @@ public class Map {
 		onStageGirls.remove(selectedGirl);
 		selectedGirl.remove();
 		setSelectedGirl(null);
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
 	}
 	
 }
