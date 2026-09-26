@@ -274,7 +274,7 @@ public class Map {
 	
 	public void placeSpellCard() {
 		if (selectedGirl != null) {
-			stage.addActor(selectedGirl.createSpellCardActor());
+			selectedGirl.createSpellCardActor().ifPresent(stage::addActor);
 		}
 	}
 	
