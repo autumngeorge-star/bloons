@@ -46,6 +46,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Stage stage;
 	private Player player;
 	private Map map;
+	private AudioManager audioManager;
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
@@ -59,7 +60,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		autoContinue = false;
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
-		musicPlayer = new MusicPlayer();
+		audioManager = new AudioManager();
+		musicPlayer = new MusicPlayer(audioManager);
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -431,7 +433,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 			}
 		});
 		
-		map = MapFactory.createHeaterMap(stage);
+		map = MapFactory.createHeaterMap(stage, audioManager);
 		
 		Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(map.getBackgroundImageFilePath()))));
 		ImageButton backgroundMap = new ImageButton(drawable);
@@ -449,6 +451,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
+	}
+
+	public AudioManager getAudioManager() {
+		return audioManager;
 	}
 	
 	@Override
@@ -574,6 +580,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void dispose() {
 		stage.dispose();
+		if (audioManager != null) {
+			audioManager.dispose();
+		}
 	}
 
 }
