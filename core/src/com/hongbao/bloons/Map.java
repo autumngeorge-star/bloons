@@ -20,6 +20,7 @@ import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
+import com.hongbao.bloons.actors.SpellCardActor;
 import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
@@ -273,8 +274,11 @@ public class Map {
 	}
 	
 	public void placeSpellCard() {
-		if (selectedGirl != null) {
-			stage.addActor(selectedGirl.createSpellCardActor());
+		if (selectedGirl != null && selectedGirl.isActive()) {
+			SpellCardActor spellCardActor = selectedGirl.createSpellCardActor();
+			if (spellCardActor != null) {
+				stage.addActor(spellCardActor);
+			}
 		}
 	}
 	
