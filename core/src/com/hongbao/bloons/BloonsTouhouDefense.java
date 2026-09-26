@@ -3,9 +3,11 @@ package com.hongbao.bloons;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -30,6 +32,7 @@ import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -49,11 +52,16 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private MusicPlayer musicPlayer;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private AssetManager assetManager;
+	private TextureAtlas textureAtlas;
+	private java.util.Map<String, TextureRegion> textureRegionMap;
 	
 	
 	@Override
 	public void create() {
-		Gdx.graphics.setWindowedMode(1800, 900);
+		if (Gdx.graphics != null) {
+			Gdx.graphics.setWindowedMode(1800, 900);
+		}
 		paused = false;
 		tripleSpeed = false;
 		autoContinue = false;
@@ -63,11 +71,19 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
+		assetManager = new AssetManager();
+		assetManager.load("game.atlas", TextureAtlas.class);
+		assetManager.finishLoading();
+		textureAtlas = assetManager.get("game.atlas", TextureAtlas.class);
+		textureRegionMap = new HashMap<>();
+
 		final RunnableAction bloonCreationAction = new RunnableAction();
 		bloonCreationAction.setRunnable(() -> map.getBloonManager().createBloons());
 		stage.addAction(Actions.repeat(RepeatAction.FOREVER, bloonCreationAction));
 
-		Gdx.input.setInputProcessor(stage);
+		if (Gdx.input != null) {
+			Gdx.input.setInputProcessor(stage);
+		}
 		
 		createMap();
 		createMenu();
@@ -439,6 +455,39 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		stage.addActor(backgroundMap);
 	}
 	
+	public AssetManager getAssetManager() {
+		return assetManager;
+	}
+
+	public TextureAtlas getTextureAtlas() {
+		return textureAtlas;
+	}
+
+	public TextureRegion getTextureRegion(String imageFileName) {
+		if (imageFileName == null) {
+			return null;
+		}
+		TextureRegion region = textureRegionMap.get(imageFileName);
+		if (region == null) {
+			String regionName = extractRegionName(imageFileName);
+			region = textureAtlas.findRegion(regionName);
+			if (region != null) {
+				textureRegionMap.put(imageFileName, region);
+			} else {
+				Gdx.app.error("BloonsTouhouDefense", "Could not find region: " + regionName + " for file: " + imageFileName);
+			}
+		}
+		return region;
+	}
+
+	public static String extractRegionName(String imageFileName) {
+		if (imageFileName == null) return "";
+		int lastSlash = imageFileName.lastIndexOf('/');
+		String name = (lastSlash >= 0) ? imageFileName.substring(lastSlash + 1) : imageFileName;
+		int lastDot = name.lastIndexOf('.');
+		return (lastDot >= 0) ? name.substring(0, lastDot) : name;
+	}
+
 	public Map getMap() {
 		return map;
 	}
@@ -543,8 +592,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		if (map.getSelectedGirl() != null) {
 			// Draw the range of collision, the range of sight, and range of... well, range
 			if (!map.getSelectedGirl().isActive()) {
-				map.getSelectedGirl().setX(Gdx.input.getX() - map.getSelectedGirl().getTextureRegion().getTexture().getWidth() / 2f);
-				map.getSelectedGirl().setY(Gdx.graphics.getHeight() - (Gdx.input.getY() + map.getSelectedGirl().getTextureRegion().getTexture().getHeight() / 2f));
+				map.getSelectedGirl().setX(Gdx.input.getX() - map.getSelectedGirl().getTextureRegion().getRegionWidth() / 2f);
+				map.getSelectedGirl().setY(Gdx.graphics.getHeight() - (Gdx.input.getY() + map.getSelectedGirl().getTextureRegion().getRegionHeight() / 2f));
 				if (!map.canPlaceGirl(map.getSelectedGirl())) {
 					shapeRenderer.setColor(Color.RED);
 				} else {
@@ -574,6 +623,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void dispose() {
 		stage.dispose();
+		if (assetManager != null) {
+			assetManager.dispose();
+		}
 	}
 
 }

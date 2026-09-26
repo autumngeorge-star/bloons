@@ -24,6 +24,18 @@ task debug(dependsOn: classes, type: JavaExec) {
     debug = true
 }
 
+task packAssets(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.badlogic.gdx.tools.texturepacker.TexturePacker"
+    args = ["../core/assets/img", "../core/assets", "game"]
+}
+
+task testAtlas(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.hongbao.bloons.desktop.AtlasVerificationTest"
+    workingDir = project.assetsDir
+}
+
 task dist(type: Jar) {
     manifest {
         attributes 'Main-Class': project.mainClassName
