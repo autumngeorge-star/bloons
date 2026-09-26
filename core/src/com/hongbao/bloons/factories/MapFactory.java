@@ -1,8 +1,12 @@
 package com.hongbao.bloons.factories;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.Map;
 import com.hongbao.bloons.helpers.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MapFactory {
@@ -18,6 +22,7 @@ public class MapFactory {
 		}
 		
 		map.setDirections(directions);
+		map.setPathRectangles(calculatePathRectangles(directions));
 		return map;
 	}
 	
@@ -38,6 +43,7 @@ public class MapFactory {
 		}
 		
 		map.setDirections(directions);
+		map.setPathRectangles(calculatePathRectangles(directions));
 		return map;
 	}
 	
@@ -179,10 +185,27 @@ public class MapFactory {
 		directions[31][8] = new Pair<>(1f, 0f);
 		
 		map.setDirections(directions);
+		map.setPathRectangles(calculatePathRectangles(directions));
 		return map;
 	}
 	
-	
+	public static List<Rectangle> calculatePathRectangles(Pair<Float, Float>[][] directions) {
+		List<Rectangle> pathRectangles = new ArrayList<>();
+		if (directions == null) {
+			return pathRectangles;
+		}
+		for (int i = 0; i < directions.length; i++) {
+			for (int j = 0; j < directions[i].length; j++) {
+				if (directions[i][j] != null && (directions[i][j].getFirst() != 0 || directions[i][j].getSecond() != 0)) {
+					float rectX = i * Map.TILE_LENGTH - Map.TILE_LENGTH;
+					float rectY = j * Map.TILE_HEIGHT;
+					pathRectangles.add(new Rectangle(rectX, rectY, Map.TILE_LENGTH, Map.TILE_HEIGHT));
+				}
+			}
+		}
+		return pathRectangles;
+	}
+
 	private static Pair<Float, Float>[][] initializeEmptyDirections() {
 		Pair<Float, Float>[][] directions = new Pair[32][18];
 		for (int x = 0; x < directions.length - 1; x++) {
