@@ -25,6 +25,9 @@ import com.hongbao.bloons.actors.RenderableImageButton;
 import com.hongbao.bloons.actors.RenderableLabel;
 import com.hongbao.bloons.comparators.SortByZIndex;
 import com.hongbao.bloons.entities.Girl;
+import com.hongbao.bloons.events.EventBus;
+import com.hongbao.bloons.events.GameStateChangedEvent;
+import com.hongbao.bloons.events.UIInteractionEvent;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
@@ -46,7 +49,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Stage stage;
 	private Player player;
 	private Map map;
-	private MusicPlayer musicPlayer;
+	private SoundManager soundManager;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
 	
@@ -59,7 +62,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		autoContinue = false;
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
-		musicPlayer = new MusicPlayer();
+		soundManager = new SoundManager();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -72,7 +75,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMap();
 		createMenu();
 		createInstructions();
-		musicPlayer.playTitleMusic();
+		EventBus.getInstance().publish(new GameStateChangedEvent(GameStateChangedEvent.State.TITLE));
 	}
 
 	private void createInstructions() {
@@ -447,8 +450,8 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		return player;
 	}
 
-	public MusicPlayer getMusicPlayer() {
-		return musicPlayer;
+	public SoundManager getSoundManager() {
+		return soundManager;
 	}
 	
 	@Override
@@ -521,7 +524,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					updateInstructions();
 				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.V)) {
-				musicPlayer.toggleMusic();
+				EventBus.getInstance().publish(new UIInteractionEvent(UIInteractionEvent.InteractionType.TOGGLE_MUSIC));
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
@@ -562,17 +565,20 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void pause() {
 		paused = true;
-		musicPlayer.pause();
+		EventBus.getInstance().publish(new GameStateChangedEvent(GameStateChangedEvent.State.PAUSED));
 	}
 
 	@Override
 	public void resume() {
 		paused = false;
-		musicPlayer.resume();
+		EventBus.getInstance().publish(new GameStateChangedEvent(GameStateChangedEvent.State.RESUMED));
 	}
 
 	@Override
 	public void dispose() {
+		if (soundManager != null) {
+			soundManager.dispose();
+		}
 		stage.dispose();
 	}
 
