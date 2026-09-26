@@ -16,6 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.hongbao.bloons.actors.GirlActor;
 import com.hongbao.bloons.actors.RenderableActor;
 import com.hongbao.bloons.actors.RenderableImageButton;
@@ -24,7 +27,9 @@ import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -37,6 +42,7 @@ public class Map {
 	private String backgroundImage;
 	private BloonManager bloonManager;
 	private Pair<Float, Float>[][] directions;
+	private List<Rectangle> pathRectangles = new ArrayList<>();
 	private Set<GirlActor> onStageGirls;
 	private GirlActor selectedGirl;
 	private Stage stage;
@@ -182,6 +188,31 @@ public class Map {
 
 	public void setDirections(Pair<Float, Float>[][] directions) {
 		this.directions = directions;
+		buildPathRectangles();
+	}
+
+	public void buildPathRectangles() {
+		pathRectangles.clear();
+		if (directions == null) {
+			return;
+		}
+		for (int i = 0; i < directions.length; i++) {
+			for (int j = 0; j < directions[i].length; j++) {
+				if (directions[i][j] != null && (directions[i][j].getFirst() != 0 || directions[i][j].getSecond() != 0)) {
+					float rectX = i * TILE_LENGTH - TILE_LENGTH;
+					float rectY = j * TILE_HEIGHT;
+					pathRectangles.add(new Rectangle(rectX, rectY, TILE_LENGTH, TILE_HEIGHT));
+				}
+			}
+		}
+	}
+
+	public List<Rectangle> getPathRectangles() {
+		return pathRectangles;
+	}
+
+	public void setPathRectangles(List<Rectangle> pathRectangles) {
+		this.pathRectangles = pathRectangles != null ? pathRectangles : new ArrayList<>();
 	}
 
 	public void setBackgroundImage(String backgroundImage) {
@@ -231,21 +262,18 @@ public class Map {
 		// It's colliding with the bloon path
 		// It's colliding with another girl
 
-		float x = girlActor.getCenterX() + TILE_LENGTH; // x is always offset by one tile because we have that extra tile on the left
+		float x = girlActor.getCenterX();
 		float y = girlActor.getCenterY();
 		float r = girlActor.getCollisionRadius();
 
-		if (y < 0 || y > 900 || x < 0 || x > 1550) {
+		if (x - r < 0 || x + r > 1500 || y - r < 0 || y + r > 900) {
 			return false;
 		}
-		
-		for (int i = 0; i < directions.length; i++) {
-			for (int j = 0; j < directions[i].length; j++) {
-				if (directions[i][j] != null && (directions[i][j].getFirst() != 0 || directions[i][j].getSecond() != 0)) {
-					if (Math.abs(x - getCenterXOfTile(i)) < r + (TILE_LENGTH / 2f) && Math.abs(y - getCenterYOfTile(j)) < r + (TILE_HEIGHT / 2f)) {
-						return false;
-					}
-				}
+
+		Circle circle = new Circle(x, y, r);
+		for (Rectangle rect : pathRectangles) {
+			if (Intersector.overlaps(circle, rect)) {
+				return false;
 			}
 		}
 		
@@ -261,7 +289,9 @@ public class Map {
 	public void placeGirl(GirlActor girlActor) {
 		girlActor.setActive(true);
 		onStageGirls.add(girlActor);
-		stage.addActor(girlActor);
+		if (stage != null) {
+			stage.addActor(girlActor);
+		}
 		selectedGirl = girlActor;
 		girlActor.addListener(new ClickListener() {
 			@Override
