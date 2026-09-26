@@ -1,7 +1,6 @@
 package com.hongbao.bloons;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.hongbao.bloons.actors.BloonActor;
 import com.hongbao.bloons.actors.BulletActor;
@@ -10,9 +9,14 @@ import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.factories.BloonFactory;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.listeners.BloonEventListener;
+import com.hongbao.bloons.listeners.LevelEventListener;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class BloonManager {
@@ -22,31 +26,83 @@ public class BloonManager {
 	// A dedicated collection of onstage bloons is maintained to (probably) speed up collision checking
 	// especially when there are a lot of bullets on screen.
 	private Set<BloonActor> onstageBloons;
-	private Sound popSound; // todo another sound for damaging bloons
 	private BloonQueue bloonQueue;
+	private final List<BloonEventListener> bloonEventListeners = new CopyOnWriteArrayList<>();
+	private final List<LevelEventListener> levelEventListeners = new CopyOnWriteArrayList<>();
 	
 	public BloonManager(Stage stage, Map map) {
 		this.stage = stage;
 		this.map = map;
 		onstageBloons = new HashSet<>();
-		popSound = Gdx.audio.newSound(Gdx.files.internal("music/pop.mp3"));
 		bloonQueue = BloonFactory.createBloonQueue();
+	}
+
+	public void addBloonEventListener(BloonEventListener listener) {
+		if (listener != null && !bloonEventListeners.contains(listener)) {
+			bloonEventListeners.add(listener);
+		}
+	}
+
+	public void removeBloonEventListener(BloonEventListener listener) {
+		bloonEventListeners.remove(listener);
+	}
+
+	public void addLevelEventListener(LevelEventListener listener) {
+		if (listener != null && !levelEventListeners.contains(listener)) {
+			levelEventListeners.add(listener);
+		}
+	}
+
+	public void removeLevelEventListener(LevelEventListener listener) {
+		levelEventListeners.remove(listener);
+	}
+
+	public void addObserver(Object observer) {
+		if (observer instanceof BloonEventListener) {
+			addBloonEventListener((BloonEventListener) observer);
+		}
+		if (observer instanceof LevelEventListener) {
+			addLevelEventListener((LevelEventListener) observer);
+		}
+	}
+
+	public void removeObserver(Object observer) {
+		if (observer instanceof BloonEventListener) {
+			removeBloonEventListener((BloonEventListener) observer);
+		}
+		if (observer instanceof LevelEventListener) {
+			removeLevelEventListener((LevelEventListener) observer);
+		}
+	}
+
+	private void notifyBloonPopped() {
+		List<BloonEventListener> copy = new ArrayList<>(bloonEventListeners);
+		for (BloonEventListener listener : copy) {
+			listener.onBloonPopped();
+		}
+	}
+
+	private void notifyLevelChanged(int newLevel) {
+		List<LevelEventListener> copy = new ArrayList<>(levelEventListeners);
+		for (LevelEventListener listener : copy) {
+			listener.onLevelChanged(newLevel);
+		}
 	}
 
 	public void nextLevel() {
 		if (canGoToNextLevel()) {
 			bloonQueue.nextLevel();
-			MusicPlayer musicPlayer = ((BloonsTouhouDefense) Gdx.app.getApplicationListener()).getMusicPlayer();
-			if (map.getBloonManager().getLevel() == 1) {
-				musicPlayer.playStageMusic();
-			} else if (map.getBloonManager().getLevel() == 40) {
-				musicPlayer.playFinalBossMusic();
-			}
+			notifyLevelChanged(bloonQueue.getLevel());
 		}
 	}
 
 	public boolean canGoToNextLevel() {
-		return ((BloonsTouhouDefense)Gdx.app.getApplicationListener()).instructions.isEmpty() && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
+		boolean instructionsEmpty = true;
+		if (Gdx.app != null && Gdx.app.getApplicationListener() instanceof BloonsTouhouDefense) {
+			BloonsTouhouDefense game = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+			instructionsEmpty = game.instructions == null || game.instructions.isEmpty();
+		}
+		return instructionsEmpty && bloonQueue.hasNextLevel() && onstageBloons.isEmpty() && bloonQueue.isEmpty();
 	}
 
 	public int getLevel() {
@@ -117,7 +173,7 @@ public class BloonManager {
 				previousBloonActor = generatedBloonActor;
 			}
 			
-			popSound.play(0.5f);
+			notifyBloonPopped();
 		} else {
 			bloonActor.damage(damage);
 			player.earnMoney(damage);

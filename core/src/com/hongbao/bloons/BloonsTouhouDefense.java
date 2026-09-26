@@ -28,9 +28,11 @@ import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.listeners.GameLifecycleListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class BloonsTouhouDefense implements ApplicationListener {
@@ -46,9 +48,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	private Stage stage;
 	private Player player;
 	private Map map;
-	private MusicPlayer musicPlayer;
+	private SoundManager soundManager;
 	private ShapeRenderer shapeRenderer;
 	public List<RenderableImageButton> instructions;
+	private final List<GameLifecycleListener> gameLifecycleListeners = new CopyOnWriteArrayList<>();
 	
 	
 	@Override
@@ -59,7 +62,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		autoContinue = false;
 		stage = new Stage();
 		player = new Player(MONEY, HEALTH);
-		musicPlayer = new MusicPlayer();
+		soundManager = new SoundManager();
 		shapeRenderer = new ShapeRenderer();
 		instructions = new ArrayList<>();
 
@@ -72,7 +75,13 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		createMap();
 		createMenu();
 		createInstructions();
-		musicPlayer.playTitleMusic();
+
+		if (map != null) {
+			map.addObserver(soundManager);
+		}
+		addObserver(soundManager);
+
+		soundManager.playTitleMusic();
 	}
 
 	private void createInstructions() {
@@ -448,7 +457,33 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	}
 
 	public MusicPlayer getMusicPlayer() {
-		return musicPlayer;
+		return soundManager != null ? soundManager.getMusicPlayer() : null;
+	}
+
+	public SoundManager getSoundManager() {
+		return soundManager;
+	}
+
+	public void addGameLifecycleListener(GameLifecycleListener listener) {
+		if (listener != null && !gameLifecycleListeners.contains(listener)) {
+			gameLifecycleListeners.add(listener);
+		}
+	}
+
+	public void removeGameLifecycleListener(GameLifecycleListener listener) {
+		gameLifecycleListeners.remove(listener);
+	}
+
+	public void addObserver(Object observer) {
+		if (observer instanceof GameLifecycleListener) {
+			addGameLifecycleListener((GameLifecycleListener) observer);
+		}
+	}
+
+	public void removeObserver(Object observer) {
+		if (observer instanceof GameLifecycleListener) {
+			removeGameLifecycleListener((GameLifecycleListener) observer);
+		}
 	}
 	
 	@Override
@@ -521,7 +556,9 @@ public class BloonsTouhouDefense implements ApplicationListener {
 					updateInstructions();
 				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.V)) {
-				musicPlayer.toggleMusic();
+				if (soundManager != null) {
+					soundManager.toggleMusic();
+				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
 				getMap().placeSpellCard();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
@@ -562,18 +599,30 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	@Override
 	public void pause() {
 		paused = true;
-		musicPlayer.pause();
+		List<GameLifecycleListener> copy = new ArrayList<>(gameLifecycleListeners);
+		for (GameLifecycleListener listener : copy) {
+			listener.onGamePaused();
+		}
 	}
 
 	@Override
 	public void resume() {
 		paused = false;
-		musicPlayer.resume();
+		List<GameLifecycleListener> copy = new ArrayList<>(gameLifecycleListeners);
+		for (GameLifecycleListener listener : copy) {
+			listener.onGameResumed();
+		}
 	}
 
 	@Override
 	public void dispose() {
-		stage.dispose();
+		List<GameLifecycleListener> copy = new ArrayList<>(gameLifecycleListeners);
+		for (GameLifecycleListener listener : copy) {
+			listener.onGameDisposed();
+		}
+		if (stage != null) {
+			stage.dispose();
+		}
 	}
 
 }
