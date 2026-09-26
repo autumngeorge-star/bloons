@@ -9,6 +9,8 @@ import com.hongbao.bloons.entities.Bloon;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 import com.hongbao.bloons.helpers.ZIndex;
 import com.hongbao.bloons.helpers.Pair;
+import com.hongbao.bloons.rendering.DefaultStatusEffectRenderer;
+import com.hongbao.bloons.entities.StatusEffectType;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -37,10 +39,14 @@ public class BloonActor extends RenderableActor {
 		if (parent != null) {
 			parentBloonIds = new HashSet(parent.getParentBloonIds());
 			parentBloonIds.add(parent.getBloonId());
+			if (parent.getBloon() != null && bloon != null) {
+				bloon.getStatusEffects().addAll(parent.getBloon().getStatusEffects());
+			}
 		} else {
 			parentBloonIds = new HashSet<>();
 		}
 		bloonId = RANDOM.nextLong();
+		setStatusEffectRenderer(new DefaultStatusEffectRenderer());
 	}
 
 	public Bloon getBloon() {
@@ -109,6 +115,14 @@ public class BloonActor extends RenderableActor {
 	}
 
 	@Override
+	public Set<StatusEffectType> getStatusEffects() {
+		if (bloon != null) {
+			return bloon.getStatusEffects();
+		}
+		return super.getStatusEffects();
+	}
+
+	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		if (bloon.isBlimp()) {
 			BloonsTouhouDefense app = (BloonsTouhouDefense)Gdx.app.getApplicationListener();
@@ -128,6 +142,10 @@ public class BloonActor extends RenderableActor {
 			);
 		} else {
 			batch.draw(textureRegion.getTexture(), getX(), getY(), textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
+		}
+
+		if (getStatusEffectRenderer() != null && bloon != null) {
+			getStatusEffectRenderer().render(batch, bloon.getStatusEffects(), getX(), getY(), getWidth(), getHeight());
 		}
 	}
 	

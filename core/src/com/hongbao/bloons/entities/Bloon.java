@@ -3,7 +3,9 @@ package com.hongbao.bloons.entities;
 import com.hongbao.bloons.helpers.BloonPoppedResult;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static com.hongbao.bloons.entities.Bloon.Color.BFB;
 import static com.hongbao.bloons.entities.Bloon.Color.BLACK;
@@ -93,6 +95,7 @@ public class Bloon {
 	private int distanceTravelled;
 	private boolean camo;
 	private boolean regen;
+	private final Set<StatusEffectType> statusEffects = new HashSet<>();
 
 	public Bloon(Color color, int health, boolean camo, boolean regen) {
 		this.color = color;
@@ -161,6 +164,32 @@ public class Bloon {
 
 	public void setRegen(boolean regen) {
 		this.regen = regen;
+	}
+
+	public Set<StatusEffectType> getStatusEffects() {
+		return statusEffects;
+	}
+
+	public boolean addStatusEffect(StatusEffectType statusEffect) {
+		if (statusEffect == null) {
+			return false;
+		}
+		return statusEffects.add(statusEffect);
+	}
+
+	public boolean removeStatusEffect(StatusEffectType statusEffect) {
+		if (statusEffect == null) {
+			return false;
+		}
+		return statusEffects.remove(statusEffect);
+	}
+
+	public boolean hasStatusEffect(StatusEffectType statusEffect) {
+		return statusEffects.contains(statusEffect);
+	}
+
+	public void clearStatusEffects() {
+		statusEffects.clear();
 	}
 	
 	public boolean willPopBloon(int damage) {

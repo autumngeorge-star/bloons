@@ -14,6 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
+import com.hongbao.bloons.entities.StatusEffectType;
+import com.hongbao.bloons.rendering.StatusEffectRenderer;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 public abstract class RenderableActor extends Actor {
@@ -24,6 +29,8 @@ public abstract class RenderableActor extends Actor {
 	private int zIndex;
 	private Actor actor; // This is kind of stupid, but I want this thing to be able to accommodate many superclasses of actors. If I think of a better way to do things I'll change it.
 	public TextureRegion textureRegion;
+	private StatusEffectRenderer statusEffectRenderer;
+	private final Set<StatusEffectType> statusEffects = new HashSet<>();
 	
 	public int getZIndex() {
 		return zIndex;
@@ -48,6 +55,40 @@ public abstract class RenderableActor extends Actor {
 	
 	public void setTextureRegion(TextureRegion textureRegion) {
 		this.textureRegion = textureRegion;
+	}
+
+	public StatusEffectRenderer getStatusEffectRenderer() {
+		return statusEffectRenderer;
+	}
+
+	public void setStatusEffectRenderer(StatusEffectRenderer statusEffectRenderer) {
+		this.statusEffectRenderer = statusEffectRenderer;
+	}
+
+	public Set<StatusEffectType> getStatusEffects() {
+		return statusEffects;
+	}
+
+	public boolean addStatusEffect(StatusEffectType statusEffect) {
+		if (statusEffect == null) {
+			return false;
+		}
+		return statusEffects.add(statusEffect);
+	}
+
+	public boolean removeStatusEffect(StatusEffectType statusEffect) {
+		if (statusEffect == null) {
+			return false;
+		}
+		return statusEffects.remove(statusEffect);
+	}
+
+	public boolean hasStatusEffect(StatusEffectType statusEffect) {
+		return statusEffects.contains(statusEffect);
+	}
+
+	public void clearStatusEffects() {
+		statusEffects.clear();
 	}
 	
 	public float getCenterX() {
