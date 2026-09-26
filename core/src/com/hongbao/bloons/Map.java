@@ -57,7 +57,7 @@ public class Map {
 
 		Skin skin = new Skin(Gdx.files.internal("uiskins/uiskin.json"));
 
-		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/ui/girl_details_template.png")))));
+		ImageButton infoBackground = new ImageButton(new TextureRegionDrawable(((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getAtlasRegion("img/ui/girl_details_template.png")));
 		infoBackground.setPosition(1504, 4);
 		this.infoBackground = new RenderableImageButton(infoBackground, ZIndex.MENU_ITEM_Z_INDEX);
 

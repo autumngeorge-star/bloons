@@ -35,4 +35,11 @@ task dist(type: Jar) {
 }
 
 
+task packTextures(type: JavaExec) {
+    main = "com.badlogic.gdx.tools.texturepacker.TexturePacker"
+    classpath = sourceSets.main.runtimeClasspath
+    args = ["core/assets/img", "core/assets", "game.atlas"]
+    workingDir = project.rootDir
+}
+
 dist.dependsOn classes

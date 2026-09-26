@@ -27,12 +27,13 @@ public class BloonActor extends RenderableActor {
 	
 	public BloonActor(Bloon bloon, float x, float y, BloonActor parent) {
 		this.bloon = bloon;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(bloon.getImageFileName())));
+		BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+		textureRegion = app.getAtlasRegion(bloon.getImageFileName());
 
-		collisionRadius = textureRegion.getTexture().getWidth() * SCALE / 2f;
+		collisionRadius = textureRegion.getRegionWidth() * SCALE / 2f;
 		
 		setZIndex(ZIndex.BLOON_Z_INDEX);
-		setBounds(x - textureRegion.getTexture().getWidth() * SCALE / 2f, y - textureRegion.getTexture().getHeight() * SCALE / 2f, textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
+		setBounds(x - textureRegion.getRegionWidth() * SCALE / 2f, y - textureRegion.getRegionHeight() * SCALE / 2f, textureRegion.getRegionWidth() * SCALE, textureRegion.getRegionHeight() * SCALE);
 		
 		if (parent != null) {
 			parentBloonIds = new HashSet(parent.getParentBloonIds());
@@ -53,12 +54,12 @@ public class BloonActor extends RenderableActor {
 	
 	@Override
 	public float getCenterX() {
-		return getX() + textureRegion.getTexture().getWidth() * SCALE / 2f;
+		return getX() + textureRegion.getRegionWidth() * SCALE / 2f;
 	}
 	
 	@Override
 	public float getCenterY() {
-		return getY() + textureRegion.getTexture().getHeight() * SCALE / 2f;
+		return getY() + textureRegion.getRegionHeight() * SCALE / 2f;
 	}
 	
 	public float getCollisionRadius() {
@@ -85,14 +86,12 @@ public class BloonActor extends RenderableActor {
 	// Please avoid calling this method directly, instead use the BloonManager pop()
 	public BloonPoppedResult pop(int damage) {
 		BloonPoppedResult bloonPoppedResult = bloon.pop(damage);
-		textureRegion.getTexture().dispose();
 		remove();
 		return bloonPoppedResult;
 	}
 	
 	public void release() {
 		((BloonsTouhouDefense)Gdx.app.getApplicationListener()).getPlayer().decreaseHealth(BloonPoppedResult.getTotalHealthOfBloon(bloon));
-		textureRegion.getTexture().dispose();
 		remove();
 	}
 	
@@ -120,14 +119,14 @@ public class BloonActor extends RenderableActor {
 			 getY(),
 			 getCenterX() - getX(),
 			 getCenterY() - getY(),
-			 textureRegion.getTexture().getWidth() * SCALE,
-			 textureRegion.getTexture().getHeight() * SCALE,
+			 textureRegion.getRegionWidth() * SCALE,
+			 textureRegion.getRegionHeight() * SCALE,
 			 1f,
 			 1f,
 			 -rotationAngle
 			);
 		} else {
-			batch.draw(textureRegion.getTexture(), getX(), getY(), textureRegion.getTexture().getWidth() * SCALE, textureRegion.getTexture().getHeight() * SCALE);
+			batch.draw(textureRegion, getX(), getY(), textureRegion.getRegionWidth() * SCALE, textureRegion.getRegionHeight() * SCALE);
 		}
 	}
 	

@@ -20,15 +20,16 @@ public class SpellCardActor extends RenderableActor {
 	
 	public SpellCardActor(SpellCard spellCard, float x, float y) {
 		this.spellCard = spellCard;
-		textureRegion = new TextureRegion(new Texture(Gdx.files.internal(spellCard.getImageFileName())));
+		BloonsTouhouDefense app = (BloonsTouhouDefense) Gdx.app.getApplicationListener();
+		textureRegion = app.getAtlasRegion(spellCard.getImageFileName());
 		rotationAngle = 0;
 		
 		setZIndex(ZIndex.SPELL_CARD_Z_INDEX);
 		setBounds(
-		 x - textureRegion.getTexture().getWidth() / 2f,
-		 y - textureRegion.getTexture().getHeight() / 2f,
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight()
+		 x - textureRegion.getRegionWidth() / 2f,
+		 y - textureRegion.getRegionHeight() / 2f,
+		 textureRegion.getRegionWidth(),
+		 textureRegion.getRegionHeight()
 		);
 	}
 	
@@ -44,8 +45,8 @@ public class SpellCardActor extends RenderableActor {
 		 getY(),
 		 getCenterX() - getX(),
 		 getCenterY() - getY(),
-		 textureRegion.getTexture().getWidth(),
-		 textureRegion.getTexture().getHeight(),
+		 textureRegion.getRegionWidth(),
+		 textureRegion.getRegionHeight(),
 		 spellCard.getScale(),
 		 spellCard.getScale(),
 		 -rotationAngle
