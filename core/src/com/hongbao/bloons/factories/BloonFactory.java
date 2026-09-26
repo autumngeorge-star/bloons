@@ -294,8 +294,27 @@ public class BloonFactory {
 	}
 	
 	public static BloonQueue createBloonQueueFromFile(String fileName) {
-		FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
-		String fileContents = file.readString();
+		String fileContents = null;
+		if (Gdx.files != null) {
+			FileHandle file = Gdx.files.internal("bloon_queues/" + fileName);
+			if (file != null && file.exists()) {
+				fileContents = file.readString();
+			}
+		}
+		if (fileContents == null) {
+			try (java.io.InputStream is = BloonFactory.class.getClassLoader().getResourceAsStream("bloon_queues/" + fileName)) {
+				if (is != null) {
+					java.util.Scanner scanner = new java.util.Scanner(is, "UTF-8").useDelimiter("\\A");
+					if (scanner.hasNext()) {
+						fileContents = scanner.next();
+					}
+				}
+			} catch (Exception ignored) {
+			}
+		}
+		if (fileContents == null) {
+			return new BloonQueue(new ArrayList<>(), new ArrayList<>());
+		}
 		String[] lines = fileContents.split("\n");
 		long timer = 0;
 

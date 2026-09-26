@@ -27,7 +27,7 @@ public class BloonQueue {
 	
 	public Set<Bloon> getBloons() {
 		HashSet<Bloon> generatedBloons = new HashSet<>();
-		while (currentIndex < bloons.get(currentLevel).size()) {
+		while (currentIndex < bloons.get(currentLevel).size() && currentIndex < intervals.get(currentLevel).size()) {
 			if (intervals.get(currentLevel).get(currentIndex) == clock) {
 				generatedBloons.add(bloons.get(currentLevel).get(currentIndex));
 				currentIndex++;
