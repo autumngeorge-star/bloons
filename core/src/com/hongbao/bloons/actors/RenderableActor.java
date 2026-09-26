@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
+import com.hongbao.bloons.stage.GameStage;
 
 
 public abstract class RenderableActor extends Actor {
@@ -31,6 +32,9 @@ public abstract class RenderableActor extends Actor {
 	
 	public boolean setZIndex(int zIndex) {
 		this.zIndex = zIndex;
+		if (getStage() instanceof GameStage) {
+			((GameStage) getStage()).markDirty();
+		}
 		return true;
 	}
 	

@@ -28,6 +28,7 @@ import com.hongbao.bloons.entities.Girl;
 import com.hongbao.bloons.factories.GirlFactory;
 import com.hongbao.bloons.factories.MapFactory;
 import com.hongbao.bloons.helpers.ZIndex;
+import com.hongbao.bloons.stage.GameStage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 	public boolean tripleSpeed;
 	public boolean autoContinue;
 
-	private Stage stage;
+	private GameStage stage;
 	private Player player;
 	private Map map;
 	private MusicPlayer musicPlayer;
@@ -57,7 +58,7 @@ public class BloonsTouhouDefense implements ApplicationListener {
 		paused = false;
 		tripleSpeed = false;
 		autoContinue = false;
-		stage = new Stage();
+		stage = new GameStage();
 		player = new Player(MONEY, HEALTH);
 		musicPlayer = new MusicPlayer();
 		shapeRenderer = new ShapeRenderer();
@@ -536,7 +537,10 @@ public class BloonsTouhouDefense implements ApplicationListener {
 				}
 			}
 			
-			stage.getActors().sort(new SortByZIndex());
+			if (stage.isDirty()) {
+				stage.getActors().sort(SortByZIndex.INSTANCE);
+				stage.setDirty(false);
+			}
 		}
 		stage.draw();
 		
